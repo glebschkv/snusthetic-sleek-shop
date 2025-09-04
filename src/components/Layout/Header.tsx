@@ -19,17 +19,18 @@ const Header = () => {
       <div className="bg-gradient-primary text-primary-foreground text-center py-2 px-4">
         <div className="flex items-center justify-center gap-2 text-sm font-medium">
           <Shield className="h-4 w-4" />
-          <span>Free Worldwide Shipping on Orders Over $150 | 30-Day Money Back Guarantee</span>
+          <span className="hidden sm:inline">Free Worldwide Shipping on Orders Over $150 | 30-Day Money Back Guarantee</span>
+          <span className="sm:hidden">Free Shipping Over $150</span>
           <Star className="h-4 w-4 fill-current" />
         </div>
       </div>
       
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border-subtle">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <h1 className="text-2xl font-black tracking-tight uppercase">Snusthetic</h1>
+              <h1 className="text-lg sm:text-2xl font-black tracking-tight uppercase">Snusthetic</h1>
             </div>
 
             {/* Desktop Navigation */}
@@ -46,7 +47,7 @@ const Header = () => {
             </nav>
 
             {/* Search & Actions */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <div className="hidden md:block relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
@@ -56,11 +57,11 @@ const Header = () => {
                 />
               </div>
               
-              <Button variant="ghost" size="sm" className="hidden md:flex">
+              <Button variant="ghost" size="sm" className="hidden sm:flex min-w-[44px] min-h-[44px]">
                 <User className="h-5 w-5" />
               </Button>
               
-              <Button variant="ghost" size="sm" className="relative">
+              <Button variant="ghost" size="sm" className="relative min-w-[44px] min-h-[44px]">
                 <ShoppingBag className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-semibold">
                   2
@@ -71,7 +72,7 @@ const Header = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="md:hidden"
+                className="md:hidden min-w-[44px] min-h-[44px]"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -83,16 +84,32 @@ const Header = () => {
           {isMenuOpen && (
             <div className="md:hidden py-4 border-t border-border-subtle">
               <nav className="flex flex-col space-y-4">
+                <div className="sm:hidden mb-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      className="w-full pl-10 pr-4 py-3 bg-surface border border-border-subtle rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+                </div>
                 {navItems.map((item) => (
                   <a
                     key={item.name}
                     href={item.href}
-                    className="nav-link"
+                    className="nav-link py-3 text-lg min-h-[44px] flex items-center"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.name}
                   </a>
                 ))}
+                <div className="pt-4 border-t border-border-subtle">
+                  <Button variant="outline" className="w-full justify-start gap-2 min-h-[44px]">
+                    <User className="h-5 w-5" />
+                    My Account
+                  </Button>
+                </div>
               </nav>
             </div>
           )}
