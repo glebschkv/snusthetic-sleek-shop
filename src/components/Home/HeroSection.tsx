@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Star, Shield, Truck, Award } from 'lucide-react';
-import heroProduct from '@/assets/hero-product.jpg';
+const heroProduct = '/lovable-uploads/14da64e2-328f-483e-8e7c-a7f81612e8dc.png';
 
 const HeroSection = () => {
   return (
@@ -51,7 +51,7 @@ const HeroSection = () => {
 
           <div className="flex flex-col sm:flex-row gap-4">
             <Button size="lg" className="group relative overflow-hidden">
-              <span className="relative z-10">Shop Now - $149</span>
+              <span className="relative z-10">Shop Now - $100</span>
               <span className="ml-2 group-hover:translate-x-1 transition-transform relative z-10">→</span>
             </Button>
             <Button variant="outline" size="lg">
@@ -74,15 +74,15 @@ const HeroSection = () => {
             <div className="absolute inset-0 bg-gradient-primary opacity-20 rounded-lg blur-xl group-hover:opacity-30 transition-opacity"></div>
             <img 
               src={heroProduct} 
-              alt="Premium Snus Holder - The Degen Collection" 
+              alt="Premium Gold Casino Chip Snus Holder - Limited Edition" 
               className="relative z-10 w-full max-w-md mx-auto rounded-lg shadow-prominent group-hover:scale-105 transition-transform duration-500"
             />
             <div className="absolute top-4 right-4 z-20 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
               Only 12 Left
             </div>
             <div className="absolute bottom-4 left-4 z-20 bg-background/90 backdrop-blur-sm text-foreground px-3 py-2 rounded-lg text-sm">
-              <div className="font-medium">The Degen</div>
-              <div className="text-muted-foreground">Premium Black Edition</div>
+              <div className="font-medium">The Casino Gold</div>
+              <div className="text-muted-foreground">$100 Limited Edition</div>
             </div>
           </div>
         </div>
