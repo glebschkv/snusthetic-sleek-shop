@@ -1,5 +1,7 @@
 import { ShopifyProduct, ShopifyProductsResponse } from '@/types/shopify';
 
+// Shopify Storefront API Service
+
 // Replace these with your actual Shopify credentials
 const SHOPIFY_DOMAIN = import.meta.env.VITE_SHOPIFY_DOMAIN || 'your-shop.myshopify.com';
 const STOREFRONT_ACCESS_TOKEN = import.meta.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN || 'your-storefront-access-token';
