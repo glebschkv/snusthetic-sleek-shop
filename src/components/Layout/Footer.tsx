@@ -1,35 +1,72 @@
+import { Instagram, Facebook, Twitter, Youtube, Mail, Phone, MapPin } from 'lucide-react';
+
 const Footer = () => {
   return (
     <footer className="bg-surface border-t border-border-subtle">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="md:col-span-2 space-y-6">
             <h3 className="text-xl font-medium tracking-tight">Snusthetic</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Premium minimalism for the modern lifestyle. Clean design, exceptional quality.
+              Premium Swedish craftsmanship meets modern luxury. Each piece is handcrafted 
+              with passion and precision, honoring traditional techniques while embracing contemporary design.
             </p>
+            
+            {/* Contact Info */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <Mail className="h-4 w-4" />
+                <span>hello@snusthetic.com</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <Phone className="h-4 w-4" />
+                <span>+46 8 123 456 78</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4" />
+                <span>Stockholm, Sweden</span>
+              </div>
+            </div>
+            
+            {/* Social Media */}
+            <div className="flex gap-4">
+              <a href="#" className="p-2 bg-muted hover:bg-primary hover:text-primary-foreground rounded-lg transition-all">
+                <Instagram className="h-4 w-4" />
+              </a>
+              <a href="#" className="p-2 bg-muted hover:bg-primary hover:text-primary-foreground rounded-lg transition-all">
+                <Facebook className="h-4 w-4" />
+              </a>
+              <a href="#" className="p-2 bg-muted hover:bg-primary hover:text-primary-foreground rounded-lg transition-all">
+                <Twitter className="h-4 w-4" />
+              </a>
+              <a href="#" className="p-2 bg-muted hover:bg-primary hover:text-primary-foreground rounded-lg transition-all">
+                <Youtube className="h-4 w-4" />
+              </a>
+            </div>
           </div>
 
           {/* Shop */}
           <div className="space-y-4">
-            <h4 className="font-medium">Shop</h4>
+            <h4 className="font-medium">Collections</h4>
             <ul className="space-y-3">
-              <li><a href="/shop" className="text-muted-foreground hover:text-foreground transition-colors">All Products</a></li>
-              <li><a href="/shop/accessories" className="text-muted-foreground hover:text-foreground transition-colors">Accessories</a></li>
-              <li><a href="/shop/lifestyle" className="text-muted-foreground hover:text-foreground transition-colors">Lifestyle</a></li>
-              <li><a href="/shop/new" className="text-muted-foreground hover:text-foreground transition-colors">New Arrivals</a></li>
+              <li><a href="/shop" className="text-muted-foreground hover:text-primary transition-colors">All Products</a></li>
+              <li><a href="/shop/luxury" className="text-muted-foreground hover:text-primary transition-colors">Luxury Series</a></li>
+              <li><a href="/shop/limited" className="text-muted-foreground hover:text-primary transition-colors">Limited Edition</a></li>
+              <li><a href="/shop/custom" className="text-muted-foreground hover:text-primary transition-colors">Custom Orders</a></li>
+              <li><a href="/shop/accessories" className="text-muted-foreground hover:text-primary transition-colors">Accessories</a></li>
             </ul>
           </div>
 
-          {/* Support */}
+          {/* Customer Care */}
           <div className="space-y-4">
-            <h4 className="font-medium">Support</h4>
+            <h4 className="font-medium">Customer Care</h4>
             <ul className="space-y-3">
-              <li><a href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">Contact Us</a></li>
-              <li><a href="/shipping" className="text-muted-foreground hover:text-foreground transition-colors">Shipping Info</a></li>
-              <li><a href="/returns" className="text-muted-foreground hover:text-foreground transition-colors">Returns</a></li>
-              <li><a href="/faq" className="text-muted-foreground hover:text-foreground transition-colors">FAQ</a></li>
+              <li><a href="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact Us</a></li>
+              <li><a href="/shipping" className="text-muted-foreground hover:text-primary transition-colors">Shipping & Returns</a></li>
+              <li><a href="/size-guide" className="text-muted-foreground hover:text-primary transition-colors">Size Guide</a></li>
+              <li><a href="/care" className="text-muted-foreground hover:text-primary transition-colors">Care Instructions</a></li>
+              <li><a href="/warranty" className="text-muted-foreground hover:text-primary transition-colors">Warranty</a></li>
             </ul>
           </div>
 
@@ -37,28 +74,37 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-medium">Company</h4>
             <ul className="space-y-3">
-              <li><a href="/about" className="text-muted-foreground hover:text-foreground transition-colors">About</a></li>
-              <li><a href="/careers" className="text-muted-foreground hover:text-foreground transition-colors">Careers</a></li>
-              <li><a href="/press" className="text-muted-foreground hover:text-foreground transition-colors">Press</a></li>
-              <li><a href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">Privacy</a></li>
+              <li><a href="/about" className="text-muted-foreground hover:text-primary transition-colors">Our Story</a></li>
+              <li><a href="/craftsmanship" className="text-muted-foreground hover:text-primary transition-colors">Craftsmanship</a></li>
+              <li><a href="/sustainability" className="text-muted-foreground hover:text-primary transition-colors">Sustainability</a></li>
+              <li><a href="/press" className="text-muted-foreground hover:text-primary transition-colors">Press Kit</a></li>
+              <li><a href="/careers" className="text-muted-foreground hover:text-primary transition-colors">Careers</a></li>
             </ul>
           </div>
         </div>
 
         <div className="mt-16 pt-8 border-t border-border-subtle">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-muted-foreground text-sm">
-              © 2024 Snusthetic. All rights reserved.
-            </p>
-            <div className="flex space-x-6">
-              <a href="/terms" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                Terms
+            <div className="text-center md:text-left">
+              <p className="text-muted-foreground text-sm">
+                © 2024 Snusthetic AB. All rights reserved. Handcrafted in Stockholm, Sweden.
+              </p>
+              <p className="text-muted-foreground text-xs mt-1">
+                VAT Registration: SE123456789001 | Company Reg: 556123-4567
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6">
+              <a href="/terms" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                Terms of Service
               </a>
-              <a href="/privacy" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                Privacy
+              <a href="/privacy" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                Privacy Policy
               </a>
-              <a href="/cookies" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                Cookies
+              <a href="/cookies" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                Cookie Policy
+              </a>
+              <a href="/refund" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                Refund Policy
               </a>
             </div>
           </div>
