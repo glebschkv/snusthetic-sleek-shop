@@ -1,20 +1,20 @@
-import { Sparkles, Zap, Shield } from 'lucide-react';
+import { Crown, Eye, Gem } from 'lucide-react';
 
 const features = [
   {
-    icon: Sparkles,
-    title: 'Premium Quality',
-    description: 'Meticulously crafted with the finest materials and attention to every detail.'
+    icon: Crown,
+    title: 'Swedish Heritage',
+    description: 'Honoring traditional craftsmanship with premium materials and meticulous attention to detail.'
   },
   {
-    icon: Zap,
-    title: 'Thoughtful Design',
-    description: 'Every element serves a purpose, creating harmony between form and function.'
+    icon: Eye,
+    title: 'Discrete Elegance',
+    description: 'Sophisticated storage that maintains your privacy while showcasing exceptional taste.'
   },
   {
-    icon: Shield,
-    title: 'Built to Last',
-    description: 'Engineered for durability and designed to stand the test of time.'
+    icon: Gem,
+    title: 'Luxury Finishes',
+    description: 'Hand-selected materials and artisan finishes that age beautifully with time.'
   }
 ];
 
@@ -23,10 +23,10 @@ const FeatureSection = () => {
     <section className="py-24 bg-gradient-hero">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-section mb-6">Why Choose Snusthetic</h2>
+          <h2 className="text-section mb-6">The Snusthetic Difference</h2>
           <p className="text-body-large text-muted-foreground max-w-2xl mx-auto">
-            We believe in creating products that enhance your daily life through 
-            thoughtful design and uncompromising quality.
+            We honor Swedish snus culture through luxury craftsmanship, creating storage solutions 
+            that embody tradition, discretion, and unparalleled quality.
           </p>
         </div>
 

@@ -1,30 +1,30 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
-import product1 from '@/assets/product-1.jpg';
-import product2 from '@/assets/product-2.jpg';
-import product3 from '@/assets/product-3.jpg';
+import monarchHolder from '@/assets/snus-holder-monarch.jpg';
+import nationalistHolder from '@/assets/snus-holder-nationalist.jpg';
+import degenHolder from '@/assets/snus-holder-degen.jpg';
 
 const products = [
   {
     id: 1,
-    name: 'Essential Collection',
-    price: '$189',
-    image: product1,
-    description: 'Timeless design meets modern functionality'
+    name: 'The Monarch',
+    price: '$149',
+    image: monarchHolder,
+    description: 'Regal craftsmanship with premium gold finish'
   },
   {
     id: 2,
-    name: 'Premium Series',
-    price: '$299',
-    image: product2,
-    description: 'Crafted for the discerning individual'
+    name: 'The Nationalist',
+    price: '$179',
+    image: nationalistHolder,
+    description: 'Tactical olive design for the distinguished'
   },
   {
     id: 3,
-    name: 'Signature Line',
-    price: '$449',
-    image: product3,
-    description: 'The pinnacle of minimalist design'
+    name: 'The Degen',
+    price: '$199',
+    image: degenHolder,
+    description: 'Elite luxury for the true connoisseur'
   }
 ];
 
@@ -34,10 +34,10 @@ const ProductGrid = () => {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-section mb-6">Featured Collection</h2>
+          <h2 className="text-section mb-6">Premium Snus Holders</h2>
           <p className="text-body-large text-muted-foreground max-w-2xl mx-auto">
-            Discover our carefully curated selection of premium products, 
-            each designed with meticulous attention to detail and quality.
+            Handcrafted luxury storage solutions for the modern snus enthusiast. 
+            Each piece combines Swedish heritage with contemporary sophistication.
           </p>
         </div>
 
@@ -74,7 +74,7 @@ const ProductGrid = () => {
         {/* View All Button */}
         <div className="text-center">
           <Button size="lg">
-            View All Products
+            Explore Full Collection
           </Button>
         </div>
       </div>
