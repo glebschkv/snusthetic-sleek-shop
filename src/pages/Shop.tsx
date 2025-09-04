@@ -15,11 +15,8 @@ const Shop = () => {
   const { products, categories, loading, error } = useShopifyProducts();
   const { toast } = useToast();
 
-  // Check if Shopify is configured
-  const isShopifyConfigured = import.meta.env.VITE_SHOPIFY_DOMAIN && 
-    import.meta.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN &&
-    import.meta.env.VITE_SHOPIFY_DOMAIN !== 'your-shop.myshopify.com' &&
-    import.meta.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN !== 'your-storefront-access-token';
+  // Shopify is now configured with hardcoded credentials
+  const isShopifyConfigured = true;
 
   const filteredProducts = selectedCategory === 'All' 
     ? products 
