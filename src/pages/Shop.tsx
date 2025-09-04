@@ -92,10 +92,10 @@ const Shop = () => {
               {categories.map((category) => (
                 <Button
                   key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
+                  variant={selectedCategory === category ? "neutral" : "ghost"}
                   size="sm"
                   onClick={() => setSelectedCategory(category)}
-                  className={selectedCategory === category ? "btn-primary" : "btn-secondary"}
+                  className={selectedCategory === category ? "bg-sage-muted/70 text-foreground border-sage" : ""}
                 >
                   {category}
                 </Button>
@@ -110,18 +110,16 @@ const Shop = () => {
               
               <div className="flex items-center gap-2">
                 <Button
-                  variant="ghost"
+                  variant={viewMode === 'grid' ? "neutral" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode('grid')}
-                  className={viewMode === 'grid' ? 'bg-muted' : ''}
                 >
                   <Grid className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant={viewMode === 'list' ? "neutral" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className={viewMode === 'list' ? 'bg-muted' : ''}
                 >
                   <List className="h-4 w-4" />
                 </Button>
@@ -210,7 +208,7 @@ const Shop = () => {
                           ${price.toFixed(2)} {product.priceRange.minVariantPrice.currencyCode}
                         </span>
                         <Button 
-                          className="btn-primary"
+                          variant="neutral"
                           onClick={() => handleAddToCart(product)}
                           disabled={!isAvailable}
                         >
