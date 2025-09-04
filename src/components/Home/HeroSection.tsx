@@ -4,7 +4,7 @@ import heroProduct from '@/assets/hero-product.jpg';
 
 const HeroSection = () => {
   return (
-    <section className="min-h-screen flex items-center justify-center bg-background">
+    <section className="min-h-screen flex items-center justify-center hero-gradient">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Content */}
@@ -22,11 +22,11 @@ const HeroSection = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button className="btn-primary group">
+              <Button size="lg" className="group">
                 Explore Collection
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button variant="outline" className="btn-secondary">
+              <Button variant="secondary" size="lg">
                 Learn More
               </Button>
             </div>
@@ -43,8 +43,8 @@ const HeroSection = () => {
             </div>
             
             {/* Floating Badge */}
-            <div className="absolute -top-4 -right-4 bg-background border border-border-subtle rounded-full px-6 py-3 shadow-moderate">
-              <span className="text-caption">New</span>
+            <div className="absolute -top-4 -right-4 bg-gradient-accent text-accent-foreground border border-border-subtle rounded-full px-6 py-3 shadow-glow">
+              <span className="text-caption font-semibold">New</span>
             </div>
           </div>
         </div>

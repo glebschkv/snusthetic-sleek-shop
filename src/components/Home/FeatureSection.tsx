@@ -20,7 +20,7 @@ const features = [
 
 const FeatureSection = () => {
   return (
-    <section className="py-24 bg-background">
+    <section className="py-24 bg-gradient-hero">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-section mb-6">Why Choose Snusthetic</h2>
@@ -32,9 +32,9 @@ const FeatureSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {features.map((feature, index) => (
-            <div key={index} className="text-center space-y-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-surface rounded-full">
-                <feature.icon className="h-8 w-8" />
+            <div key={index} className="text-center space-y-6 group">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-sage rounded-full shadow-moderate group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
+                <feature.icon className="h-8 w-8 text-sage-foreground" />
               </div>
               
               <div className="space-y-3">

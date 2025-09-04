@@ -60,8 +60,8 @@ const ProductGrid = () => {
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-medium">{product.price}</span>
-                  <Button variant="ghost" size="sm" className="btn-ghost group">
+                  <span className="text-lg font-semibold text-accent">{product.price}</span>
+                  <Button variant="accent" size="sm" className="group">
                     View
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
@@ -73,7 +73,7 @@ const ProductGrid = () => {
 
         {/* View All Button */}
         <div className="text-center">
-          <Button className="btn-primary">
+          <Button size="lg">
             View All Products
           </Button>
         </div>
