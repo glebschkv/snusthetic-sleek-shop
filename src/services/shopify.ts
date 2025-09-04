@@ -1,8 +1,8 @@
 import { ShopifyProduct, ShopifyProductsResponse } from '@/types/shopify';
 
 // Replace these with your actual Shopify credentials
-const SHOPIFY_DOMAIN = process.env.VITE_SHOPIFY_DOMAIN || 'your-shop.myshopify.com';
-const STOREFRONT_ACCESS_TOKEN = process.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN || 'your-storefront-access-token';
+const SHOPIFY_DOMAIN = import.meta.env.VITE_SHOPIFY_DOMAIN || 'your-shop.myshopify.com';
+const STOREFRONT_ACCESS_TOKEN = import.meta.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN || 'your-storefront-access-token';
 
 const STOREFRONT_API_URL = `https://${SHOPIFY_DOMAIN}/api/2024-01/graphql.json`;
 

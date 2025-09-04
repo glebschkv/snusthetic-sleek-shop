@@ -16,10 +16,10 @@ const Shop = () => {
   const { toast } = useToast();
 
   // Check if Shopify is configured
-  const isShopifyConfigured = process.env.VITE_SHOPIFY_DOMAIN && 
-    process.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN &&
-    process.env.VITE_SHOPIFY_DOMAIN !== 'your-shop.myshopify.com' &&
-    process.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN !== 'your-storefront-access-token';
+  const isShopifyConfigured = import.meta.env.VITE_SHOPIFY_DOMAIN && 
+    import.meta.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN &&
+    import.meta.env.VITE_SHOPIFY_DOMAIN !== 'your-shop.myshopify.com' &&
+    import.meta.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN !== 'your-storefront-access-token';
 
   const filteredProducts = selectedCategory === 'All' 
     ? products 
