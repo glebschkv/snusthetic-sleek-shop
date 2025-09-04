@@ -18,19 +18,27 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				inter: ['Inter', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
+				'border-subtle': 'hsl(var(--border-subtle))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				surface: 'hsl(var(--surface))',
+				'surface-elevated': 'hsl(var(--surface-elevated))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					hover: 'hsl(var(--primary-hover))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					foreground: 'hsl(var(--secondary-foreground))',
+					hover: 'hsl(var(--secondary-hover))'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -62,6 +70,11 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				}
+			},
+			boxShadow: {
+				'subtle': 'var(--shadow-subtle)',
+				'moderate': 'var(--shadow-moderate)',
+				'prominent': 'var(--shadow-prominent)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
