@@ -67,23 +67,45 @@ const CREATE_CART_MUTATION = `
 `;
 
 const fetchGraphQL = async (query: string, variables: any = {}) => {
-  const response = await fetch(STOREFRONT_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Shopify-Storefront-Access-Token': STOREFRONT_ACCESS_TOKEN,
-    },
-    body: JSON.stringify({
-      query,
-      variables,
-    }),
-  });
+  console.log('Making request to:', STOREFRONT_API_URL);
+  console.log('Access token:', STOREFRONT_ACCESS_TOKEN);
+  console.log('Query variables:', variables);
+  
+  try {
+    const response = await fetch(STOREFRONT_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': STOREFRONT_ACCESS_TOKEN,
+      },
+      body: JSON.stringify({
+        query,
+        variables,
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('Response data:', result);
+    
+    if (result.errors) {
+      console.error('GraphQL errors:', result.errors);
+      throw new Error(`GraphQL errors: ${JSON.stringify(result.errors)}`);
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Fetch error details:', error);
+    throw error;
   }
-
-  return response.json();
 };
 
 export const shopifyService = {
