@@ -1,121 +1,74 @@
 import { useState } from 'react';
-import { Menu, X, ShoppingBag, Search, User, Star, Shield } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Menu, X, ShoppingBag, User } from 'lucide-react';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { name: 'Home', href: '/' },
     { name: 'Shop', href: '/shop' },
-    { name: 'Collections', href: '/collections' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
   ];
 
   return (
-    <>
-      {/* Promotional Banner */}
-      <div className="bg-gradient-primary text-primary-foreground text-center py-2 px-4">
-        <div className="flex items-center justify-center gap-2 text-sm font-medium">
-          <Shield className="h-4 w-4" />
-          <span className="hidden sm:inline">Free Worldwide Shipping on Orders Over $150 | 30-Day Money Back Guarantee</span>
-          <span className="sm:hidden">Free Shipping Over $150</span>
-          <Star className="h-4 w-4 fill-current" />
+    <header className="sticky top-0 z-50 bg-background border-b border-border">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <h1 className="text-xl font-bold text-foreground">METAL RIBBED</h1>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            {navItems.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+              >
+                {item.name}
+              </a>
+            ))}
+          </nav>
+
+          {/* Actions */}
+          <div className="flex items-center space-x-4">
+            <button className="p-2 text-foreground hover:text-primary transition-colors">
+              <User className="h-5 w-5" />
+            </button>
+            <button className="p-2 text-foreground hover:text-primary transition-colors">
+              <ShoppingBag className="h-5 w-5" />
+            </button>
+            
+            {/* Mobile menu button */}
+            <button 
+              className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </div>
       
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border-subtle">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
-            {/* Logo */}
-            <div className="flex-shrink-0">
-              <h1 className="text-lg sm:text-2xl font-black tracking-tight uppercase">Snusthetic</h1>
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="nav-link"
-                >
-                  {item.name}
-                </a>
-              ))}
-            </nav>
-
-            {/* Search & Actions */}
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <div className="hidden md:block relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  className="w-64 pl-10 pr-4 py-2 bg-surface border border-border-subtle rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
-              
-              <Button variant="ghost" size="sm" className="hidden sm:flex min-w-[44px] min-h-[44px]">
-                <User className="h-5 w-5" />
-              </Button>
-              
-              <Button variant="ghost" size="sm" className="relative min-w-[44px] min-h-[44px]">
-                <ShoppingBag className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-semibold">
-                  2
-                </span>
-              </Button>
-
-              {/* Mobile menu button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="md:hidden min-w-[44px] min-h-[44px]"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-border bg-background">
+          <div className="px-4 pt-2 pb-3 space-y-1">
+            {navItems.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary transition-colors"
               >
-                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-            </div>
+                {item.name}
+              </a>
+            ))}
           </div>
-
-          {/* Mobile Navigation */}
-          {isMenuOpen && (
-            <div className="md:hidden py-4 border-t border-border-subtle">
-              <nav className="flex flex-col space-y-4">
-                <div className="sm:hidden mb-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input
-                      type="text"
-                      placeholder="Search products..."
-                      className="w-full pl-10 pr-4 py-3 bg-surface border border-border-subtle rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                {navItems.map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    className="nav-link py-3 text-lg min-h-[44px] flex items-center"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.name}
-                  </a>
-                ))}
-                <div className="pt-4 border-t border-border-subtle">
-                  <Button variant="outline" className="w-full justify-start gap-2 min-h-[44px]">
-                    <User className="h-5 w-5" />
-                    My Account
-                  </Button>
-                </div>
-              </nav>
-            </div>
-          )}
         </div>
-      </header>
-    </>
+      )}
+    </header>
   );
 };
 

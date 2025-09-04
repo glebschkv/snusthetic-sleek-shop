@@ -8,32 +8,32 @@ Apple-inspired clean aesthetic with sophisticated typography and spacing
 
 @layer base {
   :root {
-    /* Core Brand Colors - Luxury Dark Theme */
-    --background: 220 15% 8%;
-    --foreground: 45 15% 95%;
+    /* Core Brand Colors - Minimalist Light Theme */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 9%;
     
     /* Surface Colors */
-    --surface: 220 12% 12%;
-    --surface-elevated: 220 10% 16%;
+    --surface: 0 0% 98%;
+    --surface-elevated: 0 0% 96%;
     
     /* Card System */
-    --card: 220 12% 12%;
-    --card-foreground: 45 15% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
     
     /* Interactive Elements - Metallic Gold */
     --primary: 45 85% 55%;
-    --primary-foreground: 220 15% 8%;
+    --primary-foreground: 0 0% 100%;
     --primary-hover: 45 90% 50%;
     --primary-glow: 45 95% 65%;
     
     /* Secondary Actions */
-    --secondary: 220 8% 20%;
-    --secondary-foreground: 45 15% 95%;
-    --secondary-hover: 220 10% 25%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
+    --secondary-hover: 0 0% 90%;
     
     /* Subtle Elements */
-    --muted: 220 10% 18%;
-    --muted-foreground: 220 5% 65%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
     
     /* Accent Colors - Olive Green */
     --accent: 120 25% 45%;
@@ -46,9 +46,9 @@ Apple-inspired clean aesthetic with sophisticated typography and spacing
     --sage-muted: 120 15% 20%;
     
     /* Borders & Inputs */
-    --border: 220 8% 25%;
-    --border-subtle: 220 6% 22%;
-    --input: 220 8% 25%;
+    --border: 0 0% 90%;
+    --border-subtle: 0 0% 85%;
+    --input: 0 0% 96%;
     --ring: 45 85% 55%;
     
     /* States */
