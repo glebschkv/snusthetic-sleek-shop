@@ -6,10 +6,29 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Helper logging function for debugging
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[SHOPIFY-API] ${step}${detailsStr}`);
+};
+
 const SHOPIFY_DOMAIN = Deno.env.get('SHOPIFY_DOMAIN');
 const STOREFRONT_ACCESS_TOKEN = Deno.env.get('SHOPIFY_STOREFRONT_ACCESS_TOKEN');
 
+// Validate environment variables
+if (!SHOPIFY_DOMAIN) {
+  console.error('[SHOPIFY-API] SHOPIFY_DOMAIN environment variable is not set');
+}
+if (!STOREFRONT_ACCESS_TOKEN) {
+  console.error('[SHOPIFY-API] SHOPIFY_STOREFRONT_ACCESS_TOKEN environment variable is not set');
+}
+
 const STOREFRONT_API_URL = `https://${SHOPIFY_DOMAIN}/api/2024-01/graphql.json`;
+logStep('Environment setup', { 
+  domain: SHOPIFY_DOMAIN, 
+  hasToken: !!STOREFRONT_ACCESS_TOKEN,
+  apiUrl: STOREFRONT_API_URL 
+});
 
 const PRODUCTS_QUERY = `
   query GetProducts($first: Int!, $query: String) {
@@ -110,58 +129,158 @@ const fetchShopifyGraphQL = async (query: string, variables: any = {}) => {
 };
 
 serve(async (req) => {
+  logStep('Function invoked', { method: req.method, url: req.url });
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    logStep('Handling CORS preflight request');
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Validate environment variables before processing
+  if (!SHOPIFY_DOMAIN || !STOREFRONT_ACCESS_TOKEN) {
+    const errorMsg = 'Missing required environment variables';
+    logStep('ERROR: Environment validation failed', { 
+      hasDomain: !!SHOPIFY_DOMAIN, 
+      hasToken: !!STOREFRONT_ACCESS_TOKEN 
+    });
+    return new Response(JSON.stringify({ 
+      error: errorMsg,
+      details: 'SHOPIFY_DOMAIN and SHOPIFY_STOREFRONT_ACCESS_TOKEN must be set'
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
   try {
-    const { action, query, variantId, quantity } = await req.json();
-
-    if (action === 'getProducts') {
-      console.log('Fetching products with query:', query);
+    logStep('Attempting to parse request body');
+    let requestBody;
+    
+    try {
+      const bodyText = await req.text();
+      logStep('Request body text received', { bodyLength: bodyText.length, bodyPreview: bodyText.substring(0, 100) });
       
-      const response = await fetchShopifyGraphQL(PRODUCTS_QUERY, {
-        first: 20,
-        query: query || '',
-      });
-
-      const products = response.data?.products.edges.map((edge: any) => edge.node) || [];
+      if (!bodyText) {
+        throw new Error('Request body is empty');
+      }
       
-      return new Response(JSON.stringify({ products }), {
+      requestBody = JSON.parse(bodyText);
+      logStep('Request body parsed successfully', requestBody);
+    } catch (parseError) {
+      logStep('ERROR: Failed to parse request body', { error: parseError.message });
+      return new Response(JSON.stringify({ 
+        error: 'Invalid JSON in request body',
+        details: parseError.message 
+      }), {
+        status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+
+    const { action, query, variantId, quantity } = requestBody;
+    logStep('Extracted request parameters', { action, query, variantId, quantity });
+
+    if (!action) {
+      logStep('ERROR: No action specified');
+      return new Response(JSON.stringify({ 
+        error: 'Missing required parameter: action',
+        validActions: ['getProducts', 'createCart']
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (action === 'getProducts') {
+      logStep('Processing getProducts action', { query });
+      
+      try {
+        const response = await fetchShopifyGraphQL(PRODUCTS_QUERY, {
+          first: 20,
+          query: query || '',
+        });
+
+        const products = response.data?.products.edges.map((edge: any) => edge.node) || [];
+        logStep('Products fetched successfully', { productCount: products.length });
+        
+        return new Response(JSON.stringify({ products }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (shopifyError) {
+        logStep('ERROR: Shopify API call failed', { error: shopifyError.message });
+        return new Response(JSON.stringify({ 
+          error: 'Failed to fetch products from Shopify',
+          details: shopifyError.message 
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
     }
 
     if (action === 'createCart') {
-      console.log('Creating cart for variant:', variantId, 'quantity:', quantity);
+      logStep('Processing createCart action', { variantId, quantity });
       
-      const response = await fetchShopifyGraphQL(CREATE_CART_MUTATION, {
-        input: {
-          lines: [
-            {
-              merchandiseId: variantId,
-              quantity: quantity || 1,
-            },
-          ],
-        },
-      });
+      if (!variantId) {
+        logStep('ERROR: Missing variantId for createCart');
+        return new Response(JSON.stringify({ 
+          error: 'Missing required parameter: variantId' 
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      
+      try {
+        const response = await fetchShopifyGraphQL(CREATE_CART_MUTATION, {
+          input: {
+            lines: [
+              {
+                merchandiseId: variantId,
+                quantity: quantity || 1,
+              },
+            ],
+          },
+        });
 
-      const checkoutUrl = response.data?.cartCreate?.cart?.checkoutUrl || null;
-      
-      return new Response(JSON.stringify({ checkoutUrl }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+        const checkoutUrl = response.data?.cartCreate?.cart?.checkoutUrl || null;
+        logStep('Cart created successfully', { checkoutUrl: !!checkoutUrl });
+        
+        return new Response(JSON.stringify({ checkoutUrl }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (shopifyError) {
+        logStep('ERROR: Shopify cart creation failed', { error: shopifyError.message });
+        return new Response(JSON.stringify({ 
+          error: 'Failed to create cart in Shopify',
+          details: shopifyError.message 
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
     }
 
-    return new Response(JSON.stringify({ error: 'Invalid action' }), {
+    logStep('ERROR: Invalid action received', { action });
+    return new Response(JSON.stringify({ 
+      error: 'Invalid action',
+      receivedAction: action,
+      validActions: ['getProducts', 'createCart']
+    }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('Error in shopify-api function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    logStep('ERROR: Unexpected error in function', { 
+      error: error.message, 
+      stack: error.stack 
+    });
+    return new Response(JSON.stringify({ 
+      error: 'Unexpected server error',
+      details: error.message 
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
