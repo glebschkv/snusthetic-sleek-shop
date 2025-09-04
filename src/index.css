@@ -179,7 +179,7 @@ Apple-inspired clean aesthetic with sophisticated typography and spacing
   
   /* Product Card */
   .product-card {
-    @apply bg-card rounded-lg overflow-hidden transition-all duration-300 hover:shadow-moderate group;
+    @apply bg-card rounded-lg overflow-hidden transition-all duration-300 hover:shadow-moderate;
   }
   
   /* Navigation */

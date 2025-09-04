@@ -44,7 +44,7 @@ const ProductGrid = () => {
         {/* Product Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {products.map((product) => (
-            <div key={product.id} className="product-card">
+            <div key={product.id} className="product-card group">
               <div className="aspect-square overflow-hidden bg-background">
                 <img
                   src={product.image}

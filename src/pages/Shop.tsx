@@ -140,7 +140,7 @@ const Shop = () => {
               : 'grid-cols-1'
           }`}>
             {filteredProducts.map((product) => (
-              <div key={product.id} className={`product-card ${
+              <div key={product.id} className={`product-card group ${
                 viewMode === 'list' ? 'flex gap-6' : ''
               }`}>
                 <div className={`${
