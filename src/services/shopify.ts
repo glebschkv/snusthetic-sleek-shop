@@ -3,7 +3,7 @@ import { ShopifyProduct, ShopifyProductsResponse } from '@/types/shopify';
 // Shopify Storefront API Service
 
 // Shopify credentials (Storefront API tokens are safe for client-side use)
-const SHOPIFY_DOMAIN = 'snusthetic-s.myshopify.com';
+const SHOPIFY_DOMAIN = 'snusthetic.myshopify.com';
 const STOREFRONT_ACCESS_TOKEN = '2728d7113f7a5cbd1a80057886d2dd18';
 
 const STOREFRONT_API_URL = `https://${SHOPIFY_DOMAIN}/api/2024-01/graphql.json`;
