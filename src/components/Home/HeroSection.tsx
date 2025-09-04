@@ -11,14 +11,17 @@ const HeroSection = () => {
           <div className="space-y-8 text-center lg:text-left">
             <div className="space-y-6">
               <h1 className="text-display">
-                Minimalism
+                Luxury Snus Storage
                 <br />
-                <span className="text-muted-foreground">Redefined</span>
+                <span className="text-primary">Refined</span>
               </h1>
               <p className="text-body-large text-muted-foreground max-w-lg">
-                Experience the perfect balance of form and function. Clean lines, 
-                premium materials, and thoughtful design for the modern lifestyle.
+                Premium craftsmanship meets discrete elegance. Our handcrafted snus holders 
+                represent the pinnacle of Swedish heritage and modern luxury.
               </p>
+              <div className="text-lg font-medium text-primary">
+                In Snusthetic We Trust
+              </div>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">

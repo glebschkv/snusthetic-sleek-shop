@@ -8,48 +8,48 @@ Apple-inspired clean aesthetic with sophisticated typography and spacing
 
 @layer base {
   :root {
-    /* Core Brand Colors - Earthy Sophistication */
-    --background: 28 15% 97%;
-    --foreground: 20 14% 15%;
+    /* Core Brand Colors - Luxury Dark Theme */
+    --background: 220 15% 8%;
+    --foreground: 45 15% 95%;
     
     /* Surface Colors */
-    --surface: 30 20% 95%;
-    --surface-elevated: 28 15% 98%;
+    --surface: 220 12% 12%;
+    --surface-elevated: 220 10% 16%;
     
     /* Card System */
-    --card: 28 15% 98%;
-    --card-foreground: 20 14% 15%;
+    --card: 220 12% 12%;
+    --card-foreground: 45 15% 95%;
     
-    /* Interactive Elements */
-    --primary: 14 45% 36%;
-    --primary-foreground: 28 15% 97%;
-    --primary-hover: 14 45% 30%;
-    --primary-glow: 14 45% 46%;
+    /* Interactive Elements - Metallic Gold */
+    --primary: 45 85% 55%;
+    --primary-foreground: 220 15% 8%;
+    --primary-hover: 45 90% 50%;
+    --primary-glow: 45 95% 65%;
     
     /* Secondary Actions */
-    --secondary: 85 20% 88%;
-    --secondary-foreground: 20 14% 15%;
-    --secondary-hover: 85 20% 82%;
+    --secondary: 220 8% 20%;
+    --secondary-foreground: 45 15% 95%;
+    --secondary-hover: 220 10% 25%;
     
     /* Subtle Elements */
-    --muted: 30 10% 90%;
-    --muted-foreground: 20 8% 45%;
+    --muted: 220 10% 18%;
+    --muted-foreground: 220 5% 65%;
     
-    /* Accent Colors - Terracotta */
-    --accent: 15 65% 65%;
-    --accent-foreground: 28 15% 97%;
-    --accent-muted: 15 35% 85%;
+    /* Accent Colors - Olive Green */
+    --accent: 120 25% 45%;
+    --accent-foreground: 45 15% 95%;
+    --accent-muted: 120 15% 25%;
     
     /* Sage Green Accents */
-    --sage: 85 20% 65%;
-    --sage-foreground: 20 14% 15%;
-    --sage-muted: 85 15% 85%;
+    --sage: 120 20% 40%;
+    --sage-foreground: 45 15% 95%;
+    --sage-muted: 120 15% 20%;
     
     /* Borders & Inputs */
-    --border: 30 8% 85%;
-    --border-subtle: 30 12% 90%;
-    --input: 30 15% 92%;
-    --ring: 14 45% 36%;
+    --border: 220 8% 25%;
+    --border-subtle: 220 6% 22%;
+    --input: 220 8% 25%;
+    --ring: 45 85% 55%;
     
     /* States */
     --destructive: 0 84% 60%;
@@ -59,19 +59,20 @@ Apple-inspired clean aesthetic with sophisticated typography and spacing
     --radius: 8px;
     --radius-sm: 4px;
     --radius-lg: 12px;
-    
+
     /* Enhanced Shadows & Gradients */
-    --shadow-subtle: 0 2px 8px 0 rgb(14 45% 36% / 0.08), 0 1px 3px -1px rgb(20 14% 15% / 0.1);
-    --shadow-moderate: 0 8px 25px -5px rgb(14 45% 36% / 0.15), 0 4px 12px -4px rgb(20 14% 15% / 0.1);
-    --shadow-prominent: 0 20px 40px -12px rgb(14 45% 36% / 0.25), 0 8px 16px -8px rgb(20 14% 15% / 0.15);
-    --shadow-glow: 0 0 20px rgb(14 45% 46% / 0.3);
+    --shadow-subtle: 0 2px 8px 0 rgb(0 0 0 / 0.15), 0 1px 3px -1px rgb(0 0 0 / 0.2);
+    --shadow-moderate: 0 8px 25px -5px rgb(0 0 0 / 0.25), 0 4px 12px -4px rgb(0 0 0 / 0.15);
+    --shadow-prominent: 0 20px 40px -12px rgb(0 0 0 / 0.35), 0 8px 16px -8px rgb(0 0 0 / 0.25);
+    --shadow-glow: 0 0 20px rgb(45 85% 55% / 0.4);
     
     /* Premium Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--surface)) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--surface)) 50%, hsl(var(--surface-elevated)) 100%);
     --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--surface-elevated)) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--accent-muted)) 100%);
     --gradient-sage: linear-gradient(135deg, hsl(var(--sage)) 0%, hsl(var(--sage-muted)) 100%);
+    --gradient-luxury: linear-gradient(135deg, hsl(220 15% 8%) 0%, hsl(220 20% 15%) 50%, hsl(220 15% 8%) 100%);
     
     /* Typography Scale */
     --font-size-xs: 0.75rem;

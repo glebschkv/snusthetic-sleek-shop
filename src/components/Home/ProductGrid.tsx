@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import monarchHolder from '@/assets/snus-holder-monarch.jpg';
 import nationalistHolder from '@/assets/snus-holder-nationalist.jpg';
-import degenHolder from '@/assets/snus-holder-degen.jpg';
+import heroProduct from '@/assets/hero-product.jpg';
 
 const products = [
   {
@@ -23,7 +23,7 @@ const products = [
     id: 3,
     name: 'The Degen',
     price: '$199',
-    image: degenHolder,
+    image: heroProduct,
     description: 'Elite luxury for the true connoisseur'
   }
 ];
