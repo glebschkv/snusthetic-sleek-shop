@@ -11,7 +11,6 @@ export const shopifyService = {
       
       const { data, error } = await supabase.functions.invoke('shopify-api', {
         body: { action: 'getProducts', query: query || '' },
-        method: 'GET',
       });
 
       if (error) {

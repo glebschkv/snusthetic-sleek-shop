@@ -116,17 +116,14 @@ serve(async (req) => {
   }
 
   try {
-    const url = new URL(req.url);
-    const action = url.searchParams.get('action');
+    const { action, query, variantId, quantity } = await req.json();
 
     if (action === 'getProducts') {
-      const query = url.searchParams.get('query') || '';
-      
       console.log('Fetching products with query:', query);
       
       const response = await fetchShopifyGraphQL(PRODUCTS_QUERY, {
         first: 20,
-        query: query,
+        query: query || '',
       });
 
       const products = response.data?.products.edges.map((edge: any) => edge.node) || [];
@@ -137,8 +134,6 @@ serve(async (req) => {
     }
 
     if (action === 'createCart') {
-      const { variantId, quantity = 1 } = await req.json();
-      
       console.log('Creating cart for variant:', variantId, 'quantity:', quantity);
       
       const response = await fetchShopifyGraphQL(CREATE_CART_MUTATION, {
@@ -146,7 +141,7 @@ serve(async (req) => {
           lines: [
             {
               merchandiseId: variantId,
-              quantity,
+              quantity: quantity || 1,
             },
           ],
         },
