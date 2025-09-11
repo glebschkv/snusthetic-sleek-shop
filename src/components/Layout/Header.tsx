@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { Menu, X, ShoppingBag, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCartContext } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { getItemCount, toggleCart } = useCartContext();
+  const { user, signOut, isAdmin } = useAuth();
   const itemCount = getItemCount();
 
   const navItems = [
@@ -41,9 +44,33 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            <button className="p-2 text-foreground hover:text-primary transition-colors">
-              <User className="h-5 w-5" />
-            </button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="p-2 text-foreground hover:text-primary transition-colors">
+                    <User className="h-5 w-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin">Admin Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={signOut}>
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/auth" className="p-2 text-foreground hover:text-primary transition-colors">
+                <User className="h-5 w-5" />
+              </Link>
+            )}
             <button 
               className="p-2 text-foreground hover:text-primary transition-colors relative"
               onClick={toggleCart}
