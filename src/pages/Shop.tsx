@@ -1,225 +1,157 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Grid, List, Loader2 } from 'lucide-react';
+import { Grid, List, Loader2, ShoppingCart } from 'lucide-react';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
-import { useShopifyProducts } from '@/hooks/useShopifyProducts';
-import { shopifyService } from '@/services/shopify';
-import { ShopifyProduct } from '@/types/shopify';
+import { useProducts } from '@/hooks/useProducts';
+import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
-import ShopifySetup from '@/components/ShopifySetup';
+import ProductCard from '@/components/Store/ProductCard';
+import CartDrawer from '@/components/Store/CartDrawer';
+import CategoryFilter from '@/components/Store/CategoryFilter';
+import { useNavigate } from 'react-router-dom';
 
 const Shop = () => {
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const { products, categories, loading, error } = useShopifyProducts();
+  const { products, categories, loading, error } = useProducts();
+  const cart = useCart();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  // Shopify is now configured with hardcoded credentials
-  const isShopifyConfigured = true;
-
-  const filteredProducts = selectedCategory === 'All' 
+  const filteredProducts = selectedCategory === 'all' 
     ? products 
-    : products.filter(product => product.productType === selectedCategory);
+    : products.filter(product => product.category?.slug === selectedCategory);
 
-  const handleAddToCart = async (product: ShopifyProduct) => {
-    const firstVariant = product.variants.edges[0]?.node;
-    
-    if (!firstVariant) {
-      toast({
-        title: "Error",
-        description: "This product has no available variants",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleAddToCart = (product: any) => {
+    cart.addItem(product);
+    toast({
+      title: "Added to cart!",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
 
-    if (!firstVariant.availableForSale) {
-      toast({
-        title: "Out of Stock",
-        description: "This product is currently out of stock",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const checkoutUrl = await shopifyService.createCart(firstVariant.id);
-      
-      if (checkoutUrl) {
-        // Open Shopify checkout in a new tab
-        window.open(checkoutUrl, '_blank');
-        toast({
-          title: "Added to Cart",
-          description: "Redirecting to secure checkout...",
-        });
-      } else {
-        throw new Error('Failed to create checkout');
-      }
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to add item to cart. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const handleCheckout = () => {
+    cart.closeCart();
+    navigate('/checkout');
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-surface">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-          <h1 className="text-hero mb-6">Shop Collection</h1>
-          <p className="text-body-large text-muted-foreground max-w-2xl mx-auto">
-            Discover our full range of premium products, each designed with meticulous 
-            attention to detail and uncompromising quality.
-          </p>
-        </div>
-      </section>
+      <main className="pt-16">
+        {/* Hero Section */}
+        <section className="bg-primary/5 py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-4">
+              SHOP COLLECTION
+            </h1>
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Premium ribbed metal snus holders for the discerning user
+            </p>
+          </div>
+        </section>
 
-      {/* Filters and Controls */}
-      <section className="py-8 border-b border-border-subtle">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            {/* Category Filters */}
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "neutral" : "ghost"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                  className={selectedCategory === category ? "bg-sage-muted/70 text-foreground border-sage" : ""}
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
-
-            {/* View Controls */}
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">
-                {filteredProducts.length} products
+        {/* Cart Button */}
+        <div className="fixed top-20 right-4 z-50">
+          <Button
+            onClick={cart.toggleCart}
+            className="rounded-full w-14 h-14 shadow-lg"
+            size="sm"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {cart.getItemCount() > 0 && (
+              <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-6 h-6 text-xs flex items-center justify-center">
+                {cart.getItemCount()}
               </span>
-              
-              <div className="flex items-center gap-2">
-                <Button
-                  variant={viewMode === 'grid' ? "neutral" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
+            )}
+          </Button>
+        </div>
+
+        {/* Content */}
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {loading ? (
+              <div className="flex items-center justify-center min-h-[400px]">
+                <Loader2 className="h-8 w-8 animate-spin" />
+              </div>
+            ) : error ? (
+              <div className="text-center py-16">
+                <p className="text-destructive text-lg">{error}</p>
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  className="mt-4"
+                  variant="outline"
                 >
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? "neutral" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                >
-                  <List className="h-4 w-4" />
+                  Try Again
                 </Button>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            ) : products.length === 0 ? (
+              <div className="text-center py-16">
+                <h3 className="text-2xl font-semibold mb-4">No products found</h3>
+                <p className="text-muted-foreground">Check back later for new products.</p>
+              </div>
+            ) : (
+              <>
+                {/* Filters and View Controls */}
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+                  {/* Category Filter */}
+                  <CategoryFilter
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    onCategoryChange={setSelectedCategory}
+                  />
 
-      {/* Products Grid */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          {!isShopifyConfigured ? (
-            <ShopifySetup />
-          ) : loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin" />
-              <span className="ml-2 text-muted-foreground">Loading products...</span>
-            </div>
-          ) : error ? (
-            <div className="text-center py-20">
-              <p className="text-destructive mb-4">{error}</p>
-              <p className="text-sm text-muted-foreground">
-                Please check your Shopify configuration in the environment variables.
-              </p>
-            </div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground">No products found in this category.</p>
-            </div>
-          ) : (
-            <div className={`grid gap-8 ${
-              viewMode === 'grid' 
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-                : 'grid-cols-1'
-            }`}>
-              {filteredProducts.map((product) => {
-                const firstImage = product.images.edges[0]?.node;
-                const price = parseFloat(product.priceRange.minVariantPrice.amount);
-                const isAvailable = product.variants.edges.some(variant => variant.node.availableForSale);
-                
-                return (
-                  <div key={product.id} className={`product-card group ${
-                    viewMode === 'list' ? 'flex gap-6' : ''
-                  }`}>
-                    <div className={`${
-                      viewMode === 'list' 
-                        ? 'w-48 h-48 flex-shrink-0' 
-                        : 'aspect-square'
-                    } overflow-hidden bg-surface`}>
-                      {firstImage ? (
-                        <img
-                          src={firstImage.url}
-                          alt={firstImage.altText || product.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <span className="text-muted-foreground">No image</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className={`p-6 space-y-4 ${
-                      viewMode === 'list' ? 'flex-1 flex flex-col justify-center' : ''
-                    }`}>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-caption text-muted-foreground">
-                            {product.productType}
-                          </span>
-                          {!isAvailable && (
-                            <span className="text-xs bg-destructive/10 text-destructive px-2 py-1 rounded">
-                              Out of Stock
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="text-xl font-medium">{product.title}</h3>
-                        <p className="text-muted-foreground line-clamp-2">
-                          {product.description.replace(/<[^>]*>/g, '')}
-                        </p>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-lg font-medium">
-                          ${price.toFixed(2)} {product.priceRange.minVariantPrice.currencyCode}
-                        </span>
-                        <Button 
-                          variant="neutral"
-                          onClick={() => handleAddToCart(product)}
-                          disabled={!isAvailable}
-                        >
-                          {isAvailable ? 'Add to Cart' : 'Out of Stock'}
-                        </Button>
-                      </div>
-                    </div>
+                  {/* View Mode Toggle */}
+                  <div className="flex gap-2">
+                    <Button
+                      variant={viewMode === 'grid' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewMode('grid')}
+                    >
+                      <Grid className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant={viewMode === 'list' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewMode('list')}
+                    >
+                      <List className="h-4 w-4" />
+                    </Button>
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </section>
+                </div>
+
+                {/* Products Grid/List */}
+                <div className={`${
+                  viewMode === 'grid' 
+                    ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' 
+                    : 'space-y-6'
+                }`}>
+                  {filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAddToCart={handleAddToCart}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+      </main>
+
+      {/* Cart Drawer */}
+      <CartDrawer
+        isOpen={cart.isOpen}
+        onClose={cart.closeCart}
+        items={cart.items}
+        onUpdateQuantity={cart.updateQuantity}
+        onRemoveItem={cart.removeItem}
+        onCheckout={handleCheckout}
+        total={cart.getTotal()}
+      />
 
       <Footer />
     </div>

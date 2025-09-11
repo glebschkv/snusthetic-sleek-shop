@@ -1,7 +1,10 @@
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 const heroImage = '/lovable-uploads/14da64e2-328f-483e-8e7c-a7f81612e8dc.png';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -26,7 +29,11 @@ const HeroSection = () => {
           </p>
           
           <div className="pt-6">
-            <Button size="lg" className="text-lg font-semibold px-12 py-6 min-h-[60px]">
+            <Button 
+              size="lg" 
+              className="text-lg font-semibold px-12 py-6 min-h-[60px]"
+              onClick={() => navigate('/shop')}
+            >
               Shop Collection
             </Button>
           </div>
