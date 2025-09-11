@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { Menu, X, ShoppingBag, User } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useCartContext } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { getItemCount, toggleCart } = useCartContext();
   const { user, signOut, isAdmin } = useAuth();
+  const location = useLocation();
   const itemCount = getItemCount();
 
   const navItems = [
@@ -35,7 +37,12 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                className={cn(
+                  "text-sm font-medium transition-colors",
+                  location.pathname === item.href 
+                    ? "text-primary font-semibold" 
+                    : "text-foreground hover:text-primary"
+                )}
               >
                 {item.name}
               </Link>
@@ -105,7 +112,12 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary transition-colors"
+                className={cn(
+                  "block px-3 py-2 text-base font-medium transition-colors",
+                  location.pathname === item.href 
+                    ? "text-primary font-semibold" 
+                    : "text-foreground hover:text-primary"
+                )}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {item.name}
