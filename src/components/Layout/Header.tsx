@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Menu, X, ShoppingBag, User } from 'lucide-react';
+import { Menu, X, ShoppingBag, User, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useCartContext } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
@@ -53,7 +54,16 @@ const Header = () => {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            {/* Admin Button - Prominent for easy access */}
+            {isAdmin && (
+              <Button asChild size="sm" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                <Link to="/admin" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Admin
+                </Link>
+              </Button>
+            )}
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -126,6 +136,16 @@ const Header = () => {
                 {item.name}
               </Link>
             ))}
+            {/* Mobile Admin Link */}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="block px-3 py-2 text-base font-medium text-primary border-l-2 border-primary bg-primary/5"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Admin Dashboard
+              </Link>
+            )}
           </div>
         </div>
       )}
