@@ -7,18 +7,35 @@ import ColorSelector from './ColorSelector';
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product, variant?: ProductVariant) => void;
+  onProductUpdate?: (updatedProduct: Product) => void;
 }
 
-const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
+const ProductCard = ({ product, onAddToCart, onProductUpdate }: ProductCardProps) => {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
     product.variants && product.variants.length > 0 ? product.variants[0] : undefined
   );
+  const [variants, setVariants] = useState<ProductVariant[]>(product.variants || []);
 
   const currentImage = selectedVariant?.image_url || product.image_url || '/placeholder.svg';
   const currentPrice = product.price + (selectedVariant?.price_adjustment || 0);
-  const hasVariants = product.variants && product.variants.length > 0;
+  const hasVariants = variants && variants.length > 0;
   const currentStock = hasVariants ? selectedVariant?.stock_quantity || 0 : product.stock_quantity;
   const isAvailable = hasVariants ? selectedVariant?.is_available : product.is_available;
+
+  const handleVariantUpdate = (updatedVariant: ProductVariant) => {
+    const updatedVariants = variants.map(v => 
+      v.id === updatedVariant.id ? updatedVariant : v
+    );
+    setVariants(updatedVariants);
+    
+    // Update the product with new variants if callback provided
+    if (onProductUpdate) {
+      onProductUpdate({
+        ...product,
+        variants: updatedVariants
+      });
+    }
+  };
 
   const handleAddToCart = () => {
     onAddToCart(product, selectedVariant);
@@ -51,9 +68,10 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
 
         {hasVariants && (
           <ColorSelector
-            variants={product.variants!}
+            variants={variants}
             selectedVariant={selectedVariant}
             onVariantChange={setSelectedVariant}
+            onVariantUpdate={handleVariantUpdate}
           />
         )}
         
