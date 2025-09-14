@@ -6,26 +6,26 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative h-screen max-h-screen flex items-center justify-center bg-background overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col justify-center h-full">
+    <section className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Hero Image with Overlay Button */}
-        <div className="relative mb-4 sm:mb-6">
+        <div className="relative mb-8 sm:mb-12">
           <img 
             src={heroImage} 
             alt="Premium ribbed metal snus holders" 
-            className="w-full max-w-3xl mx-auto max-h-[50vh] object-contain"
+            className="w-full max-w-4xl mx-auto"
           />
           {/* Tagline overlay on top of image */}
-          <div className="absolute top-4 left-4 right-4 sm:top-8 sm:left-8 sm:right-8">
-            <p className="text-lg sm:text-xl lg:text-2xl xl:text-3xl text-white font-extrabold italic tracking-wide max-w-lg">
+          <div className="absolute top-8 left-8 right-8">
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl text-white font-extrabold italic tracking-wide max-w-lg">
               BECAUSE YOUR POUCHES DESERVE BETTER
             </p>
           </div>
           {/* Shop Now button overlay */}
-          <div className="absolute inset-0 flex items-end justify-end p-4 sm:p-8">
+          <div className="absolute inset-0 flex items-end justify-end p-8">
             <Button 
               variant="outline"
-              className="text-sm sm:text-base font-semibold px-6 py-2 sm:px-8 sm:py-3 bg-transparent text-white border-2 border-white hover:bg-white hover:text-black transition-all duration-300 uppercase tracking-wider"
+              className="text-base font-semibold px-8 py-3 bg-transparent text-white border-2 border-white hover:bg-white hover:text-black transition-all duration-300 uppercase tracking-wider"
               onClick={() => navigate('/shop')}
             >
               Shop Now
@@ -34,8 +34,8 @@ const HeroSection = () => {
         </div>
         
         {/* Hero Text */}
-        <div className="space-y-2 sm:space-y-4">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight leading-none">
+        <div className="space-y-6 sm:space-y-8">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-none">
             <span className="block">IT'S METAL.</span>
             <span className="block">IT'S RIBBED.</span>
           </h1>
