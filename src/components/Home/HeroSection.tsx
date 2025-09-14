@@ -15,14 +15,13 @@ const HeroSection = () => {
             alt="Premium ribbed metal snus holders" 
             className="w-full max-w-4xl mx-auto"
           />
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-end justify-end p-8">
             <Button 
-              size="lg" 
-              variant="neutral"
-              className="text-lg font-bold px-12 py-6 min-h-[60px] bg-black/90 text-white border-black hover:bg-black hover:scale-110 backdrop-blur-sm shadow-2xl"
+              variant="outline"
+              className="text-base font-semibold px-8 py-3 bg-transparent text-white border-2 border-white hover:bg-white hover:text-black transition-all duration-300 uppercase tracking-wider"
               onClick={() => navigate('/shop')}
             >
-              Shop Collection
+              Shop Now
             </Button>
           </div>
         </div>
