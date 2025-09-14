@@ -23,11 +23,12 @@ const Shop = () => {
     ? products 
     : products.filter(product => product.category?.slug === selectedCategory);
 
-  const handleAddToCart = (product: any) => {
-    cart.addItem(product);
+  const handleAddToCart = (product: any, variant?: any) => {
+    cart.addItem(product, 1, variant);
+    const variantText = variant ? ` (${variant.color_name})` : '';
     toast({
       title: "Added to cart!",
-      description: `${product.name} has been added to your cart.`,
+      description: `${product.name}${variantText} has been added to your cart.`,
     });
   };
 

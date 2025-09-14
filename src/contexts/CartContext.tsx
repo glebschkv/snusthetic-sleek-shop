@@ -1,13 +1,13 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { useCart } from '@/hooks/useCart';
-import { Product } from '@/types/store';
+import { Product, ProductVariant } from '@/types/store';
 
 interface CartContextType {
   items: any[];
   isOpen: boolean;
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addItem: (product: Product, quantity?: number, variant?: ProductVariant) => void;
+  removeItem: (productId: string, variantId?: string) => void;
+  updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
   clearCart: () => void;
   getTotal: () => number;
   getItemCount: () => number;

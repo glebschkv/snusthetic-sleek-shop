@@ -8,8 +8,8 @@ interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   items: CartItem[];
-  onUpdateQuantity: (productId: string, quantity: number) => void;
-  onRemoveItem: (productId: string) => void;
+  onUpdateQuantity: (productId: string, quantity: number, variantId?: string) => void;
+  onRemoveItem: (productId: string, variantId?: string) => void;
   onCheckout: () => void;
   total: number;
 }
@@ -60,21 +60,38 @@ const CartDrawer = ({
         </SheetHeader>
         
         <div className="flex-1 overflow-y-auto space-y-4 py-4">
-          {items.map((item) => (
-            <div key={item.id} className="flex gap-3 p-3 bg-muted/50 rounded-lg">
-              <img
-                src={item.product.image_url || '/placeholder.svg'}
-                alt={item.product.name}
-                className="w-16 h-16 object-cover rounded"
-              />
-              
-              <div className="flex-1 space-y-2">
-                <h4 className="font-medium text-sm leading-tight">
-                  {item.product.name}
-                </h4>
-                <p className="text-sm font-semibold">
-                  {storeService.formatPrice(item.product.price, item.product.currency)}
-                </p>
+          {items.map((item) => {
+            const itemPrice = item.product.price + (item.variant?.price_adjustment || 0);
+            const displayImage = item.variant?.image_url || item.product.image_url || '/placeholder.svg';
+            
+            return (
+              <div key={item.id} className="flex gap-3 p-3 bg-muted/50 rounded-lg">
+                <img
+                  src={displayImage}
+                  alt={item.product.name}
+                  className="w-16 h-16 object-cover rounded"
+                />
+                
+                <div className="flex-1 space-y-2">
+                  <div>
+                    <h4 className="font-medium text-sm leading-tight">
+                      {item.product.name}
+                    </h4>
+                    {item.variant && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <div
+                          className="w-3 h-3 rounded-full border border-border"
+                          style={{ backgroundColor: item.variant.color_hex }}
+                        />
+                        <span className="text-xs text-muted-foreground">
+                          {item.variant.color_name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-sm font-semibold">
+                    {storeService.formatPrice(itemPrice, item.product.currency)}
+                  </p>
                 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -82,7 +99,7 @@ const CartDrawer = ({
                       size="sm"
                       variant="outline"
                       className="h-8 w-8 p-0"
-                      onClick={() => onUpdateQuantity(item.product_id, item.quantity - 1)}
+                      onClick={() => onUpdateQuantity(item.product_id, item.quantity - 1, item.variant_id)}
                     >
                       <Minus className="h-3 w-3" />
                     </Button>
@@ -93,7 +110,7 @@ const CartDrawer = ({
                       size="sm"
                       variant="outline"
                       className="h-8 w-8 p-0"
-                      onClick={() => onUpdateQuantity(item.product_id, item.quantity + 1)}
+                      onClick={() => onUpdateQuantity(item.product_id, item.quantity + 1, item.variant_id)}
                     >
                       <Plus className="h-3 w-3" />
                     </Button>
@@ -103,14 +120,15 @@ const CartDrawer = ({
                     size="sm"
                     variant="ghost"
                     className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                    onClick={() => onRemoveItem(item.product_id)}
+                    onClick={() => onRemoveItem(item.product_id, item.variant_id)}
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
                 </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         
         <div className="border-t pt-4 space-y-4">

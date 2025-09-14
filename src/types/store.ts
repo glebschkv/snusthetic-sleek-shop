@@ -6,6 +6,19 @@ export interface Category {
   created_at: string;
 }
 
+export interface ProductVariant {
+  id: string;
+  product_id: string;
+  color_name: string;
+  color_hex: string;
+  image_url?: string;
+  stock_quantity: number;
+  price_adjustment: number;
+  is_available: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -19,13 +32,16 @@ export interface Product {
   created_at: string;
   updated_at: string;
   category?: Category;
+  variants?: ProductVariant[];
 }
 
 export interface CartItem {
   id: string;
   product_id: string;
+  variant_id?: string;
   quantity: number;
   product: Product;
+  variant?: ProductVariant;
 }
 
 export interface Order {

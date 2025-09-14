@@ -14,6 +14,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Plus, Edit, Trash2, Package, Users, ShoppingCart, Tags } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import ProductVariantForm from '@/components/Admin/ProductVariantForm';
+import { ProductVariant } from '@/types/store';
 
 interface Product {
   id: string;
@@ -27,6 +29,7 @@ interface Product {
   is_available: boolean;
   created_at: string;
   category?: { name: string };
+  variants?: ProductVariant[];
 }
 
 interface Category {
@@ -59,6 +62,7 @@ const AdminDashboard = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [showProductDialog, setShowProductDialog] = useState(false);
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
+  const [productVariants, setProductVariants] = useState<ProductVariant[]>([]);
   
   const [productForm, setProductForm] = useState({
     name: '',
@@ -100,7 +104,7 @@ const AdminDashboard = () => {
       setLoading(true);
       
       const [productsRes, categoriesRes, ordersRes] = await Promise.all([
-        supabase.from('products').select('*, category:categories(name)').order('created_at', { ascending: false }),
+        supabase.from('products').select('*, category:categories(name), variants:product_variants(*)').order('created_at', { ascending: false }),
         supabase.from('categories').select('*').order('name'),
         supabase.from('orders').select('*').order('created_at', { ascending: false }),
       ]);
@@ -177,6 +181,7 @@ const AdminDashboard = () => {
 
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
+    setProductVariants(product.variants || []);
     setProductForm({
       name: product.name,
       description: product.description || '',
@@ -423,6 +428,14 @@ const AdminDashboard = () => {
                             placeholder="/src/assets/product-image.jpg"
                           />
                         </div>
+
+                        {editingProduct && (
+                          <ProductVariantForm
+                            productId={editingProduct.id}
+                            variants={productVariants}
+                            onVariantsChange={setProductVariants}
+                          />
+                        )}
                         
                         <DialogFooter>
                           <Button type="submit">

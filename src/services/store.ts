@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Product, Category, CartItem, Order, CheckoutData } from '@/types/store';
+import { Product, Category, CartItem, Order, CheckoutData, ProductVariant } from '@/types/store';
 
 export const storeService = {
   async getProducts(): Promise<Product[]> {
@@ -8,7 +8,8 @@ export const storeService = {
         .from('products')
         .select(`
           *,
-          category:categories(*)
+          category:categories(*),
+          variants:product_variants(*)
         `)
         .eq('is_available', true)
         .order('created_at', { ascending: false });
@@ -54,7 +55,8 @@ export const storeService = {
         .from('products')
         .select(`
           *,
-          category:categories!inner(*)
+          category:categories!inner(*),
+          variants:product_variants(*)
         `)
         .eq('categories.slug', categorySlug)
         .eq('is_available', true)
@@ -69,6 +71,66 @@ export const storeService = {
     } catch (error) {
       console.error('Error fetching products by category:', error);
       return [];
+    }
+  },
+
+  async createProductVariant(variant: Omit<ProductVariant, 'id' | 'created_at' | 'updated_at'>): Promise<ProductVariant | null> {
+    try {
+      const { data, error } = await supabase
+        .from('product_variants')
+        .insert(variant)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating product variant:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error creating product variant:', error);
+      return null;
+    }
+  },
+
+  async updateProductVariant(id: string, variant: Partial<ProductVariant>): Promise<ProductVariant | null> {
+    try {
+      const { data, error } = await supabase
+        .from('product_variants')
+        .update(variant)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating product variant:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error updating product variant:', error);
+      return null;
+    }
+  },
+
+  async deleteProductVariant(id: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('product_variants')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting product variant:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error deleting product variant:', error);
+      return false;
     }
   },
 
