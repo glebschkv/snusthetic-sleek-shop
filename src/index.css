@@ -150,6 +150,12 @@ Apple-inspired clean aesthetic with sophisticated typography and spacing
   body {
     @apply bg-background text-foreground font-inter antialiased;
     font-feature-settings: 'cv03', 'cv04', 'cv11';
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
   }
   
   /* Typography Hierarchy */
