@@ -115,10 +115,10 @@ export default {
 				},
 				'scroll-right': {
 					'0%': {
-						transform: 'translateX(-100%)'
+						transform: 'translateX(0%)'
 					},
 					'100%': {
-						transform: 'translateX(100%)'
+						transform: 'translateX(-100%)'
 					}
 				},
 				'slide-down': {
@@ -135,7 +135,7 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'scroll-right': 'scroll-right 20s linear infinite',
+				'scroll-right': 'scroll-right 25s linear infinite',
 				'slide-down': 'slide-down 0.3s ease-out'
 			},
 			scale: {
