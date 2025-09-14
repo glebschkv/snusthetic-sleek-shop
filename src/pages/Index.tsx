@@ -1,3 +1,4 @@
+import AdminPromoter from '@/components/AdminPromoter';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
 import HeroSection from '@/components/Home/HeroSection';
@@ -10,8 +11,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main>
-        <HeroSection />
+    <main>
+      <AdminPromoter />
+      <HeroSection />
         <ProductGrid />
         <TrustSection />
         <FeatureSection />

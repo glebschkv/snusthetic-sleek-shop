@@ -19,3 +19,6 @@ enable_sms_confirmations = false
 
 [functions.shopify-api]
 verify_jwt = false
+
+[functions.promote-admin]
+verify_jwt = false
