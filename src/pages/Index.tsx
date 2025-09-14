@@ -12,7 +12,7 @@ const Index = () => {
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Header />
       <PromoBanner />
-    <main>
+    <main className="space-y-0">
       <HeroSection />
         <ProductGrid />
         <TrustSection />
