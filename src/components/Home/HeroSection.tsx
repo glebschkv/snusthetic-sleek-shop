@@ -17,7 +17,7 @@ const HeroSection = () => {
           />
           {/* Tagline overlay on top of image */}
           <div className="absolute top-8 left-8 right-8">
-            <p className="text-lg sm:text-xl lg:text-2xl text-white font-medium max-w-lg">
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl text-white font-extrabold italic tracking-wide max-w-lg">
               BECAUSE YOUR POUCHES DESERVE BETTER
             </p>
           </div>
