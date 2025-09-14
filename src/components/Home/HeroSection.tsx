@@ -6,7 +6,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden -mt-4">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Hero Image with Overlay Button */}
         <div className="relative mb-8 sm:mb-12">
