@@ -1,4 +1,3 @@
-import AdminPromoter from '@/components/AdminPromoter';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
 import HeroSection from '@/components/Home/HeroSection';
@@ -14,7 +13,6 @@ const Index = () => {
       <Header />
       <PromoBanner />
     <main>
-      <AdminPromoter />
       <HeroSection />
         <ProductGrid />
         <TrustSection />
