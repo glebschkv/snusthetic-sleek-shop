@@ -11,8 +11,8 @@ import PromoBanner from '@/components/Layout/PromoBanner';
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <PromoBanner />
       <Header />
+      <PromoBanner />
     <main>
       <AdminPromoter />
       <HeroSection />
