@@ -14,9 +14,9 @@ const PromoBanner = () => {
 
   return (
     <div className="relative bg-foreground text-background py-2 overflow-hidden animate-slide-down">
-      <div className="relative flex items-center justify-center overflow-hidden w-full">
+      <div className="relative flex items-center justify-center overflow-hidden w-full max-w-full">
         {/* Scrolling text container */}
-        <div className="flex whitespace-nowrap animate-scroll-right">
+        <div className="flex whitespace-nowrap animate-scroll-right w-max no-scrollbar">
           <span className={`inline-block px-8 font-medium ${isMobile ? 'text-xs' : 'text-sm'}`}>
             {displayText}
           </span>

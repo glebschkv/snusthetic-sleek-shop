@@ -233,4 +233,14 @@ Apple-inspired clean aesthetic with sophisticated typography and spacing
                 radial-gradient(circle at 80% 20%, hsl(var(--sage-muted) / 0.1) 0%, transparent 50%);
     pointer-events: none;
   }
-}
+  }
+
+  /* Hide scrollbars */
+  .no-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
