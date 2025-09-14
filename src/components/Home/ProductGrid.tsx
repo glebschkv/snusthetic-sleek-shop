@@ -5,6 +5,7 @@ import { useCartContext } from '@/contexts/CartContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import { getImageUrl } from '@/utils/imageUtils';
 
 const ProductGrid = () => {
   const { products, loading, error } = useProducts();
@@ -71,14 +72,14 @@ const ProductGrid = () => {
             <div key={product.id} className="group">
               <div className="aspect-square overflow-hidden bg-surface">
                 <img
-                  src={product.image_url ? (product.image_url.startsWith('src/') ? `/${product.image_url}` : product.image_url) : '/placeholder.svg'}
+                  src={getImageUrl(product.image_url)}
+                  alt={`${product.name} - Premium Snus Holder`}
                   loading="lazy"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
                     console.error('Image failed to load:', product.image_url);
                     e.currentTarget.src = '/placeholder.svg';
                   }}
-                  alt={`${product.name} - Premium Snus Holder`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
               

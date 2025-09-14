@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Product, ProductVariant } from '@/types/store';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import ColorSelector from './ColorSelector';
+import { getImageUrl } from '@/utils/imageUtils';
 
 interface ProductCardProps {
   product: Product;
@@ -17,12 +18,7 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate }: ProductCardProps
   );
   const [variants, setVariants] = useState<ProductVariant[]>(product.variants || []);
 
-  const currentImage = (() => {
-    const imageUrl = selectedVariant?.image_url || product.image_url;
-    if (!imageUrl) return '/placeholder.svg';
-    // Fix URL format for deployed assets
-    return imageUrl.startsWith('src/') ? `/${imageUrl}` : imageUrl;
-  })();
+  const currentImage = getImageUrl(selectedVariant?.image_url || product.image_url);
   const currentPrice = product.price + (selectedVariant?.price_adjustment || 0);
   const hasVariants = variants && variants.length > 0;
   const currentStock = hasVariants ? selectedVariant?.stock_quantity || 0 : product.stock_quantity;
