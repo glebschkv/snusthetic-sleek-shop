@@ -15,6 +15,13 @@ const HeroSection = () => {
             alt="Premium ribbed metal snus holders" 
             className="w-full max-w-4xl mx-auto"
           />
+          {/* Tagline overlay on top of image */}
+          <div className="absolute top-8 left-8 right-8">
+            <p className="text-lg sm:text-xl lg:text-2xl text-white font-medium max-w-lg">
+              BECAUSE YOUR POUCHES DESERVE BETTER
+            </p>
+          </div>
+          {/* Shop Now button overlay */}
           <div className="absolute inset-0 flex items-end justify-end p-8">
             <Button 
               variant="outline"
@@ -32,10 +39,6 @@ const HeroSection = () => {
             <span className="block">IT'S METAL.</span>
             <span className="block">IT'S RIBBED.</span>
           </h1>
-          
-          <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground font-medium max-w-2xl mx-auto">
-            BECAUSE YOUR POUCHES DESERVE BETTER
-          </p>
         </div>
       </div>
     </section>
