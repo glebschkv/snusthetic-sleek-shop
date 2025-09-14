@@ -8,13 +8,23 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Hero Image */}
-        <div className="mb-8 sm:mb-12">
+        {/* Hero Image with Overlay Button */}
+        <div className="relative mb-8 sm:mb-12">
           <img 
             src={heroImage} 
             alt="Premium ribbed metal snus holders" 
             className="w-full max-w-4xl mx-auto"
           />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Button 
+              size="lg" 
+              variant="neutral"
+              className="text-lg font-bold px-12 py-6 min-h-[60px] bg-black/90 text-white border-black hover:bg-black hover:scale-110 backdrop-blur-sm shadow-2xl"
+              onClick={() => navigate('/shop')}
+            >
+              Shop Collection
+            </Button>
+          </div>
         </div>
         
         {/* Hero Text */}
@@ -27,16 +37,6 @@ const HeroSection = () => {
           <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground font-medium max-w-2xl mx-auto">
             BECAUSE YOUR POUCHES DESERVE BETTER
           </p>
-          
-          <div className="pt-6">
-            <Button 
-              size="lg" 
-              className="text-lg font-semibold px-12 py-6 min-h-[60px]"
-              onClick={() => navigate('/shop')}
-            >
-              Shop Collection
-            </Button>
-          </div>
         </div>
       </div>
     </section>
