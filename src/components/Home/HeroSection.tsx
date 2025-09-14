@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-const heroImage = '/lovable-uploads/14da64e2-328f-483e-8e7c-a7f81612e8dc.png';
+import heroImage from '@/assets/Minamilist(GREEN).jpeg';
 
 const HeroSection = () => {
   const navigate = useNavigate();
