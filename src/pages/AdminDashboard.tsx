@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Plus, Edit, Trash2, Package, Users, ShoppingCart } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, Package, Users, ShoppingCart, Tags } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -34,6 +34,7 @@ interface Category {
   name: string;
   slug: string;
   description?: string;
+  created_at: string;
 }
 
 interface Order {
@@ -55,7 +56,9 @@ const AdminDashboard = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [showProductDialog, setShowProductDialog] = useState(false);
+  const [showCategoryDialog, setShowCategoryDialog] = useState(false);
   
   const [productForm, setProductForm] = useState({
     name: '',
@@ -65,6 +68,12 @@ const AdminDashboard = () => {
     image_url: '',
     stock_quantity: '',
     is_available: true,
+  });
+
+  const [categoryForm, setCategoryForm] = useState({
+    name: '',
+    description: '',
+    slug: '',
   });
 
   useEffect(() => {
@@ -206,6 +215,89 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const categoryData = {
+        name: categoryForm.name,
+        description: categoryForm.description || null,
+        slug: categoryForm.slug || categoryForm.name.toLowerCase().replace(/\s+/g, '-'),
+      };
+
+      let result;
+      if (editingCategory) {
+        result = await supabase
+          .from('categories')
+          .update(categoryData)
+          .eq('id', editingCategory.id);
+      } else {
+        result = await supabase
+          .from('categories')
+          .insert([categoryData]);
+      }
+
+      if (result.error) throw result.error;
+
+      toast({
+        title: editingCategory ? "Category updated" : "Category created",
+        description: `${categoryForm.name} has been ${editingCategory ? 'updated' : 'created'} successfully.`,
+      });
+
+      setShowCategoryDialog(false);
+      setEditingCategory(null);
+      setCategoryForm({
+        name: '',
+        description: '',
+        slug: '',
+      });
+      
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `Failed to ${editingCategory ? 'update' : 'create'} category.`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category);
+    setCategoryForm({
+      name: category.name,
+      description: category.description || '',
+      slug: category.slug,
+    });
+    setShowCategoryDialog(true);
+  };
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    if (!confirm('Are you sure you want to delete this category?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', categoryId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Category deleted",
+        description: "Category has been deleted successfully.",
+      });
+      
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete category.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -227,6 +319,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Products
+            </TabsTrigger>
+            <TabsTrigger value="categories" className="flex items-center gap-2">
+              <Tags className="h-4 w-4" />
+              Categories
             </TabsTrigger>
             <TabsTrigger value="orders" className="flex items-center gap-2">
               <ShoppingCart className="h-4 w-4" />
@@ -375,6 +471,116 @@ const AdminDashboard = () => {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleDeleteProduct(product.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="categories">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Categories</CardTitle>
+                    <CardDescription>Manage your product categories</CardDescription>
+                  </div>
+                  <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Category
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-lg">
+                      <DialogHeader>
+                        <DialogTitle>{editingCategory ? 'Edit Category' : 'Add New Category'}</DialogTitle>
+                        <DialogDescription>
+                          {editingCategory ? 'Update the category details below.' : 'Fill in the category details below.'}
+                        </DialogDescription>
+                      </DialogHeader>
+                      
+                      <form onSubmit={handleCategorySubmit} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="category-name">Category Name</Label>
+                          <Input
+                            id="category-name"
+                            value={categoryForm.name}
+                            onChange={(e) => setCategoryForm(prev => ({ ...prev, name: e.target.value }))}
+                            required
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="category-slug">Slug</Label>
+                          <Input
+                            id="category-slug"
+                            value={categoryForm.slug}
+                            onChange={(e) => setCategoryForm(prev => ({ ...prev, slug: e.target.value }))}
+                            placeholder="auto-generated from name if empty"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="category-description">Description</Label>
+                          <Textarea
+                            id="category-description"
+                            value={categoryForm.description}
+                            onChange={(e) => setCategoryForm(prev => ({ ...prev, description: e.target.value }))}
+                            placeholder="Optional category description"
+                          />
+                        </div>
+                        
+                        <DialogFooter>
+                          <Button type="submit">
+                            {editingCategory ? 'Update Category' : 'Create Category'}
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Slug</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {categories.map((category) => (
+                      <TableRow key={category.id}>
+                        <TableCell className="font-medium">{category.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{category.slug}</Badge>
+                        </TableCell>
+                        <TableCell>{category.description || '-'}</TableCell>
+                        <TableCell>{new Date(category.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleEditCategory(category)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDeleteCategory(category.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
