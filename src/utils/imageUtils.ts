@@ -1,10 +1,10 @@
 // Image utility functions for handling asset URLs in production
 
 // Import all product images as ES6 modules
-import casinoSilver from '../assets/casino-silver.jpg.jpeg';
-import casinoGold from '../assets/casino-gold.jpg.jpeg';
+import casinoSilver from '../assets/casino-silver.jpg_1.jpeg';
+import casinoGold from '../assets/casino-gold.jpg_5.jpeg';
 import churchillSilver from '../assets/churchill-silver.jpg_1.jpeg';
-import churchillGreen from '../assets/churchill-green.jpg.jpeg';
+import churchillGreen from '../assets/churchill-green.jpg_2.jpeg';
 import blankGreen from '../assets/blank-green.jpg.jpeg';
 import blankSilver from '../assets/blank-silver.jpg.jpeg';
 import escobarGreen from '../assets/escobar-green.jpg.jpeg';
