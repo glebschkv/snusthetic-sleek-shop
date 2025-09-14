@@ -8,8 +8,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { cn } from '@/lib/utils';
 
 const Header = () => {
+  console.log('Header component rendering');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  console.log('About to call useCartContext');
   const { getItemCount, toggleCart } = useCartContext();
+  console.log('useCartContext returned successfully');
   const { user, signOut, isAdmin } = useAuth();
   const location = useLocation();
   const itemCount = getItemCount();

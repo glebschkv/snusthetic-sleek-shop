@@ -20,7 +20,9 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
+  console.log('CartProvider rendering');
   const cartHook = useCart();
+  console.log('CartProvider cartHook:', cartHook);
   
   return (
     <CartContext.Provider value={cartHook}>
@@ -30,8 +32,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useCartContext = () => {
+  console.log('useCartContext called');
   const context = useContext(CartContext);
+  console.log('useCartContext context:', context);
   if (context === undefined) {
+    console.error('useCartContext: context is undefined');
     throw new Error('useCartContext must be used within a CartProvider');
   }
   return context;
