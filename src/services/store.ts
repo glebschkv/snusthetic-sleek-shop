@@ -136,9 +136,13 @@ export const storeService = {
 
   async createOrder(orderData: CheckoutData): Promise<Order | null> {
     try {
+      // Get current user ID if authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { data, error } = await supabase
         .from('orders')
         .insert({
+          user_id: user?.id || null, // Set user_id for authenticated users, null for guests
           total_amount: orderData.total,
           customer_email: orderData.customer_email,
           customer_name: orderData.customer_name,
