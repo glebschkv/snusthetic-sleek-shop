@@ -35,7 +35,7 @@ const HeroSection = () => {
         
         {/* Hero Text */}
         <div className="space-y-6 sm:space-y-8">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-none">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-impact font-black tracking-tight leading-none">
             <span className="block">IT'S METAL.</span>
             <span className="block">IT'S RIBBED.</span>
           </h1>
