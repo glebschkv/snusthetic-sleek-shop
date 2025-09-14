@@ -84,7 +84,9 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate }: ProductCardProps
           <Button
             onClick={handleAddToCart}
             disabled={!isAvailable || currentStock <= 0}
-            className="min-w-[100px]"
+            variant="outline"
+            size="sm"
+            className="min-w-[100px] text-xs"
           >
             {currentStock <= 0 ? 'Out of Stock' : 'Add to Cart'}
           </Button>

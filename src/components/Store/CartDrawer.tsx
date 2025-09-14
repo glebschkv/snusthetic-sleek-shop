@@ -41,7 +41,7 @@ const CartDrawer = ({
               <h3 className="text-lg font-semibold">Your cart is empty</h3>
               <p className="text-muted-foreground">Add some products to get started</p>
             </div>
-            <Button onClick={onClose} variant="outline">
+            <Button onClick={onClose} variant="secondary">
               Continue Shopping
             </Button>
           </div>
@@ -98,7 +98,7 @@ const CartDrawer = ({
                   <div className="flex items-center gap-2">
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="ghost"
                       className="h-8 w-8 p-0"
                       onClick={() => onUpdateQuantity(item.product_id, item.quantity - 1, item.variant_id)}
                     >
@@ -109,7 +109,7 @@ const CartDrawer = ({
                     </span>
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="ghost"
                       className="h-8 w-8 p-0"
                       onClick={() => onUpdateQuantity(item.product_id, item.quantity + 1, item.variant_id)}
                     >
@@ -139,10 +139,10 @@ const CartDrawer = ({
           </div>
           
           <div className="space-y-2">
-            <Button onClick={onCheckout} className="w-full" size="lg">
+            <Button onClick={onCheckout} className="w-full" size="lg" variant="outline">
               Proceed to Checkout
             </Button>
-            <Button onClick={onClose} variant="outline" className="w-full">
+            <Button onClick={onClose} variant="secondary" className="w-full">
               Continue Shopping
             </Button>
           </div>

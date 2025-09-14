@@ -5,22 +5,22 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 uppercase tracking-wider",
   {
     variants: {
       variant: {
-        default: "bg-gradient-primary text-primary-foreground hover:shadow-glow hover:scale-105 shadow-moderate",
+        default: "bg-transparent text-foreground border-2 border-foreground hover:bg-foreground hover:text-background",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:scale-105",
+          "bg-transparent text-destructive border-2 border-destructive hover:bg-destructive hover:text-destructive-foreground",
         outline:
-          "border border-border-subtle bg-background hover:bg-sage-muted hover:scale-105 hover:shadow-subtle",
+          "bg-transparent text-foreground border-2 border-border hover:bg-foreground hover:text-background",
         secondary:
-          "bg-gradient-sage text-sage-foreground hover:shadow-moderate hover:scale-105 border border-border-subtle",
+          "bg-transparent text-muted-foreground border border-border hover:bg-muted hover:text-foreground",
         accent:
-          "bg-gradient-accent text-accent-foreground hover:shadow-moderate hover:scale-105",
+          "bg-transparent text-primary border-2 border-primary hover:bg-primary hover:text-primary-foreground",
         neutral:
-          "bg-gray-100 text-gray-900 border border-gray-200 hover:bg-gray-200 hover:scale-[1.02] hover:shadow-sm transition-all duration-200 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:hover:bg-gray-700",
-        ghost: "hover:bg-sage-muted hover:text-foreground hover:scale-105",
+          "bg-transparent text-foreground border border-border hover:bg-muted hover:text-foreground",
+        ghost: "bg-transparent text-foreground hover:bg-muted hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

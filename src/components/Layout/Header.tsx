@@ -61,7 +61,7 @@ const Header = () => {
             
             {/* Admin Button - Prominent for easy access */}
             {isAdmin && (
-              <Button asChild size="sm" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+              <Button asChild size="sm" variant="accent" className="text-xs">
                 <Link to="/admin" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
                   Admin
