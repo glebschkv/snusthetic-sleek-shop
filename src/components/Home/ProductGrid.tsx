@@ -71,7 +71,12 @@ const ProductGrid = () => {
             <div key={product.id} className="group">
               <div className="aspect-square overflow-hidden bg-surface">
                 <img
-                  src={product.image_url?.replace('/src/assets/', '/src/assets/') || '/placeholder.svg'}
+                  src={product.image_url ? (product.image_url.startsWith('src/') ? `/${product.image_url}` : product.image_url) : '/placeholder.svg'}
+                  loading="lazy"
+                  onError={(e) => {
+                    console.error('Image failed to load:', product.image_url);
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
                   alt={`${product.name} - Premium Snus Holder`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />

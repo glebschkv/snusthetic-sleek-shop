@@ -17,7 +17,12 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate }: ProductCardProps
   );
   const [variants, setVariants] = useState<ProductVariant[]>(product.variants || []);
 
-  const currentImage = selectedVariant?.image_url || product.image_url || '/placeholder.svg';
+  const currentImage = (() => {
+    const imageUrl = selectedVariant?.image_url || product.image_url;
+    if (!imageUrl) return '/placeholder.svg';
+    // Fix URL format for deployed assets
+    return imageUrl.startsWith('src/') ? `/${imageUrl}` : imageUrl;
+  })();
   const currentPrice = product.price + (selectedVariant?.price_adjustment || 0);
   const hasVariants = variants && variants.length > 0;
   const currentStock = hasVariants ? selectedVariant?.stock_quantity || 0 : product.stock_quantity;
@@ -48,8 +53,10 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate }: ProductCardProps
         <img
           src={currentImage}
           alt={product.name}
+          loading="lazy"
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
+            console.error('Image failed to load:', currentImage);
             e.currentTarget.src = '/placeholder.svg';
           }}
         />
