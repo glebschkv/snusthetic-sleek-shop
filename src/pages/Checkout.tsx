@@ -8,6 +8,7 @@ import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
 import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { storeService } from '@/services/store';
 import { CheckoutData } from '@/types/store';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +18,7 @@ const Checkout = () => {
   const cart = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -203,9 +205,9 @@ const Checkout = () => {
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Processing...
                       </>
-                    ) : (
-                      `Place Order - ${cart.formatTotal()}`
-                    )}
+                     ) : (
+                       `Place Order - ${formatPrice(cart.getTotal())}`
+                     )}
                   </Button>
                 </form>
               </CardContent>
@@ -230,31 +232,31 @@ const Checkout = () => {
                         <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">
-                        {storeService.formatPrice(item.product.price * item.quantity)}
-                      </p>
-                    </div>
+                     <div className="text-right">
+                       <p className="font-medium">
+                         {formatPrice(item.product.price * item.quantity)}
+                       </p>
+                     </div>
                   </div>
                 ))}
 
                 <Separator />
 
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Subtotal</span>
-                    <span>{cart.formatTotal()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Shipping</span>
-                    <span>Free</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between text-lg font-semibold">
-                    <span>Total</span>
-                    <span>{cart.formatTotal()}</span>
-                  </div>
-                </div>
+                 <div className="space-y-2">
+                   <div className="flex justify-between">
+                     <span>Subtotal</span>
+                     <span>{formatPrice(cart.getTotal())}</span>
+                   </div>
+                   <div className="flex justify-between">
+                     <span>Shipping</span>
+                     <span>Free</span>
+                   </div>
+                   <Separator />
+                   <div className="flex justify-between text-lg font-semibold">
+                     <span>Total</span>
+                     <span>{formatPrice(cart.getTotal())}</span>
+                   </div>
+                 </div>
               </CardContent>
             </Card>
           </div>

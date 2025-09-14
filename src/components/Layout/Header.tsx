@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import CurrencySwitcher from './CurrencySwitcher';
 
 const Header = () => {
   console.log('Header component rendering');
@@ -55,6 +56,9 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center space-x-3">
+            {/* Currency Switcher */}
+            <CurrencySwitcher />
+            
             {/* Admin Button - Prominent for easy access */}
             {isAdmin && (
               <Button asChild size="sm" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">

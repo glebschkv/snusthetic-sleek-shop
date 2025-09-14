@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { CartItem } from '@/types/store';
-import { storeService } from '@/services/store';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 
 interface CartDrawerProps {
@@ -23,6 +23,7 @@ const CartDrawer = ({
   onCheckout,
   total
 }: CartDrawerProps) => {
+  const { formatPrice } = useCurrency();
   if (items.length === 0) {
     return (
       <Sheet open={isOpen} onOpenChange={onClose}>
@@ -90,7 +91,7 @@ const CartDrawer = ({
                     )}
                   </div>
                   <p className="text-sm font-semibold">
-                    {storeService.formatPrice(itemPrice, item.product.currency)}
+                    {formatPrice(itemPrice)}
                   </p>
                 
                 <div className="flex items-center justify-between">
@@ -134,7 +135,7 @@ const CartDrawer = ({
         <div className="border-t pt-4 space-y-4">
           <div className="flex justify-between items-center text-lg font-semibold">
             <span>Total:</span>
-            <span>{storeService.formatPrice(total)}</span>
+            <span>{formatPrice(total)}</span>
           </div>
           
           <div className="space-y-2">

@@ -6,10 +6,12 @@ import ProductGrid from '@/components/Home/ProductGrid';
 import FeatureSection from '@/components/Home/FeatureSection';
 import TrustSection from '@/components/Home/TrustSection';
 import NewsletterSection from '@/components/Home/NewsletterSection';
+import PromoBanner from '@/components/Layout/PromoBanner';
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <PromoBanner />
       <Header />
     <main>
       <AdminPromoter />

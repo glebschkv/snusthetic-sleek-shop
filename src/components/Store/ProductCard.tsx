@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Product, ProductVariant } from '@/types/store';
-import { storeService } from '@/services/store';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import ColorSelector from './ColorSelector';
 
 interface ProductCardProps {
@@ -11,6 +11,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, onAddToCart, onProductUpdate }: ProductCardProps) => {
+  const { formatPrice } = useCurrency();
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
     product.variants && product.variants.length > 0 ? product.variants[0] : undefined
   );
@@ -77,7 +78,7 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate }: ProductCardProps
         
         <div className="flex items-center justify-between">
           <span className="text-lg font-bold text-foreground">
-            {storeService.formatPrice(currentPrice, product.currency)}
+            {formatPrice(currentPrice)}
           </span>
           
           <Button

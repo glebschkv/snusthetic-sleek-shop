@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from '@/contexts/CartContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { CurrencyProvider } from '@/contexts/CurrencyContext';
 import ConnectedCartDrawer from '@/components/Store/ConnectedCartDrawer';
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
@@ -20,8 +21,9 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <CartProvider>
-        <TooltipProvider>
+      <CurrencyProvider>
+        <CartProvider>
+          <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -38,8 +40,9 @@ const App = () => (
             </Routes>
             <ConnectedCartDrawer />
           </BrowserRouter>
-        </TooltipProvider>
-      </CartProvider>
+          </TooltipProvider>
+        </CartProvider>
+      </CurrencyProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
