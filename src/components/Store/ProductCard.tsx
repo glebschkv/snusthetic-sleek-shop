@@ -31,6 +31,9 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
           src={currentImage}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          onError={(e) => {
+            e.currentTarget.src = '/placeholder.svg';
+          }}
         />
       </div>
       
