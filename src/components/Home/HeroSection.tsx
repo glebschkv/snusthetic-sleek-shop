@@ -9,7 +9,7 @@ const HeroSection = () => {
     <section className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Hero Image with Overlay Button */}
-        <div className="relative mb-8 sm:mb-12">
+        <div className="relative mb-4 sm:mb-6">
           <img 
             src={heroImage} 
             alt="Premium ribbed metal snus holders" 
