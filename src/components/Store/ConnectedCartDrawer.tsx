@@ -43,56 +43,58 @@ export default function ConnectedCartDrawer() {
           ) : (
             <div className="flex flex-col h-full">
               <div className="flex-1 overflow-y-auto py-4">
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {items.map((item) => (
-                    <div key={`${item.id}-${item.variant?.id}`} className="flex gap-4 p-4 border rounded-xl bg-card/50">
+                    <div key={`${item.id}-${item.variant?.id}`} className="flex gap-3 p-3 border rounded-lg bg-card/50">
                       {(item.variant?.image_url || item.product?.image_url) && (
                         <img
                           src={item.variant?.image_url || item.product?.image_url}
                           alt={item.product?.name}
-                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                          className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
                         />
                       )}
-                      <div className="flex-1 min-w-0 space-y-2">
-                        <h4 className="font-semibold text-base leading-tight">{item.product?.name}</h4>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-semibold text-sm leading-tight pr-2">{item.product?.name}</h4>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeItem(item.product_id, item.variant?.id)}
+                            className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive flex-shrink-0"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
                         {item.variant?.color_name && (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 mb-2">
                             <div 
-                              className="w-4 h-4 rounded-full border-2 border-border" 
+                              className="w-3 h-3 rounded-full border border-border" 
                               style={{ backgroundColor: item.variant.color_hex }}
                             />
-                            <span className="text-sm text-muted-foreground">{item.variant.color_name}</span>
+                            <span className="text-xs text-muted-foreground">{item.variant.color_name}</span>
                           </div>
                         )}
-                        <p className="text-lg font-bold text-primary">{formatPrice(item.product?.price || 0)}</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-3">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeItem(item.product_id, item.variant?.id)}
-                          className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateQuantity(item.product_id, Math.max(0, item.quantity - 1), item.variant?.id)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                          <span className="text-base font-medium min-w-[2rem] text-center">{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateQuantity(item.product_id, item.quantity + 1, item.variant?.id)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
+                        <div className="flex justify-between items-center">
+                          <p className="text-sm font-bold text-primary">{formatPrice(item.product?.price || 0)}</p>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateQuantity(item.product_id, Math.max(0, item.quantity - 1), item.variant?.id)}
+                              className="h-7 w-7 p-0"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <span className="text-sm font-medium min-w-[1.5rem] text-center">{item.quantity}</span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateQuantity(item.product_id, item.quantity + 1, item.variant?.id)}
+                              className="h-7 w-7 p-0"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -105,12 +107,12 @@ export default function ConnectedCartDrawer() {
                   <span>Total:</span>
                   <span>{formatPrice(total)}</span>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" onClick={handleContinueShopping} className="text-sm uppercase font-medium">
-                    Continue Shopping
-                  </Button>
-                  <Button onClick={handleCheckout} className="text-sm uppercase font-medium">
+                <div className="flex flex-col gap-3">
+                  <Button onClick={handleCheckout} className="w-full text-xs uppercase font-medium py-3">
                     Proceed to Checkout
+                  </Button>
+                  <Button variant="outline" onClick={handleContinueShopping} className="w-full text-xs uppercase font-medium py-3">
+                    Continue Shopping
                   </Button>
                 </div>
               </div>
