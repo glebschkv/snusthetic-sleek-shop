@@ -208,13 +208,16 @@ const ProductVariantForm = ({ productId, variants, onVariantsChange }: ProductVa
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="variant_image">Color-specific Image URL</Label>
+              <Label htmlFor="variant_image">Color-specific Image Path</Label>
               <Input
                 id="variant_image"
                 value={newVariant.image_url}
                 onChange={(e) => setNewVariant(prev => ({ ...prev, image_url: e.target.value }))}
-                placeholder="/assets/your-image.jpg"
+                placeholder="/images/products/product-color.jpeg"
               />
+              <p className="text-xs text-muted-foreground">
+                Use format: /images/products/filename.jpeg
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

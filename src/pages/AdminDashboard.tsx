@@ -420,13 +420,16 @@ const AdminDashboard = () => {
                         </div>
                         
                         <div className="space-y-2">
-                          <Label htmlFor="image">Image URL</Label>
+                          <Label htmlFor="image">Image Path</Label>
                           <Input
                             id="image"
                             value={productForm.image_url}
                             onChange={(e) => setProductForm(prev => ({ ...prev, image_url: e.target.value }))}
-                            placeholder="/assets/your-image.jpg"
+                            placeholder="/images/products/product-name.jpeg"
                           />
+                          <p className="text-xs text-muted-foreground">
+                            Upload image to public/images/products/ folder and enter path like: /images/products/filename.jpeg
+                          </p>
                         </div>
 
                         {editingProduct && (
