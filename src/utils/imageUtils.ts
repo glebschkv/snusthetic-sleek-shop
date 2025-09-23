@@ -17,6 +17,28 @@ import patriotGreen from '../assets/patriot-green.jpg.jpeg';
 import trumpGold from '../assets/trump-gold.jpg.jpeg';
 import trumpGreen from '../assets/trump-green.jpg.jpeg';
 
+// Force all imports to be used (prevents tree-shaking in production)
+const forceImportUsage = {
+  casinoSilver,
+  casinoGold,
+  churchillSilver,
+  churchillGreen,
+  blankGreen,
+  blankSilver,
+  escobarGreen,
+  jackGreen,
+  jackSilver,
+  monacoGold,
+  monacoSilver,
+  patriotBlack,
+  patriotGreen,
+  trumpGold,
+  trumpGreen,
+};
+
+// Ensure the object is used
+console.log('Image imports loaded:', Object.keys(forceImportUsage).length);
+
 // Image mapping for product images - maps database URLs to imported assets
 const imageMap: Record<string, string> = {
   // Casino variants
@@ -77,7 +99,14 @@ export const getImageUrl = (imageUrl: string | null | undefined): string => {
   
   console.log('getImageUrl: Not found in imageMap. Available keys:', Object.keys(imageMap));
   
-  // Fallback: try to convert src/assets path to public path
+  // Fallback 1: try public assets directory
+  if (imageUrl.startsWith('src/assets/')) {
+    const publicPath = `/assets/${imageUrl.replace('src/assets/', '')}`;
+    console.log('getImageUrl: Trying public assets path:', publicPath);
+    return publicPath;
+  }
+  
+  // Fallback 2: convert src/assets path to public path
   if (imageUrl.startsWith('src/assets/')) {
     console.log('getImageUrl: Converting to public path:', `/${imageUrl}`);
     return `/${imageUrl}`;
