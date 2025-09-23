@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import heroImage from '@/assets/Minamilist(GREEN).jpeg';
+// Hero image now uses public path
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ const HeroSection = () => {
         {/* Hero Image with Overlay Button */}
         <div className="relative mb-4 sm:mb-6">
           <img 
-            src={heroImage} 
+            src="/images/hero.jpeg" 
             alt="Premium ribbed metal snus holders" 
             className="w-full max-w-4xl mx-auto"
           />
