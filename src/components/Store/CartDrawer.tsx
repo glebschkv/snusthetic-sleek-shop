@@ -63,7 +63,7 @@ const CartDrawer = ({
         <div className="flex-1 overflow-y-auto space-y-4 py-4">
           {items.map((item) => {
             const itemPrice = item.product.price + (item.variant?.price_adjustment || 0);
-            const displayImage = item.variant?.image_url || item.product.image_url || '/placeholder.svg';
+            const displayImage = item.variant?.image_url || item.product.image_url || '/images/placeholder.svg';
             
             return (
               <div key={item.id} className="flex gap-3 p-3 bg-muted/50 rounded-lg">

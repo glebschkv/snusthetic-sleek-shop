@@ -53,7 +53,7 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate }: ProductCardProps
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
             console.error('Image failed to load:', currentImage);
-            e.currentTarget.src = '/placeholder.svg';
+            e.currentTarget.src = '/images/placeholder.svg';
           }}
         />
       </div>

@@ -78,7 +78,7 @@ const ProductGrid = () => {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
                     console.error('Image failed to load:', product.image_url);
-                    e.currentTarget.src = '/placeholder.svg';
+                    e.currentTarget.src = '/images/placeholder.svg';
                   }}
                 />
               </div>
