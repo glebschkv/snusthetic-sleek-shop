@@ -420,16 +420,29 @@ const AdminDashboard = () => {
                         </div>
                         
                         <div className="space-y-2">
-                          <Label htmlFor="image">Image Path</Label>
+                          <Label htmlFor="image">Image Filename</Label>
                           <Input
                             id="image"
                             value={productForm.image_url}
                             onChange={(e) => setProductForm(prev => ({ ...prev, image_url: e.target.value }))}
-                            placeholder="/images/products/product-name.jpeg"
+                            placeholder="product-name.jpg"
                           />
                           <p className="text-xs text-muted-foreground">
-                            Upload image to public/images/products/ folder and enter path like: /images/products/filename.jpeg
+                            First upload your image to Supabase Storage (product-images bucket), then enter just the filename here (e.g., product-name.jpg)
                           </p>
+                          {productForm.image_url && (
+                            <div className="mt-2">
+                              <img 
+                                src={`https://qqrgwesxjqmdwxyxgipx.supabase.co/storage/v1/object/public/product-images/${productForm.image_url}`}
+                                alt="Product preview"
+                                className="w-20 h-20 object-cover rounded border"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
 
                         {editingProduct && (

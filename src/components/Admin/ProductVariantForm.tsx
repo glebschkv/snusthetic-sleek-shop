@@ -208,16 +208,29 @@ const ProductVariantForm = ({ productId, variants, onVariantsChange }: ProductVa
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="variant_image">Color-specific Image Path</Label>
+              <Label htmlFor="variant_image">Color-specific Image Filename</Label>
               <Input
                 id="variant_image"
                 value={newVariant.image_url}
                 onChange={(e) => setNewVariant(prev => ({ ...prev, image_url: e.target.value }))}
-                placeholder="/images/products/product-color.jpeg"
+                placeholder="product-color.jpg"
               />
               <p className="text-xs text-muted-foreground">
-                Use format: /images/products/filename.jpeg
+                Upload image to Supabase Storage (product-images bucket), then enter just the filename (e.g., product-red.jpg)
               </p>
+              {newVariant.image_url && (
+                <div className="mt-2">
+                  <img 
+                    src={`https://qqrgwesxjqmdwxyxgipx.supabase.co/storage/v1/object/public/product-images/${newVariant.image_url}`}
+                    alt="Variant preview"
+                    className="w-16 h-16 object-cover rounded border"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
