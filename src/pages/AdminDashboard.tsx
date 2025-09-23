@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Plus, Edit, Trash2, Package, Users, ShoppingCart, Tags } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, Package, Users, ShoppingCart, Tags, Home } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ProductVariantForm from '@/components/Admin/ProductVariantForm';
@@ -314,9 +314,19 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage your store products, categories, and orders</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+            <p className="text-muted-foreground">Manage your store products, categories, and orders</p>
+          </div>
+          <Button 
+            onClick={() => navigate('/')} 
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Home className="w-4 h-4" />
+            Home
+          </Button>
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
