@@ -4,17 +4,20 @@ import { Grid, List, Loader2, ShoppingCart } from 'lucide-react';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
 import { useProducts } from '@/hooks/useProducts';
-import { useCartContext } from '@/contexts/CartContext';
+import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
 import ProductCard from '@/components/Store/ProductCard';
+import CartDrawer from '@/components/Store/CartDrawer';
 import CategoryFilter from '@/components/Store/CategoryFilter';
+import { useNavigate } from 'react-router-dom';
 
 const Shop = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const { products, categories, loading, error } = useProducts();
-  const cart = useCartContext();
+  const cart = useCart();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const filteredProducts = selectedCategory === 'all' 
     ? products 
@@ -27,6 +30,11 @@ const Shop = () => {
       title: "Added to cart!",
       description: `${product.name}${variantText} has been added to your cart.`,
     });
+  };
+
+  const handleCheckout = () => {
+    cart.closeCart();
+    navigate('/checkout');
   };
 
   return (
@@ -134,6 +142,17 @@ const Shop = () => {
           </div>
         </section>
       </main>
+
+      {/* Cart Drawer */}
+      <CartDrawer
+        isOpen={cart.isOpen}
+        onClose={cart.closeCart}
+        items={cart.items}
+        onUpdateQuantity={cart.updateQuantity}
+        onRemoveItem={cart.removeItem}
+        onCheckout={handleCheckout}
+        total={cart.getTotal()}
+      />
 
       <Footer />
     </div>
