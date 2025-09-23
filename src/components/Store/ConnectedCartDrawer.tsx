@@ -44,50 +44,58 @@ export default function ConnectedCartDrawer() {
           ) : (
             <div className="flex flex-col h-full">
               <div className="flex-1 overflow-y-auto py-4">
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {items.map((item) => (
-                    <div key={`${item.id}-${item.variant?.id}`} className="flex items-center gap-3 p-3 border rounded-lg">
+                    <div key={`${item.id}-${item.variant?.id}`} className="flex gap-4 p-4 border rounded-xl bg-card/50">
                       {(item.variant?.image_url || item.product?.image_url) && (
                         <img
                           src={item.variant?.image_url || item.product?.image_url}
                           alt={item.product?.name}
-                          className="w-12 h-12 object-cover rounded"
+                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                         />
                       )}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate">{item.product?.name}</h4>
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <h4 className="font-semibold text-base leading-tight">{item.product?.name}</h4>
                         {item.variant?.color_name && (
-                          <p className="text-xs text-muted-foreground">Color: {item.variant.color_name}</p>
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="w-4 h-4 rounded-full border-2 border-border" 
+                              style={{ backgroundColor: item.variant.color_hex }}
+                            />
+                            <span className="text-sm text-muted-foreground">{item.variant.color_name}</span>
+                          </div>
                         )}
-                        <p className="text-sm font-medium">{formatPrice(item.product?.price || 0)}</p>
+                        <p className="text-lg font-bold text-primary">{formatPrice(item.product?.price || 0)}</p>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex flex-col items-end gap-3">
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
-                          onClick={() => updateQuantity(item.product_id, Math.max(0, item.quantity - 1), item.variant?.id)}
-                          className="h-6 w-6 p-0"
+                          onClick={() => removeItem(item.product_id, item.variant?.id)}
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
                         >
-                          <Minus className="h-3 w-3" />
+                          <X className="h-4 w-4" />
                         </Button>
-                        <span className="text-sm min-w-[1.5rem] text-center">{item.quantity}</span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => updateQuantity(item.product_id, item.quantity + 1, item.variant?.id)}
-                          className="h-6 w-6 p-0"
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => updateQuantity(item.product_id, Math.max(0, item.quantity - 1), item.variant?.id)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="text-base font-medium min-w-[2rem] text-center">{item.quantity}</span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => updateQuantity(item.product_id, item.quantity + 1, item.variant?.id)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeItem(item.product_id, item.variant?.id)}
-                        className="h-6 w-6 p-0"
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
                     </div>
                   ))}
                 </div>
