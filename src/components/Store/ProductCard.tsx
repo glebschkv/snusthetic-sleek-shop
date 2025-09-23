@@ -9,9 +9,10 @@ interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product, variant?: ProductVariant) => void;
   onProductUpdate?: (updatedProduct: Product) => void;
+  viewMode?: 'grid' | 'list';
 }
 
-const ProductCard = ({ product, onAddToCart, onProductUpdate }: ProductCardProps) => {
+const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' }: ProductCardProps) => {
   const { formatPrice } = useCurrency();
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
     product.variants && product.variants.length > 0 ? product.variants[0] : undefined
@@ -42,6 +43,72 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate }: ProductCardProps
   const handleAddToCart = () => {
     onAddToCart(product, selectedVariant);
   };
+
+  if (viewMode === 'list') {
+    return (
+      <div className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg">
+        <div className="flex gap-4 p-4">
+          <div className="w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg">
+            <img
+              src={currentImage}
+              alt={product.name}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              onError={(e) => {
+                console.error('Image failed to load:', currentImage);
+                e.currentTarget.src = '/images/placeholder.svg';
+              }}
+            />
+          </div>
+          
+          <div className="flex-1 space-y-3">
+            <div>
+              <h3 className="font-semibold text-foreground text-lg">
+                {product.name}
+              </h3>
+              {product.description && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {product.description}
+                </p>
+              )}
+            </div>
+
+            {hasVariants && (
+              <ColorSelector
+                variants={variants}
+                selectedVariant={selectedVariant}
+                onVariantChange={setSelectedVariant}
+                onVariantUpdate={handleVariantUpdate}
+              />
+            )}
+            
+            <div className="flex items-center justify-between">
+              <span className="text-xl font-bold text-foreground">
+                {formatPrice(currentPrice)}
+              </span>
+              
+              <Button
+                onClick={handleAddToCart}
+                disabled={!isAvailable || currentStock <= 0}
+                variant="outline"
+                size="default"
+                className="min-w-[120px]"
+              >
+                {currentStock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+              </Button>
+            </div>
+            
+            {currentStock > 0 && currentStock <= 5 && (
+              <p className="text-xs text-amber-600">
+                Only {currentStock} left in stock
+                {hasVariants && selectedVariant && ` (${selectedVariant.color_name})`}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg">
