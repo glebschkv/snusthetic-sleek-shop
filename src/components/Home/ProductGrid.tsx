@@ -6,11 +6,92 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { getImageUrl } from '@/utils/imageUtils';
+import { useState } from 'react';
 
 const ProductGrid = () => {
   const { products, loading, error } = useProducts();
   const { addItem, openCart } = useCartContext();
   const { toast } = useToast();
+
+  const ProductCard = ({ product }: { product: any }) => {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    
+    // Get all available images (main product + variants)
+    const allImages = [
+      product.image_url,
+      ...(product.variants?.map((v: any) => v.image_url).filter(Boolean) || [])
+    ].filter(Boolean);
+
+    const handleMouseEnter = () => {
+      if (allImages.length > 1) {
+        const interval = setInterval(() => {
+          setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+        }, 800);
+        
+        // Store interval for cleanup
+        (document.getElementById(`product-${product.id}`) as any)._interval = interval;
+      }
+    };
+
+    const handleMouseLeave = () => {
+      const interval = (document.getElementById(`product-${product.id}`) as any)?._interval;
+      if (interval) {
+        clearInterval(interval);
+      }
+      setCurrentImageIndex(0);
+    };
+
+    return (
+      <div 
+        id={`product-${product.id}`}
+        key={product.id} 
+        className="group"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div className="aspect-square overflow-hidden bg-surface relative">
+          <img
+            src={getImageUrl(allImages[currentImageIndex])}
+            alt={`${product.name} - Premium Snus Holder`}
+            loading="lazy"
+            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
+            onError={(e) => {
+              console.error('Image failed to load:', allImages[currentImageIndex]);
+              e.currentTarget.src = '/images/placeholder.svg';
+            }}
+          />
+          {allImages.length > 1 && (
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+              {allImages.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                    index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {/* Product Details */}
+        <div className="pt-6 text-center">
+          <h3 className="text-lg font-medium text-foreground mb-2">{product.name}</h3>
+          <div className="mb-4">
+            <span className="text-xl font-bold text-foreground">${product.price}</span>
+          </div>
+          <Button 
+            className="w-full" 
+            onClick={() => handleAddToCart(product)}
+            disabled={!product.is_available || product.stock_quantity <= 0}
+          >
+            <ShoppingCart className="h-4 w-4 mr-2" />
+            {product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Cart'}
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   const handleAddToCart = (product: any) => {
     addItem(product);
@@ -69,36 +150,7 @@ const ProductGrid = () => {
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
           {featuredProducts.map((product) => (
-            <div key={product.id} className="group">
-              <div className="aspect-square overflow-hidden bg-surface">
-                <img
-                  src={getImageUrl(product.image_url)}
-                  alt={`${product.name} - Premium Snus Holder`}
-                  loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    console.error('Image failed to load:', product.image_url);
-                    e.currentTarget.src = '/images/placeholder.svg';
-                  }}
-                />
-              </div>
-              
-              {/* Product Details */}
-              <div className="pt-6 text-center">
-                <h3 className="text-lg font-medium text-foreground mb-2">{product.name}</h3>
-                <div className="mb-4">
-                  <span className="text-xl font-bold text-foreground">${product.price}</span>
-                </div>
-                <Button 
-                  className="w-full" 
-                  onClick={() => handleAddToCart(product)}
-                  disabled={!product.is_available || product.stock_quantity <= 0}
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  {product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Cart'}
-                </Button>
-              </div>
-            </div>
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
         
