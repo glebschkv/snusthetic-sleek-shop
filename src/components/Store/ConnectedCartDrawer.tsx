@@ -21,9 +21,8 @@ export default function ConnectedCartDrawer() {
     setCheckoutOpen(true);
   };
 
-  const handleViewCart = () => {
+  const handleContinueShopping = () => {
     closeCart();
-    navigate('/checkout');
   };
 
   return (
@@ -33,7 +32,7 @@ export default function ConnectedCartDrawer() {
       }}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Shopping Cart ({itemCount})</SheetTitle>
+            <SheetTitle>Your Cart ({itemCount} {itemCount === 1 ? 'item' : 'items'})</SheetTitle>
           </SheetHeader>
           
           {items.length === 0 ? (
@@ -107,11 +106,11 @@ export default function ConnectedCartDrawer() {
                   <span>{formatPrice(total)}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" onClick={handleViewCart} className="text-sm">
-                    View Cart
+                  <Button variant="outline" onClick={handleContinueShopping} className="text-sm uppercase font-medium">
+                    Continue Shopping
                   </Button>
-                  <Button onClick={handleCheckout} className="text-sm">
-                    Checkout
+                  <Button onClick={handleCheckout} className="text-sm uppercase font-medium">
+                    Proceed to Checkout
                   </Button>
                 </div>
               </div>
