@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import CurrencySwitcher from './CurrencySwitcher';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Header = () => {
   console.log('Header component rendering');
@@ -24,6 +26,26 @@ const Header = () => {
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
   ];
+
+  const makeAdmin = async () => {
+    if (!user?.email) return;
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('promote-admin', {
+        body: { email: user.email }
+      });
+      
+      if (error) {
+        toast.error('Failed to promote user: ' + error.message);
+      } else {
+        toast.success('User promoted to admin successfully!');
+        window.location.reload(); // Reload to update admin status
+      }
+    } catch (error) {
+      toast.error('Failed to promote user');
+      console.error('Failed to promote user:', error);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border">
@@ -58,6 +80,13 @@ const Header = () => {
           <div className="flex items-center space-x-3">
             {/* Currency Switcher */}
             <CurrencySwitcher />
+            
+            {/* Temporary Make Admin Button */}
+            {user && !isAdmin && (
+              <Button onClick={makeAdmin} size="sm" variant="outline" className="text-xs">
+                Make Admin
+              </Button>
+            )}
             
             {/* Admin Button - Prominent for easy access */}
             {isAdmin && (
