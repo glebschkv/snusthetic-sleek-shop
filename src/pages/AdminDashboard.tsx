@@ -425,7 +425,7 @@ const AdminDashboard = () => {
                             id="image"
                             value={productForm.image_url}
                             onChange={(e) => setProductForm(prev => ({ ...prev, image_url: e.target.value }))}
-                            placeholder="/src/assets/product-image.jpg"
+                            placeholder="/assets/your-image.jpg"
                           />
                         </div>
 

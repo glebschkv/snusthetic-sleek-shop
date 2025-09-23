@@ -213,7 +213,7 @@ const ProductVariantForm = ({ productId, variants, onVariantsChange }: ProductVa
                 id="variant_image"
                 value={newVariant.image_url}
                 onChange={(e) => setNewVariant(prev => ({ ...prev, image_url: e.target.value }))}
-                placeholder="Optional: specific image for this color"
+                placeholder="/assets/your-image.jpg"
               />
             </div>
 

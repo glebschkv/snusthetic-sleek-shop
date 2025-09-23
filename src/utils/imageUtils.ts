@@ -87,13 +87,18 @@ export const getImageUrl = (imageUrl: string | null | undefined): string => {
     return imageUrl;
   }
   
-  // Priority 1: Convert src/assets path to public assets path
+  // Priority 1: Handle public/assets/ format (convert to /assets/)
+  if (imageUrl.startsWith('public/assets/')) {
+    return imageUrl.replace('public/assets/', '/assets/');
+  }
+  
+  // Priority 2: Convert src/assets path to public assets path
   if (imageUrl.startsWith('src/assets/')) {
     const publicPath = `/assets/${imageUrl.replace('src/assets/', '')}`;
     return publicPath;
   }
   
-  // Priority 2: Check imported images as fallback
+  // Priority 3: Check imported images as fallback
   if (imageMap[imageUrl]) {
     return imageMap[imageUrl];
   }
