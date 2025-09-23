@@ -79,40 +79,25 @@ const imageMap: Record<string, string> = {
 
 export const getImageUrl = (imageUrl: string | null | undefined): string => {
   if (!imageUrl) {
-    console.log('getImageUrl: No imageUrl provided');
     return '/placeholder.svg';
   }
   
-  console.log('getImageUrl: Processing imageUrl:', imageUrl);
-  
   // If it's already a proper URL (starts with http, /, or data:), return as is
   if (imageUrl.startsWith('http') || imageUrl.startsWith('/') || imageUrl.startsWith('data:')) {
-    console.log('getImageUrl: Already proper URL, returning as is');
     return imageUrl;
   }
   
-  // Check if we have an imported image for this path
-  if (imageMap[imageUrl]) {
-    console.log('getImageUrl: Found in imageMap, returning:', imageMap[imageUrl]);
-    return imageMap[imageUrl];
-  }
-  
-  console.log('getImageUrl: Not found in imageMap. Available keys:', Object.keys(imageMap));
-  
-  // Fallback 1: try public assets directory
+  // Priority 1: Convert src/assets path to public assets path
   if (imageUrl.startsWith('src/assets/')) {
     const publicPath = `/assets/${imageUrl.replace('src/assets/', '')}`;
-    console.log('getImageUrl: Trying public assets path:', publicPath);
     return publicPath;
   }
   
-  // Fallback 2: convert src/assets path to public path
-  if (imageUrl.startsWith('src/assets/')) {
-    console.log('getImageUrl: Converting to public path:', `/${imageUrl}`);
-    return `/${imageUrl}`;
+  // Priority 2: Check imported images as fallback
+  if (imageMap[imageUrl]) {
+    return imageMap[imageUrl];
   }
   
   // Final fallback
-  console.log('getImageUrl: Using placeholder for:', imageUrl);
   return '/placeholder.svg';
 };
