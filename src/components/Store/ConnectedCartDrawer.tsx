@@ -37,60 +37,61 @@ export default function ConnectedCartDrawer() {
           
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
-              <ShoppingCart className="h-16 w-16 mb-4" />
-              <p>Your cart is empty</p>
+              <ShoppingCart className="h-20 w-20 mb-6 text-muted-foreground/50" />
+              <h3 className="text-lg font-semibold mb-2">Your cart is empty</h3>
+              <p className="text-sm text-center">Add some products to get started</p>
             </div>
           ) : (
             <div className="flex flex-col h-full">
               <div className="flex-1 overflow-y-auto py-4">
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {items.map((item) => (
-                    <div key={`${item.id}-${item.variant?.id}`} className="flex gap-2 p-2 border rounded-lg bg-card/50">
+                    <div key={`${item.id}-${item.variant?.id}`} className="flex gap-3 p-3 border rounded-xl bg-card shadow-sm hover:shadow-md transition-shadow duration-200">
                       {(item.variant?.image_url || item.product?.image_url) && (
                         <img
                           src={item.variant?.image_url || item.product?.image_url}
                           alt={item.product?.name}
-                          className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
+                          className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
                         />
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start mb-1">
-                          <h4 className="font-semibold text-xs leading-tight pr-2">{item.product?.name}</h4>
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-semibold text-sm leading-tight pr-2">{item.product?.name}</h4>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => removeItem(item.product_id, item.variant?.id)}
-                            className="h-5 w-5 p-0 text-muted-foreground hover:text-destructive flex-shrink-0"
+                            className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-shrink-0 transition-colors"
                           >
-                            <X className="h-3 w-3" />
+                            <X className="h-4 w-4" />
                           </Button>
                         </div>
                         {item.variant?.color_name && (
-                          <div className="flex items-center gap-1 mb-1">
+                          <div className="flex items-center gap-2 mb-2">
                             <div 
-                              className="w-2 h-2 rounded-full border border-border" 
+                              className="w-3 h-3 rounded-full border border-border shadow-sm" 
                               style={{ backgroundColor: item.variant.color_hex }}
                             />
-                            <span className="text-xs text-muted-foreground">{item.variant.color_name}</span>
+                            <span className="text-xs text-muted-foreground font-medium">{item.variant.color_name}</span>
                           </div>
                         )}
                         <div className="flex justify-between items-center">
-                          <p className="text-xs font-bold text-foreground">{formatPrice(item.product?.price || 0)}</p>
-                          <div className="flex items-center gap-1">
+                          <p className="text-sm font-bold text-black">{formatPrice(item.product?.price || 0)}</p>
+                          <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-1">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => updateQuantity(item.product_id, Math.max(0, item.quantity - 1), item.variant?.id)}
-                              className="h-6 w-6 p-0"
+                              className="h-8 w-8 p-0 border-0 hover:bg-accent transition-colors"
                             >
                               <Minus className="h-3 w-3" />
                             </Button>
-                            <span className="text-xs font-medium min-w-[1rem] text-center">{item.quantity}</span>
+                            <span className="text-sm font-semibold min-w-[1.5rem] text-center px-2">{item.quantity}</span>
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => updateQuantity(item.product_id, item.quantity + 1, item.variant?.id)}
-                              className="h-6 w-6 p-0"
+                              className="h-8 w-8 p-0 border-0 hover:bg-accent transition-colors"
                             >
                               <Plus className="h-3 w-3" />
                             </Button>
@@ -102,16 +103,16 @@ export default function ConnectedCartDrawer() {
                 </div>
               </div>
               
-              <div className="border-t pt-4 space-y-3">
-                <div className="flex justify-between items-center font-semibold">
+              <div className="border-t pt-6 space-y-4 bg-background/80 backdrop-blur-sm">
+                <div className="flex justify-between items-center text-lg font-bold">
                   <span>Total:</span>
-                  <span>{formatPrice(total)}</span>
+                  <span className="text-primary">{formatPrice(total)}</span>
                 </div>
-                <div className="flex flex-col gap-3">
-                  <Button onClick={handleCheckout} className="w-full text-xs uppercase font-medium py-3">
+                <div className="space-y-3">
+                  <Button onClick={handleCheckout} className="w-full text-sm font-semibold py-4 shadow-lg hover:shadow-xl transition-shadow">
                     Proceed to Checkout
                   </Button>
-                  <Button variant="outline" onClick={handleContinueShopping} className="w-full text-xs uppercase font-medium py-3">
+                  <Button variant="outline" onClick={handleContinueShopping} className="w-full text-sm font-medium py-3 hover:bg-accent transition-colors">
                     Continue Shopping
                   </Button>
                 </div>
