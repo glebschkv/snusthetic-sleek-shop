@@ -24,9 +24,12 @@ const ProductGrid = () => {
 
     const handleMouseEnter = () => {
       if (allImages.length > 1) {
+        // Immediately switch to next image
+        setCurrentImageIndex(1);
+        
         const interval = setInterval(() => {
           setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
-        }, 800);
+        }, 500);
         
         // Store interval for cleanup
         (document.getElementById(`product-${product.id}`) as any)._interval = interval;
