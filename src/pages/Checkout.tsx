@@ -17,9 +17,14 @@ export default function Checkout() {
   const total = getTotal();
 
   useEffect(() => {
-    if (items.length === 0) {
-      navigate('/shop');
-    }
+    // Add a small delay to ensure cart state is properly loaded
+    const timer = setTimeout(() => {
+      if (items.length === 0) {
+        navigate('/shop');
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [items, navigate]);
 
   if (items.length === 0) {
