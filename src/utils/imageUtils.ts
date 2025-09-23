@@ -56,23 +56,34 @@ const imageMap: Record<string, string> = {
 };
 
 export const getImageUrl = (imageUrl: string | null | undefined): string => {
-  if (!imageUrl) return '/placeholder.svg';
+  if (!imageUrl) {
+    console.log('getImageUrl: No imageUrl provided');
+    return '/placeholder.svg';
+  }
+  
+  console.log('getImageUrl: Processing imageUrl:', imageUrl);
   
   // If it's already a proper URL (starts with http, /, or data:), return as is
   if (imageUrl.startsWith('http') || imageUrl.startsWith('/') || imageUrl.startsWith('data:')) {
+    console.log('getImageUrl: Already proper URL, returning as is');
     return imageUrl;
   }
   
   // Check if we have an imported image for this path
   if (imageMap[imageUrl]) {
+    console.log('getImageUrl: Found in imageMap, returning:', imageMap[imageUrl]);
     return imageMap[imageUrl];
   }
   
+  console.log('getImageUrl: Not found in imageMap. Available keys:', Object.keys(imageMap));
+  
   // Fallback: try to convert src/assets path to public path
   if (imageUrl.startsWith('src/assets/')) {
+    console.log('getImageUrl: Converting to public path:', `/${imageUrl}`);
     return `/${imageUrl}`;
   }
   
   // Final fallback
+  console.log('getImageUrl: Using placeholder for:', imageUrl);
   return '/placeholder.svg';
 };
