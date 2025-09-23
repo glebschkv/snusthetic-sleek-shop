@@ -22,6 +22,15 @@ const ProductGrid = () => {
       ...(product.variants?.map((v: any) => v.image_url).filter(Boolean) || [])
     ].filter(Boolean);
 
+    // Debug logging
+    console.log(`Product ${product.name}:`, {
+      mainImage: product.image_url,
+      variants: product.variants?.length || 0,
+      variantImages: product.variants?.map((v: any) => v.image_url) || [],
+      allImages: allImages.length,
+      hasMultipleImages: allImages.length > 1
+    });
+
     const handleMouseEnter = () => {
       if (allImages.length > 1) {
         // Immediately switch to next image
