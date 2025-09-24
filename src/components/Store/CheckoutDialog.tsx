@@ -8,8 +8,7 @@ import { useCartContext } from '@/contexts/CartContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
-import StripeCheckout from './StripeCheckout';
+import { Loader2, ExternalLink } from 'lucide-react';
 
 interface CheckoutDialogProps {
   open: boolean;
@@ -20,9 +19,7 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
   const { items, getTotal, clearCart } = useCartContext();
   const { selectedCurrency, formatPrice } = useCurrency();
   const total = getTotal();
-  const [step, setStep] = useState<'details' | 'payment'>('details');
   const [loading, setLoading] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string>('');
   
   const [customerInfo, setCustomerInfo] = useState({
     email: '',
@@ -36,7 +33,7 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
     }
   });
 
-  const handleContinueToPayment = async () => {
+  const handleProceedToPayment = async () => {
     if (!customerInfo.email || !customerInfo.name || !customerInfo.address.line1 || 
         !customerInfo.address.city || !customerInfo.address.postal_code) {
       toast.error('Please fill in all required fields');
@@ -46,7 +43,10 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
     setLoading(true);
     
     try {
-      const { data, error } = await supabase.functions.invoke('create-payment-intent', {
+      const successUrl = `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${window.location.origin}/checkout/cancel`;
+
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           items: items.map(item => ({
             id: item.id,
@@ -57,62 +57,38 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
             imageUrl: item.variant?.image_url || item.product?.image_url
           })),
           currency: selectedCurrency.code.toLowerCase(),
-          customer_email: customerInfo.email
+          customer_email: customerInfo.email,
+          success_url: successUrl,
+          cancel_url: cancelUrl
         }
       });
 
       if (error) throw error;
       
-      setClientSecret(data.client_secret);
-      setStep('payment');
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
+      
     } catch (error) {
-      console.error('Error creating payment intent:', error);
+      console.error('Error creating checkout session:', error);
       toast.error('Failed to initialize payment. Please try again.');
-    } finally {
       setLoading(false);
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentIntentId: string) => {
-    try {
-      const { error } = await supabase.functions.invoke('confirm-payment', {
-        body: {
-          payment_intent_id: paymentIntentId,
-          customer_info: customerInfo
-        }
-      });
-
-      if (error) throw error;
-      
-      clearCart();
-      onOpenChange(false);
-      setStep('details');
-      setClientSecret('');
-      toast.success('Order completed successfully! You will receive a confirmation email shortly.');
-    } catch (error) {
-      console.error('Error confirming payment:', error);
-      toast.error('Payment successful but order confirmation failed. Please contact support.');
     }
   };
 
   const handleClose = () => {
     onOpenChange(false);
-    setStep('details');
-    setClientSecret('');
+    setLoading(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {step === 'details' ? 'Checkout Details' : 'Complete Payment'}
-          </DialogTitle>
+          <DialogTitle>Checkout Details</DialogTitle>
         </DialogHeader>
 
-        {step === 'details' && (
-          <div className="space-y-6">
-            {/* Order Summary */}
+        <div className="space-y-6">
+          {/* Order Summary */}
             <div>
               <h3 className="font-medium mb-3">Order Summary</h3>
               <div className="space-y-2">
@@ -211,25 +187,15 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
             </div>
 
             <Button 
-              onClick={handleContinueToPayment}
+              onClick={handleProceedToPayment}
               disabled={loading}
               className="w-full"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Continue to Payment
+              Proceed to Stripe Checkout
+              <ExternalLink className="ml-2 h-4 w-4" />
             </Button>
-          </div>
-        )}
-
-        {step === 'payment' && clientSecret && (
-          <StripeCheckout
-            clientSecret={clientSecret}
-          onSuccess={handlePaymentSuccess}
-          onCancel={() => setStep('details')}
-          total={total}
-          currency={selectedCurrency.code}
-          />
-        )}
+        </div>
       </DialogContent>
     </Dialog>
   );
