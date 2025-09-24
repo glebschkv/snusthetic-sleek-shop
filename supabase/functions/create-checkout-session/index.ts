@@ -43,17 +43,23 @@ serve(async (req) => {
 
     for (const item of items) {
       // Create or retrieve Stripe product
+      const productData = new URLSearchParams({
+        name: `${item.name}${item.color ? ` (${item.color})` : ''}`,
+        description: `Product ID: ${item.id}`,
+      });
+
+      // Add image URL if available (URLSearchParams doesn't handle arrays, so we append manually)
+      if (item.imageUrl) {
+        productData.append('images[]', item.imageUrl);
+      }
+
       const productResponse = await fetch('https://api.stripe.com/v1/products', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${stripeSecretKey}`,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({
-          name: `${item.name}${item.color ? ` (${item.color})` : ''}`,
-          description: `Product ID: ${item.id}`,
-          ...(item.imageUrl && { images: [item.imageUrl] }),
-        }),
+        body: productData,
       });
 
       if (!productResponse.ok) {
@@ -99,14 +105,13 @@ serve(async (req) => {
       'cancel_url': cancel_url,
       'payment_method_types[]': 'card',
       'billing_address_collection': 'required',
-      'shipping_address_collection[allowed_countries][]': 'US',
-      'shipping_address_collection[allowed_countries][]': 'CA',
-      'shipping_address_collection[allowed_countries][]': 'GB',
-      'shipping_address_collection[allowed_countries][]': 'SE',
-      'shipping_address_collection[allowed_countries][]': 'NO',
-      'shipping_address_collection[allowed_countries][]': 'DK',
-      'shipping_address_collection[allowed_countries][]': 'FI',
       ...(customer_email && { 'customer_email': customer_email }),
+    });
+
+    // Add shipping countries (append multiple values)
+    const allowedCountries = ['US', 'CA', 'GB', 'SE', 'NO', 'DK', 'FI'];
+    allowedCountries.forEach(country => {
+      sessionData.append('shipping_address_collection[allowed_countries][]', country);
     });
 
     // Add line items to the session data
@@ -142,7 +147,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in create-checkout-session function:', error);
     return new Response(JSON.stringify({ 
-      error: error.message || 'Internal server error' 
+      error: error instanceof Error ? error.message : 'Internal server error' 
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
