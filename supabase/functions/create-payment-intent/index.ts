@@ -53,7 +53,7 @@ serve(async (req) => {
       body: new URLSearchParams({
         amount: amount.toString(),
         currency: currency.toLowerCase(),
-        automatic_payment_methods: JSON.stringify({ enabled: true }),
+        'automatic_payment_methods[enabled]': 'true',
         'metadata[items]': JSON.stringify(items),
         'metadata[customer_email]': customer_email || '',
       }),
