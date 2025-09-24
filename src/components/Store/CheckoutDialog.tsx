@@ -65,8 +65,12 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
 
       if (error) throw error;
       
-      // Redirect to Stripe Checkout
-      window.location.href = data.url;
+      // Open Stripe Checkout in a new window to avoid iframe restrictions
+      const newWindow = window.open(data.url, '_blank');
+      if (!newWindow) {
+        // Fallback to current window if popup was blocked
+        window.location.href = data.url;
+      }
       
     } catch (error) {
       console.error('Error creating checkout session:', error);
