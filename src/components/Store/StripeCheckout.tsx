@@ -11,7 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { toast } from 'sonner';
 
-const stripePromise = loadStripe('pk_test_51QJEMpCzNDpGZJ5LFKyYL8ej8OuZxNbm7C8zN3Bk7aGvXlIkSxKjTfqzjm3KzRdCqSxVbNjKjGfVqsXgLxQKzN00');
+const stripePromise = loadStripe('pk_test_51S8K6LK5475G51yQr2GqoNLnKij1qXuE4Mdp1yc7mLEdS8j2chMOfdysP2ehPvf7xeIjZC5vF4NtnUpVbKO6Aidx00WMTjbpPz');
 
 interface StripeCheckoutProps {
   clientSecret: string;
@@ -26,31 +26,48 @@ function CheckoutForm({ onSuccess, onCancel, total, currency }: Omit<StripeCheck
   const elements = useElements();
   const { formatPrice } = useCurrency();
   const [loading, setLoading] = useState(false);
+  const [elementsReady, setElementsReady] = useState(false);
+
+  useEffect(() => {
+    if (elements) {
+      const paymentElement = elements.getElement('payment');
+      if (paymentElement) {
+        paymentElement.on('ready', () => {
+          setElementsReady(true);
+        });
+      }
+    }
+  }, [elements]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!stripe || !elements) {
+    if (!stripe || !elements || !elementsReady) {
       return;
     }
 
     setLoading(true);
 
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/`,
-      },
-      redirect: 'if_required',
-    });
+    try {
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/`,
+        },
+        redirect: 'if_required',
+      });
 
-    if (error) {
-      toast.error(error.message || 'An error occurred during payment');
-      setLoading(false);
-    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      onSuccess(paymentIntent.id);
-      setLoading(false);
+      if (error) {
+        toast.error(error.message || 'An error occurred during payment');
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        onSuccess(paymentIntent.id);
+        return;
+      }
+    } catch (err) {
+      toast.error('Payment failed. Please try again.');
     }
+    
+    setLoading(false);
   };
 
   return (
@@ -65,7 +82,18 @@ function CheckoutForm({ onSuccess, onCancel, total, currency }: Omit<StripeCheck
         </div>
       </div>
 
-      <PaymentElement />
+      <div className="min-h-[200px]">
+        <PaymentElement 
+          options={{
+            layout: 'tabs'
+          }}
+        />
+        {!elementsReady && (
+          <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        )}
+      </div>
 
       <div className="flex gap-3">
         <Button
@@ -79,7 +107,7 @@ function CheckoutForm({ onSuccess, onCancel, total, currency }: Omit<StripeCheck
         </Button>
         <Button
           type="submit"
-          disabled={!stripe || loading}
+          disabled={!stripe || !elementsReady || loading}
           className="flex-1"
         >
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
