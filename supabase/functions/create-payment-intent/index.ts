@@ -54,10 +54,8 @@ serve(async (req) => {
         amount: amount.toString(),
         currency: currency.toLowerCase(),
         automatic_payment_methods: JSON.stringify({ enabled: true }),
-        metadata: JSON.stringify({
-          items: JSON.stringify(items),
-          customer_email: customer_email || '',
-        }),
+        'metadata[items]': JSON.stringify(items),
+        'metadata[customer_email]': customer_email || '',
       }),
     })
 
@@ -82,7 +80,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error creating payment intent:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
