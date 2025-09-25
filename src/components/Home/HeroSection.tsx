@@ -6,10 +6,10 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative min-h-screen flex items-start justify-center bg-background overflow-hidden pt-16">
+    <section className="relative min-h-[70vh] lg:min-h-screen flex items-start justify-center bg-background overflow-hidden pt-8 lg:pt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Hero Image with Overlay Button */}
-        <div className="relative mb-4 sm:mb-6">
+        <div className="relative mb-2 sm:mb-4 lg:mb-6">
           <img 
             src="/images/hero.jpeg" 
             alt="Premium ribbed metal snus holders" 
@@ -34,7 +34,7 @@ const HeroSection = () => {
         </div>
         
         {/* Hero Text */}
-        <div className="space-y-6 sm:space-y-8">
+        <div className="space-y-4 sm:space-y-6 lg:space-y-8">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-impact font-black tracking-wider leading-none">
             <span className="block">IT'S METAL.</span>
             <span className="block">IT'S RIBBED.</span>

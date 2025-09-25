@@ -145,10 +145,10 @@ const ProductGrid = () => {
   // Take first 3 products for homepage display
   const featuredProducts = products.slice(0, 3);
   return (
-    <section className="py-16 lg:py-24 bg-background">
+    <section className="py-8 sm:py-12 lg:py-16 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-4xl lg:text-5xl font-black mb-6">COLLECTION</h2>
         </div>
 

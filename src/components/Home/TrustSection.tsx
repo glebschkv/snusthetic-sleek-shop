@@ -33,10 +33,10 @@ const keyBenefits = [
 
 const TrustSection = () => {
   return (
-    <section className="py-24 bg-background">
+    <section className="py-8 sm:py-16 lg:py-24 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div>
-          <div className="text-center mb-16">
+          <div className="text-center mb-8 sm:mb-12 lg:mb-16">
             <h2 className="text-5xl sm:text-6xl lg:text-7xl font-impact font-black tracking-wider leading-none mb-6">
               NEVER RUN OUT
             </h2>
@@ -46,7 +46,7 @@ const TrustSection = () => {
           </div>
 
           {/* Features Grid */}
-          <div className="mb-16">
+          <div className="mb-8 sm:mb-12 lg:mb-16">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {restockFeatures.map((feature, index) => (
                 <div key={index} className="group">
