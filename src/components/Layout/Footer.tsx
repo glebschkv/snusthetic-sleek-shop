@@ -67,7 +67,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-center md:text-left">
               <p className="text-muted-foreground text-sm">
-                © 2024 Snusthetic AB. All rights reserved. Handcrafted in Stockholm, Sweden.
+                © 2024 Snusthetic AB. All rights reserved.
               </p>
               <p className="text-muted-foreground text-xs mt-1">
                 VAT Registration: SE123456789001 | Company Reg: 556123-4567
