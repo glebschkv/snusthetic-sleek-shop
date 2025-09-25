@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useCartContext } from '@/contexts/CartContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
@@ -21,24 +19,7 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
   const total = getTotal();
   const [loading, setLoading] = useState(false);
   
-  const [customerInfo, setCustomerInfo] = useState({
-    email: '',
-    name: '',
-    address: {
-      line1: '',
-      line2: '',
-      city: '',
-      postal_code: '',
-      country: 'SE'
-    }
-  });
-
   const handleProceedToPayment = async () => {
-    if (!customerInfo.email || !customerInfo.name || !customerInfo.address.line1 || 
-        !customerInfo.address.city || !customerInfo.address.postal_code) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
 
     setLoading(true);
     
@@ -57,7 +38,7 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
             imageUrl: item.variant?.image_url || item.product?.image_url
           })),
           currency: selectedCurrency.code.toLowerCase(),
-          customer_email: customerInfo.email,
+          customer_email: null,
           success_url: successUrl,
           cancel_url: cancelUrl
         }
@@ -110,85 +91,6 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
               </div>
             </div>
 
-            {/* Customer Details */}
-            <div className="space-y-4">
-              <h3 className="font-medium">Contact Information</h3>
-              
-              <div>
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={customerInfo.email}
-                  onChange={(e) => setCustomerInfo(prev => ({ ...prev, email: e.target.value }))}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="name">Full Name *</Label>
-                <Input
-                  id="name"
-                  value={customerInfo.name}
-                  onChange={(e) => setCustomerInfo(prev => ({ ...prev, name: e.target.value }))}
-                  required
-                />
-              </div>
-
-              <h3 className="font-medium mt-6">Shipping Address</h3>
-              
-              <div>
-                <Label htmlFor="address1">Address Line 1 *</Label>
-                <Input
-                  id="address1"
-                  value={customerInfo.address.line1}
-                  onChange={(e) => setCustomerInfo(prev => ({ 
-                    ...prev, 
-                    address: { ...prev.address, line1: e.target.value }
-                  }))}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="address2">Address Line 2</Label>
-                <Input
-                  id="address2"
-                  value={customerInfo.address.line2}
-                  onChange={(e) => setCustomerInfo(prev => ({ 
-                    ...prev, 
-                    address: { ...prev.address, line2: e.target.value }
-                  }))}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor="city">City *</Label>
-                  <Input
-                    id="city"
-                    value={customerInfo.address.city}
-                    onChange={(e) => setCustomerInfo(prev => ({ 
-                      ...prev, 
-                      address: { ...prev.address, city: e.target.value }
-                    }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="postal">Postal Code *</Label>
-                  <Input
-                    id="postal"
-                    value={customerInfo.address.postal_code}
-                    onChange={(e) => setCustomerInfo(prev => ({ 
-                      ...prev, 
-                      address: { ...prev.address, postal_code: e.target.value }
-                    }))}
-                    required
-                  />
-                </div>
-              </div>
-            </div>
 
             <Button 
               onClick={handleProceedToPayment}
