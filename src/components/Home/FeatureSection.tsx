@@ -65,10 +65,9 @@ export const FeatureSection = () => {
     <section className="py-8 sm:py-12 lg:py-16 xl:py-24 bg-gradient-hero">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-6 sm:mb-8 lg:mb-12 xl:mb-16">
-          <h2 className="text-section mb-4 md:mb-6">Custom & Bulk Orders</h2>
+          <h2 className="text-4xl lg:text-5xl font-impact font-black mb-4 md:mb-6">Custom & Bulk Orders</h2>
           <p className="text-body-large text-muted-foreground max-w-2xl mx-auto">
-            Need something special? Looking to order in bulk? We're here to help create the perfect 
-            snus storage solution for your specific needs.
+            Need something special? Looking to order in bulk?
           </p>
         </div>
 
