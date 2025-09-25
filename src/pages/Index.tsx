@@ -4,7 +4,6 @@ import HeroSection from '@/components/Home/HeroSection';
 import ProductGrid from '@/components/Home/ProductGrid';
 import FeatureSection from '@/components/Home/FeatureSection';
 import TrustSection from '@/components/Home/TrustSection';
-import NewsletterSection from '@/components/Home/NewsletterSection';
 import PromoBanner from '@/components/Layout/PromoBanner';
 
 const Index = () => {
@@ -17,7 +16,6 @@ const Index = () => {
         <ProductGrid />
         <TrustSection />
         <FeatureSection />
-        <NewsletterSection />
       </main>
       <Footer />
     </div>
