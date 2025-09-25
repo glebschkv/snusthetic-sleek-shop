@@ -50,13 +50,16 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
 
   const formatPrice = (price: number): string => {
     const convertedPrice = convertPrice(price);
-    return new Intl.NumberFormat('en-US', {
+    const formatted = new Intl.NumberFormat('en', {
       style: 'currency',
       currency: selectedCurrency.code,
       currencyDisplay: 'symbol',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(convertedPrice);
+    
+    // Remove any superscript characters that might be added
+    return formatted.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, '');
   };
 
   return (
