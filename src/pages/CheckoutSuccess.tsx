@@ -34,12 +34,15 @@ export default function CheckoutSuccess() {
               <CardTitle className="text-2xl text-green-700">
                 Payment Successful!
               </CardTitle>
+              <p className="text-lg font-semibold">
+                Thank you for shopping with <span className="font-bold text-primary">SNUSTHETIC</span>!
+              </p>
             </CardHeader>
             
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <p className="text-muted-foreground">
-                  Thank you for your order. Your payment has been processed successfully.
+                  Your days of spilling used pouches in your pocket are officially over! Your payment has been processed successfully.
                 </p>
                 {sessionId && (
                   <p className="text-sm text-muted-foreground">
