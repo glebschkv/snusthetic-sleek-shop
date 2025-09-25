@@ -5,8 +5,64 @@ import { Label } from '@/components/ui/label';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+
+const customOrderSchema = z.object({
+  firstName: z.string().trim().min(1, "First name is required").max(50, "First name must be less than 50 characters"),
+  lastName: z.string().trim().min(1, "Last name is required").max(50, "Last name must be less than 50 characters"),
+  email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+  quantity: z.string().trim().min(1, "Quantity is required").max(100, "Quantity must be less than 100 characters"),
+  requirements: z.string().trim().min(10, "Please provide at least 10 characters describing your requirements").max(1000, "Requirements must be less than 1000 characters")
+})
+
+type CustomOrderForm = z.infer<typeof customOrderSchema>
 
 const Contact = () => {
+  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<CustomOrderForm>({
+    resolver: zodResolver(customOrderSchema)
+  })
+
+  const onSubmit = async (data: CustomOrderForm) => {
+    setIsSubmitting(true)
+    try {
+      const { error } = await supabase.functions.invoke('send-custom-order', {
+        body: data
+      })
+
+      if (error) throw error
+
+      toast({
+        title: "Custom order request sent!",
+        description: "We'll get back to you within 24-48 hours.",
+      })
+      
+      reset()
+    } catch (error) {
+      console.error('Error submitting custom order:', error)
+      toast({
+        title: "Error sending request",
+        description: "Please try again or contact us directly.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -56,7 +112,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1">Email</h3>
-                    <p className="text-muted-foreground">hello@snusthetic.com</p>
+                    <p className="text-muted-foreground">snusthetic@gmail.com</p>
                   </div>
                 </div>
                 
@@ -85,52 +141,85 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* Contact Form */}
-            <div className="bg-surface rounded-lg p-8">
-              <h3 className="text-xl font-medium mb-6">Tell us about your project</h3>
-              
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" placeholder="John" />
+            {/* Custom Order Request Form */}
+            <Card className="bg-surface/50 border-border/50">
+              <CardHeader>
+                <CardTitle>Custom Order Request</CardTitle>
+                <CardDescription>
+                  Tell us about your specific needs and we'll get back to you with options
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input 
+                        id="firstName" 
+                        placeholder="John" 
+                        {...register("firstName")}
+                      />
+                      {errors.firstName && (
+                        <p className="text-sm text-destructive mt-1">{errors.firstName.message}</p>
+                      )}
+                    </div>
+                    <div>
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input 
+                        id="lastName" 
+                        placeholder="Doe" 
+                        {...register("lastName")}
+                      />
+                      {errors.lastName && (
+                        <p className="text-sm text-destructive mt-1">{errors.lastName.message}</p>
+                      )}
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" placeholder="Doe" />
+                  
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      placeholder="john@example.com" 
+                      {...register("email")}
+                    />
+                    {errors.email && (
+                      <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
+                    )}
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="john@example.com" />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="subject">Type of Inquiry</Label>
-                  <select id="subject" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                    <option value="">Select inquiry type...</option>
-                    <option value="custom">Custom Order</option>
-                    <option value="bulk">Bulk Order</option>
-                    <option value="general">General Question</option>
-                    <option value="support">Product Support</option>
-                  </select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea 
-                    id="message" 
-                    placeholder="Please provide details about your custom design, quantity needed, or any questions you have..."
-                    rows={6}
-                  />
-                </div>
-                
-                <Button className="btn-primary w-full">
-                  Send Message
-                </Button>
-              </form>
-            </div>
+                  
+                  <div>
+                    <Label htmlFor="quantity">Quantity Needed</Label>
+                    <Input 
+                      id="quantity" 
+                      placeholder="e.g., 50 units, 10 sets" 
+                      {...register("quantity")}
+                    />
+                    {errors.quantity && (
+                      <p className="text-sm text-destructive mt-1">{errors.quantity.message}</p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="requirements">Custom Requirements</Label>
+                    <Textarea 
+                      id="requirements" 
+                      placeholder="Please describe your custom requirements, preferred materials, colors, engraving details, etc."
+                      className="min-h-[100px]"
+                      {...register("requirements")}
+                    />
+                    {errors.requirements && (
+                      <p className="text-sm text-destructive mt-1">{errors.requirements.message}</p>
+                    )}
+                  </div>
+                  
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? "Sending..." : "Submit Custom Order Request"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

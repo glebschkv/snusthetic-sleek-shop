@@ -62,57 +62,57 @@ export const FeatureSection = () => {
   }
 
   return (
-    <section className="py-24 bg-gradient-hero">
+    <section className="py-16 md:py-24 bg-gradient-hero">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-section mb-6">Custom & Bulk Orders</h2>
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-section mb-4 md:mb-6">Custom & Bulk Orders</h2>
           <p className="text-body-large text-muted-foreground max-w-2xl mx-auto">
             Need something special? Looking to order in bulk? We're here to help create the perfect 
             snus storage solution for your specific needs.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Bulk Order Information */}
-          <div className="space-y-8">
+          <div className="space-y-6 lg:space-y-8">
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-sage rounded-full">
-                    <Users className="h-6 w-6 text-sage-foreground" />
+              <CardHeader className="pb-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                  <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gradient-sage rounded-full flex-shrink-0">
+                    <Users className="h-5 w-5 sm:h-6 sm:w-6 text-sage-foreground" />
                   </div>
-                  <div>
-                    <CardTitle>Bulk Orders</CardTitle>
-                    <CardDescription>Corporate gifts, events, or large quantities</CardDescription>
+                  <div className="min-w-0">
+                    <CardTitle className="text-lg">Bulk Orders</CardTitle>
+                    <CardDescription className="text-sm">Corporate gifts, events, or large quantities</CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground">
+              <CardContent className="space-y-3">
+                <p className="text-muted-foreground text-sm">
                   Perfect for corporate gifts, special events, or when you need multiple units. 
                   We offer competitive pricing for bulk orders and can customize packaging.
                 </p>
                 <div className="flex items-center gap-2 text-sm">
-                  <Package className="h-4 w-4" />
+                  <Package className="h-4 w-4 flex-shrink-0" />
                   <span>Minimum 10 units for bulk pricing</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-sage rounded-full">
-                    <Mail className="h-6 w-6 text-sage-foreground" />
+              <CardHeader className="pb-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                  <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gradient-sage rounded-full flex-shrink-0">
+                    <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-sage-foreground" />
                   </div>
-                  <div>
-                    <CardTitle>Contact for Special Orders</CardTitle>
-                    <CardDescription>Custom finishes, engravings, or unique requests</CardDescription>
+                  <div className="min-w-0">
+                    <CardTitle className="text-lg">Contact for Special Orders</CardTitle>
+                    <CardDescription className="text-sm">Custom finishes, engravings, or unique requests</CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground">
+              <CardContent className="space-y-3">
+                <p className="text-muted-foreground text-sm">
                   For bulk orders or custom requests, reach out to us directly:
                 </p>
                 <div className="space-y-2 text-sm">
@@ -125,74 +125,78 @@ export const FeatureSection = () => {
 
           {/* Custom Order Form */}
           <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-            <CardHeader>
-              <CardTitle>Custom Order Request</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg">Custom Order Request</CardTitle>
+              <CardDescription className="text-sm">
                 Tell us about your specific needs and we'll get back to you with options
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="firstName">First Name</Label>
+                    <Label htmlFor="firstName" className="text-sm">First Name</Label>
                     <Input 
                       id="firstName" 
                       placeholder="John" 
+                      className="mt-1"
                       {...register("firstName")}
                     />
                     {errors.firstName && (
-                      <p className="text-sm text-destructive mt-1">{errors.firstName.message}</p>
+                      <p className="text-xs text-destructive mt-1">{errors.firstName.message}</p>
                     )}
                   </div>
                   <div>
-                    <Label htmlFor="lastName">Last Name</Label>
+                    <Label htmlFor="lastName" className="text-sm">Last Name</Label>
                     <Input 
                       id="lastName" 
                       placeholder="Doe" 
+                      className="mt-1"
                       {...register("lastName")}
                     />
                     {errors.lastName && (
-                      <p className="text-sm text-destructive mt-1">{errors.lastName.message}</p>
+                      <p className="text-xs text-destructive mt-1">{errors.lastName.message}</p>
                     )}
                   </div>
                 </div>
                 
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-sm">Email</Label>
                   <Input 
                     id="email" 
                     type="email" 
                     placeholder="john@example.com" 
+                    className="mt-1"
                     {...register("email")}
                   />
                   {errors.email && (
-                    <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
+                    <p className="text-xs text-destructive mt-1">{errors.email.message}</p>
                   )}
                 </div>
                 
                 <div>
-                  <Label htmlFor="quantity">Quantity Needed</Label>
+                  <Label htmlFor="quantity" className="text-sm">Quantity Needed</Label>
                   <Input 
                     id="quantity" 
                     placeholder="e.g., 50 units, 10 sets" 
+                    className="mt-1"
                     {...register("quantity")}
                   />
                   {errors.quantity && (
-                    <p className="text-sm text-destructive mt-1">{errors.quantity.message}</p>
+                    <p className="text-xs text-destructive mt-1">{errors.quantity.message}</p>
                   )}
                 </div>
                 
                 <div>
-                  <Label htmlFor="requirements">Custom Requirements</Label>
+                  <Label htmlFor="requirements" className="text-sm">Custom Requirements</Label>
                   <Textarea 
                     id="requirements" 
                     placeholder="Please describe your custom requirements, preferred materials, colors, engraving details, etc."
-                    className="min-h-[100px]"
+                    className="min-h-[80px] mt-1"
                     {...register("requirements")}
                   />
                   {errors.requirements && (
-                    <p className="text-sm text-destructive mt-1">{errors.requirements.message}</p>
+                    <p className="text-xs text-destructive mt-1">{errors.requirements.message}</p>
                   )}
                 </div>
                 
