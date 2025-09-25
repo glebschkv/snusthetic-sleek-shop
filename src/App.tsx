@@ -6,7 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from '@/contexts/CartContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { CurrencyProvider } from '@/contexts/CurrencyContext';
+import { AgeVerificationProvider } from '@/contexts/AgeVerificationContext';
 import ConnectedCartDrawer from '@/components/Store/ConnectedCartDrawer';
+import AgeVerificationModal from '@/components/Layout/AgeVerificationModal';
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
 import Checkout from "./pages/Checkout";
@@ -24,7 +26,8 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CurrencyProvider>
-        <CartProvider>
+        <AgeVerificationProvider>
+          <CartProvider>
           <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -43,9 +46,11 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <ConnectedCartDrawer />
+            <AgeVerificationModal />
           </BrowserRouter>
           </TooltipProvider>
         </CartProvider>
+        </AgeVerificationProvider>
       </CurrencyProvider>
     </AuthProvider>
   </QueryClientProvider>
