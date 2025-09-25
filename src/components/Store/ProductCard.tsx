@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Product, ProductVariant } from '@/types/store';
 import { useCurrency } from '@/contexts/CurrencyContext';
@@ -14,6 +15,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' }: ProductCardProps) => {
   const { formatPrice } = useCurrency();
+  const navigate = useNavigate();
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
     product.variants && product.variants.length > 0 ? product.variants[0] : undefined
   );
@@ -40,13 +42,21 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' 
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigation when clicking Add to Cart
     onAddToCart(product, selectedVariant);
+  };
+
+  const handleCardClick = () => {
+    navigate(`/product/${product.id}`);
   };
 
   if (viewMode === 'list') {
     return (
-      <div className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg">
+      <div 
+        className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg cursor-pointer"
+        onClick={handleCardClick}
+      >
         <div className="flex gap-4 p-4">
           <div className="w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg">
             <img
@@ -111,7 +121,10 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' 
   }
 
   return (
-    <div className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg min-h-[420px] flex flex-col">
+    <div 
+      className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg min-h-[420px] flex flex-col cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="aspect-square overflow-hidden flex-shrink-0">
         <img
           src={currentImage}
