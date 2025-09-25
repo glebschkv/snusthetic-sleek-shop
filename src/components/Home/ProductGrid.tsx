@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { ShoppingCart, Loader2 } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCartContext } from '@/contexts/CartContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -11,6 +12,7 @@ import { useState } from 'react';
 const ProductGrid = () => {
   const { products, loading, error } = useProducts();
   const { addItem, openCart } = useCartContext();
+  const { formatPrice } = useCurrency();
   const { toast } = useToast();
 
   const ProductCard = ({ product }: { product: any }) => {
@@ -81,7 +83,7 @@ const ProductGrid = () => {
         <div className="pt-6 text-center">
           <h3 className="text-lg font-medium text-foreground mb-2">{product.name}</h3>
           <div className="mb-4">
-            <span className="text-xl font-bold text-foreground">${product.price}</span>
+            <span className="text-xl font-bold text-foreground">{formatPrice(product.price)}</span>
           </div>
           <Button 
             className="w-full" 

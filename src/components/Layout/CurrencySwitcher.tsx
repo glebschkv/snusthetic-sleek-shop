@@ -15,7 +15,7 @@ const CurrencySwitcher = () => {
           <ChevronDown className="h-3 w-3" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[160px]">
+      <DropdownMenuContent align="end" className="min-w-[160px] bg-background border border-border shadow-lg z-50">
         {currencies.map((currency) => (
           <DropdownMenuItem
             key={currency.code}
