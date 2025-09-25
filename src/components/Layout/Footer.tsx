@@ -8,26 +8,6 @@ const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-2 space-y-6">
             <h3 className="text-xl font-medium tracking-tight">Snusthetic</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              Premium Swedish craftsmanship meets modern luxury. Each piece is handcrafted 
-              with passion and precision, honoring traditional techniques while embracing contemporary design.
-            </p>
-            
-            {/* Contact Info */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <Mail className="h-4 w-4" />
-                <span>hello@snusthetic.com</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <Phone className="h-4 w-4" />
-                <span>+46 8 123 456 78</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4" />
-                <span>Stockholm, Sweden</span>
-              </div>
-            </div>
             
             {/* Social Media */}
             <div className="flex gap-4">
