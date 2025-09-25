@@ -111,8 +111,8 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' 
   }
 
   return (
-    <div className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg">
-      <div className="aspect-square overflow-hidden">
+    <div className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg h-[420px] flex flex-col">
+      <div className="aspect-square overflow-hidden flex-shrink-0">
         <img
           src={currentImage}
           alt={product.name}
@@ -125,28 +125,48 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' 
         />
       </div>
       
-      <div className="p-4 space-y-3">
-        <div>
-          <h3 className="font-semibold text-foreground line-clamp-2">
-            {product.name}
-          </h3>
+      <div className="p-4 flex flex-col flex-1">
+        {/* Fixed height content area */}
+        <div className="flex-1 space-y-2">
+          <div className="h-12">
+            <h3 className="font-semibold text-foreground line-clamp-2 text-sm leading-tight">
+              {product.name}
+            </h3>
+          </div>
+          
           {product.description && (
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-              {product.description}
+            <div className="h-8">
+              <p className="text-xs text-muted-foreground line-clamp-2">
+                {product.description}
+              </p>
+            </div>
+          )}
+
+          {/* Fixed height color selector area - handles 0-4 colors */}
+          <div className="h-10 flex items-start">
+            {hasVariants && (
+              <ColorSelector
+                variants={variants}
+                selectedVariant={selectedVariant}
+                onVariantChange={setSelectedVariant}
+                onVariantUpdate={handleVariantUpdate}
+              />
+            )}
+          </div>
+        </div>
+        
+        {/* Stock warning - consistent positioning */}
+        <div className="h-4 mb-2">
+          {currentStock > 0 && currentStock <= 5 && (
+            <p className="text-xs text-amber-600">
+              Only {currentStock} left in stock
+              {hasVariants && selectedVariant && ` (${selectedVariant.color_name})`}
             </p>
           )}
         </div>
-
-        {hasVariants && (
-          <ColorSelector
-            variants={variants}
-            selectedVariant={selectedVariant}
-            onVariantChange={setSelectedVariant}
-            onVariantUpdate={handleVariantUpdate}
-          />
-        )}
         
-        <div className="flex items-center justify-between">
+        {/* Fixed bottom section for price and button */}
+        <div className="flex items-center justify-between mt-auto">
           <span className="text-lg font-bold text-foreground">
             {formatPrice(currentPrice)}
           </span>
@@ -161,13 +181,6 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' 
             {currentStock <= 0 ? 'Out of Stock' : 'Add to Cart'}
           </Button>
         </div>
-        
-        {currentStock > 0 && currentStock <= 5 && (
-          <p className="text-xs text-amber-600">
-            Only {currentStock} left in stock
-            {hasVariants && selectedVariant && ` (${selectedVariant.color_name})`}
-          </p>
-        )}
       </div>
     </div>
   );
