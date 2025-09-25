@@ -50,13 +50,16 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
 
   const formatPrice = (price: number): string => {
     const convertedPrice = convertPrice(price);
-    return new Intl.NumberFormat('en-US', {
+    const formatted = new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: selectedCurrency.code,
       currencyDisplay: 'symbol',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(convertedPrice);
+    
+    // Remove trailing zeros after decimal point, but keep at least one decimal place
+    return formatted.replace(/\.?0+$/, '');
   };
 
   return (

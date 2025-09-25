@@ -13,11 +13,14 @@ interface ProductImageGalleryProps {
 const ProductImageGallery = ({ product, selectedVariant }: ProductImageGalleryProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Build array of images - main product image + variant images
-  const images = [
+  // Build array of images - main product image + variant images, filter out duplicates and empty values
+  const allImages = [
     product.image_url,
     ...(product.variants?.map(v => v.image_url).filter(Boolean) || [])
   ].filter(Boolean);
+  
+  // Remove duplicates and ensure we have unique images
+  const images = [...new Set(allImages)].filter(img => img && img.trim() !== '');
 
   // Get current image URL
   const currentImage = getImageUrl(
