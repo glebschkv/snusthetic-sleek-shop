@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react';
 import { CartItem, Product, ProductVariant } from '@/types/store';
-import { storeService } from '@/services/store';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 export const useCart = () => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const { formatPrice } = useCurrency();
 
   const addItem = useCallback((product: Product, quantity: number = 1, variant?: ProductVariant) => {
     setItems(prevItems => {
@@ -81,8 +82,8 @@ export const useCart = () => {
   }, []);
 
   const formatTotal = useCallback(() => {
-    return storeService.formatPrice(getTotal());
-  }, [getTotal]);
+    return formatPrice(getTotal());
+  }, [getTotal, formatPrice]);
 
   return {
     items,
