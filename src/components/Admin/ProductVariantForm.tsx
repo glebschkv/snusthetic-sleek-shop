@@ -152,78 +152,80 @@ const ProductVariantForm = ({ productId, variants, onVariantsChange }: ProductVa
       )}
 
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent>
+        <DialogContent className="max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Color Variant</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Preset Colors</Label>
-              <div className="grid grid-cols-5 gap-2">
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label className="text-sm">Preset Colors</Label>
+              <div className="grid grid-cols-6 gap-1">
                 {PRESET_COLORS.map((color) => (
                   <button
                     key={color.name}
                     type="button"
                     onClick={() => selectPresetColor(color)}
-                    className="flex flex-col items-center gap-1 p-2 border rounded-md hover:bg-muted transition-colors"
+                    className="flex flex-col items-center gap-1 p-1 border rounded hover:bg-muted transition-colors"
                   >
                     <div
-                      className="w-6 h-6 rounded-full border border-border"
+                      className="w-4 h-4 rounded-full border border-border"
                       style={{ backgroundColor: color.hex }}
                     />
-                    <span className="text-xs">{color.name}</span>
+                    <span className="text-xs text-center leading-tight">{color.name}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="color_name">Color Name</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label htmlFor="color_name" className="text-sm">Color Name</Label>
                 <Input
                   id="color_name"
                   value={newVariant.color_name}
                   onChange={(e) => setNewVariant(prev => ({ ...prev, color_name: e.target.value }))}
                   placeholder="e.g., Red"
+                  className="h-8"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="color_hex">Color Code</Label>
-                <div className="flex gap-2">
+              <div className="space-y-1">
+                <Label htmlFor="color_hex" className="text-sm">Color Code</Label>
+                <div className="flex gap-1">
                   <Input
                     id="color_hex"
                     type="color"
                     value={newVariant.color_hex}
                     onChange={(e) => setNewVariant(prev => ({ ...prev, color_hex: e.target.value }))}
-                    className="w-12 h-10 p-1"
+                    className="w-8 h-8 p-0"
                   />
                   <Input
                     value={newVariant.color_hex}
                     onChange={(e) => setNewVariant(prev => ({ ...prev, color_hex: e.target.value }))}
                     placeholder="#000000"
-                    className="flex-1"
+                    className="flex-1 h-8"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="variant_image">Color-specific Image Filename</Label>
+            <div className="space-y-1">
+              <Label htmlFor="variant_image" className="text-sm">Image Filename</Label>
               <Input
                 id="variant_image"
                 value={newVariant.image_url}
                 onChange={(e) => setNewVariant(prev => ({ ...prev, image_url: e.target.value }))}
                 placeholder="product-color.jpg"
+                className="h-8"
               />
               <p className="text-xs text-muted-foreground">
-                Upload image to Supabase Storage (product-images bucket), then enter just the filename (e.g., product-red.jpg)
+                Upload to Supabase Storage, enter filename only
               </p>
               {newVariant.image_url && (
-                <div className="mt-2">
+                <div className="mt-1">
                   <img 
                     src={`https://qqrgwesxjqmdwxyxgipx.supabase.co/storage/v1/object/public/product-images/${newVariant.image_url}`}
                     alt="Variant preview"
-                    className="w-16 h-16 object-cover rounded border"
+                    className="w-12 h-12 object-cover rounded border"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
@@ -233,19 +235,20 @@ const ProductVariantForm = ({ productId, variants, onVariantsChange }: ProductVa
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="variant_stock">Stock Quantity</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label htmlFor="variant_stock" className="text-sm">Stock</Label>
                 <Input
                   id="variant_stock"
                   type="number"
                   value={newVariant.stock_quantity}
                   onChange={(e) => setNewVariant(prev => ({ ...prev, stock_quantity: e.target.value }))}
                   min="0"
+                  className="h-8"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="price_adjustment">Price Adjustment ($)</Label>
+              <div className="space-y-1">
+                <Label htmlFor="price_adjustment" className="text-sm">Price Adj. ($)</Label>
                 <Input
                   id="price_adjustment"
                   type="number"
@@ -253,20 +256,23 @@ const ProductVariantForm = ({ productId, variants, onVariantsChange }: ProductVa
                   value={newVariant.price_adjustment}
                   onChange={(e) => setNewVariant(prev => ({ ...prev, price_adjustment: e.target.value }))}
                   placeholder="0.00"
+                  className="h-8"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2 pt-2">
               <Button
                 type="button"
                 variant="outline"
+                size="sm"
                 onClick={() => setShowAddDialog(false)}
               >
                 Cancel
               </Button>
               <Button
                 type="button"
+                size="sm"
                 onClick={handleAddVariant}
                 disabled={!newVariant.color_name.trim()}
               >
