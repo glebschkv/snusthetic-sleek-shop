@@ -360,7 +360,7 @@ const AdminDashboard = () => {
                         Add Product
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
                         <DialogDescription>
@@ -368,19 +368,20 @@ const AdminDashboard = () => {
                         </DialogDescription>
                       </DialogHeader>
                       
-                      <form onSubmit={handleProductSubmit} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="name">Product Name</Label>
+                      <form onSubmit={handleProductSubmit} className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label htmlFor="name" className="text-sm">Product Name</Label>
                             <Input
                               id="name"
                               value={productForm.name}
                               onChange={(e) => setProductForm(prev => ({ ...prev, name: e.target.value }))}
                               required
+                              className="h-8"
                             />
                           </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="price">Price ($)</Label>
+                          <div className="space-y-1">
+                            <Label htmlFor="price" className="text-sm">Price ($)</Label>
                             <Input
                               id="price"
                               type="number"
@@ -388,24 +389,26 @@ const AdminDashboard = () => {
                               value={productForm.price}
                               onChange={(e) => setProductForm(prev => ({ ...prev, price: e.target.value }))}
                               required
+                              className="h-8"
                             />
                           </div>
                         </div>
                         
-                        <div className="space-y-2">
-                          <Label htmlFor="description">Description</Label>
+                        <div className="space-y-1">
+                          <Label htmlFor="description" className="text-sm">Description</Label>
                           <Textarea
                             id="description"
                             value={productForm.description}
                             onChange={(e) => setProductForm(prev => ({ ...prev, description: e.target.value }))}
+                            className="min-h-[60px] text-sm"
                           />
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="category">Category</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label htmlFor="category" className="text-sm">Category</Label>
                             <Select value={productForm.category_id} onValueChange={(value) => setProductForm(prev => ({ ...prev, category_id: value }))}>
-                              <SelectTrigger>
+                              <SelectTrigger className="h-8">
                                 <SelectValue placeholder="Select category" />
                               </SelectTrigger>
                               <SelectContent>
@@ -417,35 +420,37 @@ const AdminDashboard = () => {
                               </SelectContent>
                             </Select>
                           </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="stock">Stock Quantity</Label>
+                          <div className="space-y-1">
+                            <Label htmlFor="stock" className="text-sm">Stock Quantity</Label>
                             <Input
                               id="stock"
                               type="number"
                               value={productForm.stock_quantity}
                               onChange={(e) => setProductForm(prev => ({ ...prev, stock_quantity: e.target.value }))}
                               required
+                              className="h-8"
                             />
                           </div>
                         </div>
                         
-                        <div className="space-y-2">
-                          <Label htmlFor="image">Image Filename</Label>
+                        <div className="space-y-1">
+                          <Label htmlFor="image" className="text-sm">Image Filename</Label>
                           <Input
                             id="image"
                             value={productForm.image_url}
                             onChange={(e) => setProductForm(prev => ({ ...prev, image_url: e.target.value }))}
                             placeholder="product-name.jpg"
+                            className="h-8"
                           />
                           <p className="text-xs text-muted-foreground">
                             First upload your image to Supabase Storage (product-images bucket), then enter just the filename here (e.g., product-name.jpg)
                           </p>
                           {productForm.image_url && (
-                            <div className="mt-2">
+                            <div className="mt-1">
                               <img 
                                 src={`https://qqrgwesxjqmdwxyxgipx.supabase.co/storage/v1/object/public/product-images/${productForm.image_url}`}
                                 alt="Product preview"
-                                className="w-20 h-20 object-cover rounded border"
+                                className="w-16 h-16 object-cover rounded border"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
                                   target.style.display = 'none';
@@ -463,8 +468,8 @@ const AdminDashboard = () => {
                           />
                         )}
                         
-                        <DialogFooter>
-                          <Button type="submit">
+                        <DialogFooter className="pt-3">
+                          <Button type="submit" size="sm">
                             {editingProduct ? 'Update Product' : 'Create Product'}
                           </Button>
                         </DialogFooter>
