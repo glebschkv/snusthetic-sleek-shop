@@ -51,10 +51,10 @@ const Footer = () => {
             <h4 className="font-medium">Collections</h4>
             <ul className="space-y-3">
               <li><a href="/shop" className="text-muted-foreground hover:text-primary transition-colors">All Products</a></li>
-              <li><a href="/shop/luxury" className="text-muted-foreground hover:text-primary transition-colors">Luxury Series</a></li>
-              <li><a href="/shop/limited" className="text-muted-foreground hover:text-primary transition-colors">Limited Edition</a></li>
-              <li><a href="/shop/custom" className="text-muted-foreground hover:text-primary transition-colors">Custom Orders</a></li>
-              <li><a href="/shop/accessories" className="text-muted-foreground hover:text-primary transition-colors">Accessories</a></li>
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Luxury Series</a></li>
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Limited Edition</a></li>
+              <li><a href="/contact" className="text-muted-foreground hover:text-primary transition-colors">Custom Orders</a></li>
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Accessories</a></li>
             </ul>
           </div>
 
@@ -63,10 +63,10 @@ const Footer = () => {
             <h4 className="font-medium">Customer Care</h4>
             <ul className="space-y-3">
               <li><a href="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact Us</a></li>
-              <li><a href="/shipping" className="text-muted-foreground hover:text-primary transition-colors">Shipping & Returns</a></li>
-              <li><a href="/size-guide" className="text-muted-foreground hover:text-primary transition-colors">Size Guide</a></li>
-              <li><a href="/care" className="text-muted-foreground hover:text-primary transition-colors">Care Instructions</a></li>
-              <li><a href="/warranty" className="text-muted-foreground hover:text-primary transition-colors">Warranty</a></li>
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Shipping & Returns</a></li>
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Size Guide</a></li>
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Care Instructions</a></li>
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Warranty</a></li>
             </ul>
           </div>
 
@@ -75,10 +75,10 @@ const Footer = () => {
             <h4 className="font-medium">Company</h4>
             <ul className="space-y-3">
               <li><a href="/about" className="text-muted-foreground hover:text-primary transition-colors">Our Story</a></li>
-              <li><a href="/craftsmanship" className="text-muted-foreground hover:text-primary transition-colors">Craftsmanship</a></li>
-              <li><a href="/sustainability" className="text-muted-foreground hover:text-primary transition-colors">Sustainability</a></li>
-              <li><a href="/press" className="text-muted-foreground hover:text-primary transition-colors">Press Kit</a></li>
-              <li><a href="/careers" className="text-muted-foreground hover:text-primary transition-colors">Careers</a></li>
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Craftsmanship</a></li>
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Sustainability</a></li>
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Press Kit</a></li>
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Careers</a></li>
             </ul>
           </div>
         </div>
@@ -94,16 +94,16 @@ const Footer = () => {
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-6">
-              <a href="/terms" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+              <a href="/" className="text-muted-foreground hover:text-primary text-sm transition-colors">
                 Terms of Service
               </a>
-              <a href="/privacy" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+              <a href="/" className="text-muted-foreground hover:text-primary text-sm transition-colors">
                 Privacy Policy
               </a>
-              <a href="/cookies" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+              <a href="/" className="text-muted-foreground hover:text-primary text-sm transition-colors">
                 Cookie Policy
               </a>
-              <a href="/refund" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+              <a href="/" className="text-muted-foreground hover:text-primary text-sm transition-colors">
                 Refund Policy
               </a>
             </div>
