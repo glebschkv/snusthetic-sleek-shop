@@ -200,8 +200,13 @@ export const FeatureSection = () => {
                   )}
                 </div>
                 
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? "Sending..." : "Submit Custom Order Request"}
+                <Button type="submit" className="w-full text-sm sm:text-base px-4 py-2 h-auto min-h-[44px]" disabled={isSubmitting}>
+                  <span className="hidden sm:inline">
+                    {isSubmitting ? "Sending..." : "Submit Custom Order Request"}
+                  </span>
+                  <span className="sm:hidden">
+                    {isSubmitting ? "Sending..." : "Submit Request"}
+                  </span>
                 </Button>
               </form>
             </CardContent>
