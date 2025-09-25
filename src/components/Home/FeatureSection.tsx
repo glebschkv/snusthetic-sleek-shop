@@ -1,11 +1,66 @@
-import { Package, Users, Mail } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Mail, Package, Users } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { supabase } from "@/integrations/supabase/client"
+import { useToast } from "@/hooks/use-toast"
+import { useState } from "react"
 
-const FeatureSection = () => {
+const customOrderSchema = z.object({
+  firstName: z.string().trim().min(1, "First name is required").max(50, "First name must be less than 50 characters"),
+  lastName: z.string().trim().min(1, "Last name is required").max(50, "Last name must be less than 50 characters"),
+  email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+  quantity: z.string().trim().min(1, "Quantity is required").max(100, "Quantity must be less than 100 characters"),
+  requirements: z.string().trim().min(10, "Please provide at least 10 characters describing your requirements").max(1000, "Requirements must be less than 1000 characters")
+})
+
+type CustomOrderForm = z.infer<typeof customOrderSchema>
+
+export const FeatureSection = () => {
+  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<CustomOrderForm>({
+    resolver: zodResolver(customOrderSchema)
+  })
+
+  const onSubmit = async (data: CustomOrderForm) => {
+    setIsSubmitting(true)
+    try {
+      const { error } = await supabase.functions.invoke('send-custom-order', {
+        body: data
+      })
+
+      if (error) throw error
+
+      toast({
+        title: "Custom order request sent!",
+        description: "We'll get back to you within 24-48 hours.",
+      })
+      
+      reset()
+    } catch (error) {
+      console.error('Error submitting custom order:', error)
+      toast({
+        title: "Error sending request",
+        description: "Please try again or contact us directly.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <section className="py-24 bg-gradient-hero">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -61,8 +116,7 @@ const FeatureSection = () => {
                   For bulk orders or custom requests, reach out to us directly:
                 </p>
                 <div className="space-y-2 text-sm">
-                  <div><strong>Email:</strong> orders@snusthetic.com</div>
-                  <div><strong>Phone:</strong> +46 123 456 789</div>
+                  <div><strong>Email:</strong> snusthetic@gmail.com</div>
                   <div><strong>Response Time:</strong> Within 24 hours</div>
                 </div>
               </CardContent>
@@ -78,49 +132,80 @@ const FeatureSection = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" placeholder="John" />
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input 
+                      id="firstName" 
+                      placeholder="John" 
+                      {...register("firstName")}
+                    />
+                    {errors.firstName && (
+                      <p className="text-sm text-destructive mt-1">{errors.firstName.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input 
+                      id="lastName" 
+                      placeholder="Doe" 
+                      {...register("lastName")}
+                    />
+                    {errors.lastName && (
+                      <p className="text-sm text-destructive mt-1">{errors.lastName.message}</p>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" placeholder="Doe" />
+                
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="john@example.com" 
+                    {...register("email")}
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
+                  )}
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="john@example.com" />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="quantity">Estimated Quantity</Label>
-                <Input id="quantity" type="number" placeholder="10" min="1" />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="requirements">Custom Requirements</Label>
-                <Textarea 
-                  id="requirements" 
-                  placeholder="Describe your custom requirements: specific colors, engravings, packaging needs, timeline, etc."
-                  className="min-h-[120px]"
-                />
-              </div>
-              
-              <Button className="w-full">
-                Submit Custom Order Request
-              </Button>
-              
-              <p className="text-xs text-muted-foreground text-center">
-                We'll review your request and get back to you within 24 hours with pricing and availability.
-              </p>
+                
+                <div>
+                  <Label htmlFor="quantity">Quantity Needed</Label>
+                  <Input 
+                    id="quantity" 
+                    placeholder="e.g., 50 units, 10 sets" 
+                    {...register("quantity")}
+                  />
+                  {errors.quantity && (
+                    <p className="text-sm text-destructive mt-1">{errors.quantity.message}</p>
+                  )}
+                </div>
+                
+                <div>
+                  <Label htmlFor="requirements">Custom Requirements</Label>
+                  <Textarea 
+                    id="requirements" 
+                    placeholder="Please describe your custom requirements, preferred materials, colors, engraving details, etc."
+                    className="min-h-[100px]"
+                    {...register("requirements")}
+                  />
+                  {errors.requirements && (
+                    <p className="text-sm text-destructive mt-1">{errors.requirements.message}</p>
+                  )}
+                </div>
+                
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Sending..." : "Submit Custom Order Request"}
+                </Button>
+              </form>
             </CardContent>
           </Card>
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default FeatureSection;
+export default FeatureSection

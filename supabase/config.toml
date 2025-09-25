@@ -22,3 +22,6 @@ verify_jwt = false
 
 [functions.promote-admin]
 verify_jwt = false
+
+[functions.send-custom-order]
+verify_jwt = false
