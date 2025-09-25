@@ -58,8 +58,9 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
       maximumFractionDigits: 2
     }).format(convertedPrice);
     
-    // Remove trailing zeros after decimal point, but keep at least one decimal place
-    return formatted.replace(/\.?0+$/, '');
+    // Only remove trailing zeros if they come after the decimal point and are truly trailing
+    // e.g., "€28.00" → "€28" or "€28.10" → "€28.1", but keep "€28.90" as "€28.9"
+    return formatted.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
   };
 
   return (
