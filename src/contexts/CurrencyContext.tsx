@@ -53,7 +53,9 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: selectedCurrency.code,
-      currencyDisplay: 'symbol'
+      currencyDisplay: 'symbol',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(convertedPrice);
   };
 

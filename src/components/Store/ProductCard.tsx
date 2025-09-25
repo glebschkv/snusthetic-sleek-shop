@@ -53,12 +53,12 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' 
 
   if (viewMode === 'list') {
     return (
-      <div 
-        className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg cursor-pointer"
-        onClick={handleCardClick}
-      >
+      <div className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg">
         <div className="flex gap-4 p-4">
-          <div className="w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg">
+          <div 
+            className="w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg cursor-pointer"
+            onClick={handleCardClick}
+          >
             <img
               src={currentImage}
               alt={product.name}
@@ -121,11 +121,11 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' 
   }
 
   return (
-    <div 
-      className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg min-h-[420px] flex flex-col cursor-pointer"
-      onClick={handleCardClick}
-    >
-      <div className="aspect-square overflow-hidden flex-shrink-0">
+    <div className="group relative bg-card rounded-lg border border-border overflow-hidden transition-all duration-300 hover:shadow-lg min-h-[420px] flex flex-col">
+      <div 
+        className="aspect-square overflow-hidden flex-shrink-0 cursor-pointer"
+        onClick={handleCardClick}
+      >
         <img
           src={currentImage}
           alt={product.name}
