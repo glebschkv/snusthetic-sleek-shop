@@ -50,17 +50,13 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
 
   const formatPrice = (price: number): string => {
     const convertedPrice = convertPrice(price);
-    const formatted = new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: selectedCurrency.code,
       currencyDisplay: 'symbol',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(convertedPrice);
-    
-    // Only remove trailing zeros if they come after the decimal point and are truly trailing
-    // e.g., "€28.00" → "€28" or "€28.10" → "€28.1", but keep "€28.90" as "€28.9"
-    return formatted.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
   };
 
   return (
