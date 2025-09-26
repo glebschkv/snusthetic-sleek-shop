@@ -40,14 +40,38 @@ serve(async (req) => {
 
     const session = await sessionResponse.json()
 
+    // Get the payment intent to access its metadata
+    const paymentIntentResponse = await fetch(`https://api.stripe.com/v1/payment_intents/${session.payment_intent}`, {
+      headers: {
+        'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
+      },
+    })
+
+    if (!paymentIntentResponse.ok) {
+      throw new Error('Failed to retrieve payment intent')
+    }
+
+    const paymentIntent = await paymentIntentResponse.json()
+
+    // Format address to match the expected structure
+    const address = session.shipping_details?.address || session.customer_details?.address
+    const formattedAddress = address ? {
+      line1: address.line1 || '',
+      line2: address.line2 || '',
+      city: address.city || '',
+      postal_code: address.postal_code || '',
+      country: address.country || ''
+    } : null
+
     return new Response(
       JSON.stringify({
         payment_intent: session.payment_intent,
         customer_details: {
           email: session.customer_details?.email || session.customer_email,
           name: session.customer_details?.name,
-          address: session.shipping_details?.address || session.customer_details?.address
-        }
+          address: formattedAddress
+        },
+        metadata: paymentIntent.metadata
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -36,7 +36,11 @@ export default function CheckoutSuccess() {
         const { data: confirmData, error: confirmError } = await supabase.functions.invoke('confirm-payment', {
           body: {
             payment_intent_id: sessionData.payment_intent,
-            customer_info: sessionData.customer_details
+            customer_info: {
+              email: sessionData.customer_details.email,
+              name: sessionData.customer_details.name,
+              address: sessionData.customer_details.address
+            }
           }
         });
 

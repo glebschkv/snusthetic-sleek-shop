@@ -54,10 +54,16 @@ serve(async (req) => {
       throw new Error('Payment not successful')
     }
 
+    console.log('Payment intent metadata:', paymentIntent.metadata)
+
     // Initialize Supabase client
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
     // Parse items from metadata
+    if (!paymentIntent.metadata?.items) {
+      throw new Error('No items found in payment intent metadata')
+    }
+    
     const items = JSON.parse(paymentIntent.metadata.items)
 
     // Check for referral code in metadata

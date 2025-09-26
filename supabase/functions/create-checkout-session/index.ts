@@ -122,8 +122,8 @@ serve(async (req) => {
       sessionData.append(`line_items[${index}][quantity]`, item.quantity.toString());
     });
 
-    // Add items to metadata for payment confirmation
-    sessionData.append('metadata[items]', JSON.stringify(items));
+    // Add metadata to payment intent (not just the session)
+    sessionData.append('payment_intent_data[metadata][items]', JSON.stringify(items));
 
     // Create discount if referral code is provided
     if (referral_code && discount_amount && discount_amount > 0) {
@@ -146,9 +146,9 @@ serve(async (req) => {
         const coupon = await couponResponse.json();
         sessionData.append('discounts[0][coupon]', coupon.id);
         
-        // Store referral code in metadata
-        sessionData.append('metadata[referral_code]', referral_code);
-        sessionData.append('metadata[discount_amount]', discount_amount.toString());
+        // Store referral code in payment intent metadata
+        sessionData.append('payment_intent_data[metadata][referral_code]', referral_code);
+        sessionData.append('payment_intent_data[metadata][discount_amount]', discount_amount.toString());
       }
     }
 
