@@ -60,6 +60,27 @@ serve(async (req) => {
     // Parse items from metadata
     const items = JSON.parse(paymentIntent.metadata.items)
 
+    // Check for referral code in metadata
+    const referralCode = paymentIntent.metadata?.referral_code;
+    const discountAmount = paymentIntent.metadata?.discount_amount;
+    let referrerId = null;
+
+    if (referralCode) {
+      // Find the referrer
+      const { data: referrer } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('referral_code', referralCode)
+        .single();
+      
+      if (referrer) {
+        referrerId = referrer.id;
+        
+        // Track referral usage (we'll update with order_id after order creation)
+        // This will be updated below after order creation
+      }
+    }
+
     // Create order record
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -72,6 +93,9 @@ serve(async (req) => {
         currency: paymentIntent.currency,
         status: 'paid',
         items: items,
+        referral_code_used: referralCode || null,
+        referrer_id: referrerId,
+        discount_amount: discountAmount ? parseFloat(discountAmount) : 0
       })
       .select()
       .single()
@@ -79,6 +103,18 @@ serve(async (req) => {
     if (orderError) {
       console.error('Error creating order:', orderError)
       throw new Error('Failed to create order record')
+    }
+
+    // Now track referral usage with order ID if referral was used
+    if (referrerId && order) {
+      await supabase
+        .from('referral_usage')
+        .insert({
+          referrer_id: referrerId,
+          referee_email: customer_info.email,
+          order_id: order.id,
+          discount_amount: discountAmount ? parseFloat(discountAmount) : 0
+        });
     }
 
     // Send confirmation email (placeholder for now)

@@ -22,6 +22,8 @@ interface CheckoutRequest {
   customer_email?: string;
   success_url: string;
   cancel_url: string;
+  referral_code?: string;
+  discount_amount?: number;
 }
 
 serve(async (req) => {
@@ -36,7 +38,7 @@ serve(async (req) => {
       throw new Error('Stripe secret key not configured');
     }
 
-    const { items, currency, customer_email, success_url, cancel_url }: CheckoutRequest = await req.json();
+    const { items, currency, customer_email, success_url, cancel_url, referral_code, discount_amount }: CheckoutRequest = await req.json();
 
     // Create line items for Stripe Checkout
     const lineItems = [];
@@ -119,6 +121,33 @@ serve(async (req) => {
       sessionData.append(`line_items[${index}][price]`, item.price);
       sessionData.append(`line_items[${index}][quantity]`, item.quantity.toString());
     });
+
+    // Create discount if referral code is provided
+    if (referral_code && discount_amount && discount_amount > 0) {
+      // Create a coupon for the discount
+      const couponResponse = await fetch('https://api.stripe.com/v1/coupons', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${stripeSecretKey}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          'amount_off': Math.round(discount_amount * 100).toString(), // Convert to cents
+          'currency': currency.toLowerCase(),
+          'duration': 'once',
+          'name': `Referral Discount - ${referral_code}`,
+        }),
+      });
+
+      if (couponResponse.ok) {
+        const coupon = await couponResponse.json();
+        sessionData.append('discounts[0][coupon]', coupon.id);
+        
+        // Store referral code in metadata
+        sessionData.append('metadata[referral_code]', referral_code);
+        sessionData.append('metadata[discount_amount]', discount_amount.toString());
+      }
+    }
 
     const sessionResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',

@@ -7,6 +7,7 @@ import { useCurrency } from '@/contexts/CurrencyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, ExternalLink } from 'lucide-react';
+import { ReferralCodeInput } from './ReferralCodeInput';
 
 interface CheckoutDialogProps {
   open: boolean;
@@ -18,6 +19,11 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
   const { selectedCurrency, formatPrice } = useCurrency();
   const total = getTotal();
   const [loading, setLoading] = useState(false);
+  const [appliedReferralCode, setAppliedReferralCode] = useState<string>('');
+  const [discountPercent, setDiscountPercent] = useState<number>(0);
+  
+  const discountAmount = (total * discountPercent) / 100;
+  const finalTotal = total - discountAmount;
   
   const handleProceedToPayment = async () => {
 
@@ -40,7 +46,9 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
           currency: selectedCurrency.code.toLowerCase(),
           customer_email: null,
           success_url: successUrl,
-          cancel_url: cancelUrl
+          cancel_url: cancelUrl,
+          referral_code: appliedReferralCode || null,
+          discount_amount: discountAmount
         }
       });
 
@@ -85,12 +93,35 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
                 ))}
               </div>
               <Separator className="my-3" />
-              <div className="flex justify-between font-medium">
-                <span>Total</span>
+              <div className="flex justify-between text-sm">
+                <span>Subtotal</span>
                 <span>{formatPrice(total)}</span>
+              </div>
+              {appliedReferralCode && (
+                <div className="flex justify-between text-sm text-green-600">
+                  <span>Discount ({discountPercent}%)</span>
+                  <span>-{formatPrice(discountAmount)}</span>
+                </div>
+              )}
+              <Separator className="my-2" />
+              <div className="flex justify-between font-medium text-lg">
+                <span>Final Total</span>
+                <span>{formatPrice(finalTotal)}</span>
               </div>
             </div>
 
+            {/* Referral Code Input */}
+            <ReferralCodeInput 
+              onReferralApplied={(code, discount) => {
+                setAppliedReferralCode(code);
+                setDiscountPercent(discount);
+              }}
+              onReferralRemoved={() => {
+                setAppliedReferralCode('');
+                setDiscountPercent(0);
+              }}
+              appliedCode={appliedReferralCode}
+            />
 
             <Button 
               onClick={handleProceedToPayment}
@@ -98,7 +129,7 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
               className="w-full"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Proceed to Stripe Checkout
+              Pay {formatPrice(finalTotal)}
               <ExternalLink className="ml-2 h-4 w-4" />
             </Button>
         </div>
