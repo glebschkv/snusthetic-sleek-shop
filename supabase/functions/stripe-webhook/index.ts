@@ -211,26 +211,27 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
 
     console.log('Order created successfully:', newOrder.id);
 
-    // Create referral usage record if referral was used
+    // Create referral usage record if referral was used - using secure function
     if (referrerId && referralCode) {
-      const referralUsageData = {
-        referrer_id: referrerId,
-        order_id: newOrder.id,
-        referee_email: session.customer_details.email,
-        discount_amount: discountAmount
-      };
+      console.log('Creating referral usage record for referrer:', referrerId);
 
-      console.log('Creating referral usage record:', referralUsageData);
+      try {
+        const { data: referralUsageId, error: referralError } = await supabase.rpc('create_referral_usage_record', {
+          p_referrer_id: referrerId,
+          p_order_id: newOrder.id,
+          p_referee_email: session.customer_details.email,
+          p_discount_amount: discountAmount
+        });
 
-      const { error: referralError } = await supabase
-        .from('referral_usage')
-        .insert(referralUsageData);
-
-      if (referralError) {
-        console.error('Error creating referral usage:', referralError);
+        if (referralError) {
+          console.error('Error creating referral usage:', referralError);
+          // Don't throw here - order is more important than referral tracking
+        } else {
+          console.log('Referral usage recorded successfully with ID:', referralUsageId);
+        }
+      } catch (error) {
+        console.error('Exception while recording referral usage:', error);
         // Don't throw here - order is more important than referral tracking
-      } else {
-        console.log('Referral usage recorded successfully');
       }
     }
 

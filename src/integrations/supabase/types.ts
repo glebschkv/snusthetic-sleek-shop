@@ -317,6 +317,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_referral_usage_record: {
+        Args: {
+          p_discount_amount: number
+          p_order_id: string
+          p_referee_email: string
+          p_referrer_id: string
+        }
+        Returns: string
+      }
       generate_referral_code: {
         Args: Record<PropertyKey, never>
         Returns: string
