@@ -76,8 +76,11 @@ export type Database = {
           currency: string
           customer_email: string | null
           customer_name: string | null
+          discount_amount: number | null
           id: string
           items: Json | null
+          referral_code_used: string | null
+          referrer_id: string | null
           shipping_address: Json | null
           status: string
           stripe_payment_intent_id: string | null
@@ -90,8 +93,11 @@ export type Database = {
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
+          discount_amount?: number | null
           id?: string
           items?: Json | null
+          referral_code_used?: string | null
+          referrer_id?: string | null
           shipping_address?: Json | null
           status?: string
           stripe_payment_intent_id?: string | null
@@ -104,8 +110,11 @@ export type Database = {
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
+          discount_amount?: number | null
           id?: string
           items?: Json | null
+          referral_code_used?: string | null
+          referrer_id?: string | null
           shipping_address?: Json | null
           status?: string
           stripe_payment_intent_id?: string | null
@@ -113,7 +122,15 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_variants: {
         Row: {
@@ -218,6 +235,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          referral_code: string
           updated_at: string
         }
         Insert: {
@@ -225,6 +243,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          referral_code: string
           updated_at?: string
         }
         Update: {
@@ -232,9 +251,48 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          referral_code?: string
           updated_at?: string
         }
         Relationships: []
+      }
+      referral_usage: {
+        Row: {
+          created_at: string
+          discount_amount: number
+          id: string
+          order_id: string | null
+          referee_email: string
+          referrer_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          order_id?: string | null
+          referee_email: string
+          referrer_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          order_id?: string | null
+          referee_email?: string
+          referrer_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_usage_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -259,6 +317,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_referral_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
