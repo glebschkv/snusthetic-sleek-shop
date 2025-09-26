@@ -24,6 +24,11 @@ interface CheckoutSessionCompletedEvent {
         name: string;
         address?: any;
       };
+      collected_information?: {
+        shipping_details?: {
+          address?: any;
+        };
+      };
       shipping_details?: {
         address?: any;
       };
@@ -61,17 +66,20 @@ async function verifyStripeSignature(payload: string, signature: string): Promis
     }
 
     const payloadToVerify = `${timestamp}.${payload}`;
-    const expectedSig = await crypto.subtle.sign(
+    
+    // Convert hex signature to Uint8Array for verification
+    const providedSignature = new Uint8Array(
+      sig.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
+    );
+
+    const isValid = await crypto.subtle.verify(
       'HMAC',
       key,
+      providedSignature,
       encoder.encode(payloadToVerify)
     );
 
-    const expectedHex = Array.from(new Uint8Array(expectedSig))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
-
-    return expectedHex === sig;
+    return isValid;
   } catch (error) {
     console.error('Error verifying webhook signature:', error);
     return false;
@@ -118,7 +126,7 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
       name: item.n,
       price: item.p,
       quantity: item.q,
-      color: item.c,
+      color: item.c || null, // Make color optional since it might not be present
       // imageUrl will be null since we don't store it in metadata to save space
       imageUrl: null
     }));
@@ -142,8 +150,10 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
       }
     }
 
-    // Format shipping address
-    const shippingAddress = session.shipping_details?.address || session.customer_details.address;
+    // Format shipping address - check collected_information first (for new Stripe format)
+    const shippingAddress = session.collected_information?.shipping_details?.address || 
+                           session.shipping_details?.address || 
+                           session.customer_details.address;
     const formattedAddress = shippingAddress ? {
       line1: shippingAddress.line1 || '',
       line2: shippingAddress.line2 || '',
