@@ -68,21 +68,73 @@ export const ReferralSection = () => {
     }
   };
 
-  const copyReferralCode = () => {
-    navigator.clipboard.writeText(stats.referralCode);
-    toast({
-      title: "Copied!",
-      description: "Your referral code has been copied to clipboard"
-    });
+  const copyReferralCode = async () => {
+    try {
+      await navigator.clipboard.writeText(stats.referralCode);
+      toast({
+        title: "Copied!",
+        description: "Your referral code has been copied to clipboard"
+      });
+    } catch (error) {
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = stats.referralCode;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast({
+          title: "Copied!",
+          description: "Your referral code has been copied to clipboard"
+        });
+      } catch (fallbackError) {
+        toast({
+          title: "Copy Failed",
+          description: "Please manually copy the code",
+          variant: "destructive"
+        });
+      }
+      document.body.removeChild(textArea);
+    }
   };
 
-  const shareReferralLink = () => {
+  const shareReferralLink = async () => {
     const url = `${window.location.origin}?ref=${stats.referralCode}`;
-    navigator.clipboard.writeText(url);
-    toast({
-      title: "Link Copied!",
-      description: "Your referral link has been copied to clipboard"
-    });
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({
+        title: "Link Copied!",
+        description: "Your referral link has been copied to clipboard"
+      });
+    } catch (error) {
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast({
+          title: "Link Copied!",
+          description: "Your referral link has been copied to clipboard"
+        });
+      } catch (fallbackError) {
+        toast({
+          title: "Copy Failed",
+          description: "Please manually copy the link",
+          variant: "destructive"
+        });
+      }
+      document.body.removeChild(textArea);
+    }
   };
 
   if (loading) {
