@@ -122,8 +122,17 @@ serve(async (req) => {
       sessionData.append(`line_items[${index}][quantity]`, item.quantity.toString());
     });
 
-    // Add metadata to session (more reliable than payment intent for webhooks)
-    sessionData.append('metadata[items]', JSON.stringify(items));
+    // Add minimal metadata to session (to stay under 500 char limit)
+    // Store only essential data, remove imageUrl and use short property names
+    const minimalItems = items.map(item => ({
+      i: item.id,           // id
+      n: item.name,         // name  
+      p: item.price,        // price
+      q: item.quantity,     // quantity
+      c: item.color         // color
+    }));
+    
+    sessionData.append('metadata[items]', JSON.stringify(minimalItems));
 
     // Create discount if referral code is provided
     if (referral_code && discount_amount && discount_amount > 0) {

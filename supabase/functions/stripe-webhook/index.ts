@@ -98,8 +98,31 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
       return { success: true, message: 'Order already processed' };
     }
 
-    // Extract items from metadata
-    const items = session.metadata.items ? JSON.parse(session.metadata.items) : [];
+    // Extract minimal items from metadata and reconstruct full item data
+    const itemsData = session.metadata.items;
+    if (!itemsData) {
+      throw new Error('No items found in session metadata');
+    }
+
+    let minimalItems;
+    try {
+      minimalItems = JSON.parse(itemsData);
+    } catch (error) {
+      console.error('Error parsing items from metadata:', error);
+      throw new Error('Invalid items data in session metadata');
+    }
+
+    // Reconstruct full items data from minimal metadata
+    const items = minimalItems.map((item: any) => ({
+      id: item.i,
+      name: item.n,
+      price: item.p,
+      quantity: item.q,
+      color: item.c,
+      // imageUrl will be null since we don't store it in metadata to save space
+      imageUrl: null
+    }));
+
     const referralCode = session.metadata.referral_code;
     const discountAmount = session.metadata.discount_amount ? parseFloat(session.metadata.discount_amount) : 0;
 
