@@ -122,6 +122,9 @@ serve(async (req) => {
       sessionData.append(`line_items[${index}][quantity]`, item.quantity.toString());
     });
 
+    // Add items to metadata for payment confirmation
+    sessionData.append('metadata[items]', JSON.stringify(items));
+
     // Create discount if referral code is provided
     if (referral_code && discount_amount && discount_amount > 0) {
       // Create a coupon for the discount
