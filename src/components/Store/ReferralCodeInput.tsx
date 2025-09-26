@@ -27,14 +27,26 @@ export const ReferralCodeInput = ({
 
     setIsValidating(true);
     try {
-      // Check if referral code exists
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('id, referral_code, display_name')
-        .eq('referral_code', referralCode.toUpperCase())
-        .single();
+      // Use the validate-referral edge function to bypass RLS restrictions
+      const { data, error } = await supabase.functions.invoke('validate-referral', {
+        body: {
+          referral_code: referralCode.toUpperCase(),
+          customer_email: 'temp@validation.com', // Dummy email for validation
+          order_total: 100 // Dummy order total for validation
+        }
+      });
 
-      if (error || !profile) {
+      if (error) {
+        console.error('Edge function error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to validate referral code",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!data.success) {
         toast({
           title: "Invalid Code",
           description: "This referral code doesn't exist",
@@ -43,8 +55,8 @@ export const ReferralCodeInput = ({
         return;
       }
 
-      // Apply 10% discount
-      const discountPercent = 10;
+      // Apply the discount from the validation response
+      const discountPercent = data.discount_percent || 10;
       onReferralApplied(referralCode.toUpperCase(), discountPercent);
       
       toast({
