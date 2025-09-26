@@ -79,7 +79,7 @@ const Header = () => {
                     <User className="h-5 w-5" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-popover border border-border shadow-lg z-50">
+                <DropdownMenuContent align="end" className="bg-white dark:bg-gray-900 border border-border shadow-lg z-50">
                   <DropdownMenuItem asChild>
                     <Link to="/profile">Profile</Link>
                   </DropdownMenuItem>
