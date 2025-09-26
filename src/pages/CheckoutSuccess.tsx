@@ -17,51 +17,14 @@ export default function CheckoutSuccess() {
   const [orderConfirmed, setOrderConfirmed] = useState(false);
 
   useEffect(() => {
-    const confirmPayment = async () => {
-      if (!sessionId || orderConfirmed) return;
-
-      try {
-        // Get session details from Stripe to extract payment intent
-        const { data: sessionData, error: sessionError } = await supabase.functions.invoke('get-checkout-session', {
-          body: { session_id: sessionId }
-        });
-
-        if (sessionError || !sessionData?.payment_intent) {
-          console.error('Error getting session:', sessionError);
-          toast.error('Could not confirm order. Please contact support.');
-          return;
-        }
-
-        // Call confirm-payment function
-        const { data: confirmData, error: confirmError } = await supabase.functions.invoke('confirm-payment', {
-          body: {
-            payment_intent_id: sessionData.payment_intent,
-            customer_info: {
-              email: sessionData.customer_details.email,
-              name: sessionData.customer_details.name,
-              address: sessionData.customer_details.address
-            }
-          }
-        });
-
-        if (confirmError) {
-          console.error('Error confirming payment:', confirmError);
-          toast.error('Order confirmation failed. Please contact support.');
-          return;
-        }
-
-        setOrderConfirmed(true);
-        clearCart();
-        toast.success('Order completed successfully! You will receive a confirmation email shortly.');
-        
-      } catch (error) {
-        console.error('Error in payment confirmation:', error);
-        toast.error('Could not confirm order. Please contact support.');
-      }
-    };
-
-    confirmPayment();
-  }, [sessionId, orderConfirmed, clearCart]);
+    // Clear cart immediately when success page loads
+    // The webhook will handle order creation automatically
+    if (!orderConfirmed) {
+      clearCart();
+      setOrderConfirmed(true);
+      toast.success('Order completed successfully! You will receive a confirmation email shortly.');
+    }
+  }, [orderConfirmed, clearCart]);
 
   return (
     <div className="min-h-screen bg-background">
