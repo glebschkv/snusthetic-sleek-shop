@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ReferralSection } from '@/components/Profile/ReferralSection';
-import { User, Settings, LogOut } from 'lucide-react';
+import { User, Settings, LogOut, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Profile {
@@ -119,10 +119,16 @@ export default function Profile() {
               <p className="text-muted-foreground">Manage your account and referrals</p>
             </div>
           </div>
-          <Button variant="outline" onClick={handleSignOut}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => navigate('/')}>
+              <Home className="h-4 w-4 mr-2" />
+              Home
+            </Button>
+            <Button variant="outline" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
