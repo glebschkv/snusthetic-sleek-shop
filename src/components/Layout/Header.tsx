@@ -28,7 +28,6 @@ const Header = () => {
     { name: 'Contact', href: '/contact' },
   ];
 
-
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,8 +39,8 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden md:flex items-center space-x-8 flex-1 justify-center">
             {navItems.map((item) => (
               <Link
                 key={item.name}
@@ -58,75 +57,79 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Actions */}
-          <div className="flex items-center space-x-2 md:space-x-3">
-            {/* Currency Switcher - Hidden on mobile */}
-            <div className="hidden md:block">
+          {/* Right Actions - Better grouped */}
+          <div className="flex items-center space-x-4">
+            {/* Currency and Subscribe group */}
+            <div className="hidden md:flex items-center space-x-4 border-r border-border pr-4">
               <CurrencySwitcher />
+              <Link
+                to="/subscriptions"
+                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+              >
+                Subscribe
+              </Link>
             </div>
             
-            {/* Subscription Link - Hidden on mobile */}
-            <Link
-              to="/subscriptions"
-              className="hidden md:block text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              Subscribe
-            </Link>
-            
-            {/* Admin Button - Compact on mobile */}
-            {isAdmin && (
-              <Button asChild size="sm" variant="accent" className="text-xs px-2 md:px-3">
-                <Link to="/admin" className="flex items-center gap-1 md:gap-2">
-                  <Settings className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Admin</span>
-                </Link>
-              </Button>
-            )}
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="p-2 text-foreground hover:text-primary transition-colors">
-                    <User className="h-5 w-5" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-white dark:bg-gray-900 border border-border shadow-lg z-50">
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile">Profile</Link>
-                  </DropdownMenuItem>
-                  {isAdmin && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin">Admin Dashboard</Link>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={signOut}>
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Link to="/auth" className="p-2 text-foreground hover:text-primary transition-colors">
-                <User className="h-5 w-5" />
-              </Link>
-            )}
-            <button 
-              className="p-2 text-foreground hover:text-primary transition-colors relative"
-              onClick={toggleCart}
-            >
-              <ShoppingBag className="h-5 w-5" />
-              {itemCount > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                >
-                  {itemCount}
-                </Badge>
+            {/* User actions group */}
+            <div className="flex items-center space-x-2">
+              {/* Admin Button - Compact on mobile */}
+              {isAdmin && (
+                <Button asChild size="sm" variant="accent" className="text-xs px-2 md:px-3">
+                  <Link to="/admin" className="flex items-center gap-1 md:gap-2">
+                    <Settings className="h-3 w-3 md:h-4 md:w-4" />
+                    <span className="hidden sm:inline">Admin</span>
+                  </Link>
+                </Button>
               )}
-            </button>
-            
-            {/* Mobile menu button */}
-            <button 
-              className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
+              
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="p-1.5 md:p-2 text-foreground hover:text-primary transition-colors">
+                      <User className="h-4 w-4 md:h-5 md:w-5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-white dark:bg-gray-900 border border-border shadow-lg z-50">
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile">Profile</Link>
+                    </DropdownMenuItem>
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin">Admin Dashboard</Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={signOut}>
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link to="/auth" className="p-1.5 md:p-2 text-foreground hover:text-primary transition-colors">
+                  <User className="h-4 w-4 md:h-5 md:w-5" />
+                </Link>
+              )}
+              
+              {/* Shopping Cart */}
+              <button
+                onClick={toggleCart}
+                className="relative p-1.5 md:p-2 text-foreground hover:text-primary transition-colors"
+              >
+                <ShoppingBag className="h-4 w-4 md:h-5 md:w-5" />
+                {itemCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-4 w-4 md:h-5 md:w-5 text-xs flex items-center justify-center p-0 min-w-0"
+                  >
+                    {itemCount}
+                  </Badge>
+                )}
+              </button>
+            </div>
+
+            {/* Mobile menu toggle */}
+            <button
+              className="md:hidden p-1.5 text-foreground hover:text-primary transition-colors ml-2"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               <Menu className="h-5 w-5" />
@@ -153,28 +156,28 @@ const Header = () => {
               >
                 {item.name}
               </Link>
-              ))}
-              
-              {/* Mobile-only items */}
-              <div className="border-t border-border pt-2 mt-2">
-                <div className="px-3 py-2">
-                  <CurrencySwitcher />
-                </div>
+            ))}
+            
+            {/* Mobile-only items */}
+            <div className="border-t border-border pt-2 mt-2">
+              <div className="px-3 py-2">
+                <CurrencySwitcher />
               </div>
-              
-              {/* Mobile Admin Link */}
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className="block px-3 py-2 text-base font-medium text-primary border-l-2 border-primary bg-primary/5"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Admin Dashboard
-                </Link>
-              )}
             </div>
+            
+            {/* Mobile Admin Link */}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="block px-3 py-2 text-base font-medium text-primary border-l-2 border-primary bg-primary/5"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Admin Dashboard
+              </Link>
+            )}
           </div>
-        )}
+        </div>
+      )}
     </header>
   );
 };
