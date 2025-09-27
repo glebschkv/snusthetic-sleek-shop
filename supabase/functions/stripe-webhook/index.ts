@@ -36,6 +36,24 @@ interface CheckoutSessionCompletedEvent {
       currency: string;
       metadata: Record<string, string>;
       payment_status: string;
+      mode?: string;
+      subscription?: string;
+    };
+  };
+}
+
+interface SubscriptionEvent {
+  id: string;
+  type: 'customer.subscription.created' | 'customer.subscription.updated' | 'customer.subscription.deleted';
+  data: {
+    object: {
+      id: string;
+      customer: string;
+      status: string;
+      current_period_start: number;
+      current_period_end: number;
+      cancel_at_period_end: boolean;
+      metadata: Record<string, string>;
     };
   };
 }
@@ -94,6 +112,12 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
   console.log('Session metadata:', session.metadata);
 
   try {
+    // Check if this is a subscription checkout
+    if (session.mode === 'subscription') {
+      console.log('Subscription checkout completed, will be handled by subscription webhook events');
+      return { success: true, message: 'Subscription checkout completed' };
+    }
+
     // Check if order already exists to prevent duplicates
     const { data: existingOrder } = await supabase
       .from('orders')
@@ -240,6 +264,98 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
   } catch (error) {
     console.error('Error processing checkout session:', error);
     throw error;
+  }
+}
+
+async function handleSubscriptionEvent(event: SubscriptionEvent) {
+  const supabaseClient = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+  
+  try {
+    const subscription = event.data.object;
+    const userId = subscription.metadata.user_id;
+    const subscriptionPlanId = subscription.metadata.subscription_plan_id;
+    
+    console.log('Processing subscription event:', event.type, 'for user:', userId);
+    
+    if (!userId || !subscriptionPlanId) {
+      console.error('Missing metadata in subscription:', subscription.metadata);
+      return { success: false, error: 'Missing required metadata' };
+    }
+
+    switch (event.type) {
+      case 'customer.subscription.created':
+        // Create user subscription record
+        const { data: newSubscription, error: createError } = await supabaseClient
+          .from('user_subscriptions')
+          .insert({
+            user_id: userId,
+            subscription_plan_id: subscriptionPlanId,
+            stripe_subscription_id: subscription.id,
+            status: subscription.status,
+            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            cancel_at_period_end: subscription.cancel_at_period_end
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Error creating user subscription:', createError);
+          throw createError;
+        }
+
+        console.log('Created user subscription:', newSubscription);
+        return { success: true, subscription: newSubscription };
+
+      case 'customer.subscription.updated':
+        // Update existing subscription
+        const { data: updatedSubscription, error: updateError } = await supabaseClient
+          .from('user_subscriptions')
+          .update({
+            status: subscription.status,
+            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            cancel_at_period_end: subscription.cancel_at_period_end
+          })
+          .eq('stripe_subscription_id', subscription.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error('Error updating user subscription:', updateError);
+          throw updateError;
+        }
+
+        console.log('Updated user subscription:', updatedSubscription);
+        return { success: true, subscription: updatedSubscription };
+
+      case 'customer.subscription.deleted':
+        // Mark subscription as cancelled
+        const { data: cancelledSubscription, error: cancelError } = await supabaseClient
+          .from('user_subscriptions')
+          .update({
+            status: 'cancelled'
+          })
+          .eq('stripe_subscription_id', subscription.id)
+          .select()
+          .single();
+
+        if (cancelError) {
+          console.error('Error cancelling user subscription:', cancelError);
+          throw cancelError;
+        }
+
+        console.log('Cancelled user subscription:', cancelledSubscription);
+        return { success: true, subscription: cancelledSubscription };
+
+      default:
+        console.log('Unhandled subscription event type:', event.type);
+        return { success: true, message: 'Event acknowledged but not processed' };
+    }
+
+  } catch (error) {
+    console.error('Error processing subscription event:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 

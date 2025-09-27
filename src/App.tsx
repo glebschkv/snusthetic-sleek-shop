@@ -11,6 +11,7 @@ import ConnectedCartDrawer from '@/components/Store/ConnectedCartDrawer';
 import AgeVerificationModal from '@/components/Layout/AgeVerificationModal';
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
+import Subscriptions from "./pages/Subscriptions";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
@@ -37,6 +38,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/shop" element={<Shop />} />
+              <Route path="/subscriptions" element={<Subscriptions />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
