@@ -41,6 +41,28 @@ const Header = () => {
 
           {/* Desktop Navigation - Centered */}
           <nav className="hidden md:flex items-center space-x-8 flex-1 justify-center">
+            <Link
+              to="/shop"
+              className={cn(
+                "text-sm font-medium transition-colors",
+                location.pathname === '/shop' 
+                  ? "text-primary font-semibold" 
+                  : "text-foreground hover:text-primary"
+              )}
+            >
+              Shop
+            </Link>
+            <Link
+              to="/subscriptions"
+              className={cn(
+                "text-sm font-medium transition-colors",
+                location.pathname === '/subscriptions' 
+                  ? "text-primary font-semibold" 
+                  : "text-foreground hover:text-primary"
+              )}
+            >
+              Subscribe
+            </Link>
             {navItems.filter(item => !['Shop', 'Subscriptions'].includes(item.name)).map((item) => (
               <Link
                 key={item.name}
@@ -59,15 +81,9 @@ const Header = () => {
 
           {/* Right Actions - Better grouped */}
           <div className="flex items-center space-x-4">
-            {/* Currency and Subscribe group */}
-            <div className="hidden md:flex items-center space-x-4 border-r border-border pr-4">
+            {/* Currency group */}
+            <div className="hidden md:flex items-center border-r border-border pr-4">
               <CurrencySwitcher />
-              <Link
-                to="/subscriptions"
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-              >
-                Subscribe
-              </Link>
             </div>
             
             {/* User actions group */}
