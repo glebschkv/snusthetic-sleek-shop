@@ -63,6 +63,14 @@ const Header = () => {
             {/* Currency Switcher */}
             <CurrencySwitcher />
             
+            {/* Subscription Link */}
+            <Link
+              to="/subscriptions"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
+              Subscribe
+            </Link>
+            
             {/* Admin Button - Prominent for easy access */}
             {isAdmin && (
               <Button asChild size="sm" variant="accent" className="text-xs">
