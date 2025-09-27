@@ -41,7 +41,7 @@ const Header = () => {
 
           {/* Desktop Navigation - Centered */}
           <nav className="hidden md:flex items-center space-x-8 flex-1 justify-center">
-            {navItems.map((item) => (
+            {navItems.filter(item => !['Shop', 'Subscriptions'].includes(item.name)).map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
