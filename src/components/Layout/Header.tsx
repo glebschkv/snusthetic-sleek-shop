@@ -59,24 +59,26 @@ const Header = () => {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center space-x-3">
-            {/* Currency Switcher */}
-            <CurrencySwitcher />
+          <div className="flex items-center space-x-2 md:space-x-3">
+            {/* Currency Switcher - Hidden on mobile */}
+            <div className="hidden md:block">
+              <CurrencySwitcher />
+            </div>
             
-            {/* Subscription Link */}
+            {/* Subscription Link - Hidden on mobile */}
             <Link
               to="/subscriptions"
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+              className="hidden md:block text-sm font-medium text-foreground hover:text-primary transition-colors"
             >
               Subscribe
             </Link>
             
-            {/* Admin Button - Prominent for easy access */}
+            {/* Admin Button - Compact on mobile */}
             {isAdmin && (
-              <Button asChild size="sm" variant="accent" className="text-xs">
-                <Link to="/admin" className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
-                  Admin
+              <Button asChild size="sm" variant="accent" className="text-xs px-2 md:px-3">
+                <Link to="/admin" className="flex items-center gap-1 md:gap-2">
+                  <Settings className="h-3 w-3 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline">Admin</span>
                 </Link>
               </Button>
             )}
@@ -151,20 +153,28 @@ const Header = () => {
               >
                 {item.name}
               </Link>
-            ))}
-            {/* Mobile Admin Link */}
-            {isAdmin && (
-              <Link
-                to="/admin"
-                className="block px-3 py-2 text-base font-medium text-primary border-l-2 border-primary bg-primary/5"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Admin Dashboard
-              </Link>
-            )}
+              ))}
+              
+              {/* Mobile-only items */}
+              <div className="border-t border-border pt-2 mt-2">
+                <div className="px-3 py-2">
+                  <CurrencySwitcher />
+                </div>
+              </div>
+              
+              {/* Mobile Admin Link */}
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="block px-3 py-2 text-base font-medium text-primary border-l-2 border-primary bg-primary/5"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Admin Dashboard
+                </Link>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </header>
   );
 };
