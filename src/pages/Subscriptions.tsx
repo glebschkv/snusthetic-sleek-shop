@@ -86,11 +86,6 @@ const Subscriptions = () => {
       <main className="container mx-auto px-4 py-8 space-y-12">
         {/* Hero Section */}
         <section className="text-center space-y-6">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
-            <Star className="w-4 h-4" />
-            <span className="text-sm font-medium">Premium Subscription Service</span>
-          </div>
-          
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
             Never Miss Your
             <span className="text-primary block">Favorite Snus</span>
@@ -100,6 +95,10 @@ const Subscriptions = () => {
             Get your premium snus delivered automatically every month. Choose your products, 
             select your quantity, and enjoy hassle-free deliveries with exclusive subscriber benefits.
           </p>
+
+          <div className="inline-block bg-muted/50 text-muted-foreground px-4 py-2 rounded-lg border">
+            <span className="text-sm font-medium">Coming to your country soon!</span>
+          </div>
         </section>
 
         {/* Benefits Section */}

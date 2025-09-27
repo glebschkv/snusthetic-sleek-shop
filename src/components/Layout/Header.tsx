@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X, ShoppingBag, User, Settings } from 'lucide-react';
+import { Menu, X, ShoppingBag, User, Settings, Package } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useCartContext } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -63,6 +63,13 @@ const Header = () => {
             {/* Currency Switcher */}
             <CurrencySwitcher />
             
+            {/* Subscription Button */}
+            <Button asChild size="sm" variant="default" className="bg-primary hover:bg-primary/90">
+              <Link to="/subscriptions" className="flex items-center gap-2">
+                <Package className="h-4 w-4" />
+                Subscribe
+              </Link>
+            </Button>
             
             {/* Admin Button - Prominent for easy access */}
             {isAdmin && (
