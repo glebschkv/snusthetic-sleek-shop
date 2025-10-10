@@ -7,24 +7,27 @@ import { CheckCircle, Package, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
-import { supabase } from '@/integrations/supabase/client';
 
 export default function CheckoutSuccess() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { clearCart } = useCartContext();
   const sessionId = searchParams.get('session_id');
+  const isSubscription = searchParams.get('subscription') === 'true';
   const [orderConfirmed, setOrderConfirmed] = useState(false);
 
   useEffect(() => {
-    // Clear cart immediately when success page loads
-    // The webhook will handle order creation automatically
     if (!orderConfirmed) {
       clearCart();
       setOrderConfirmed(true);
-      toast.success('Order completed successfully! You will receive a confirmation email shortly.');
+      
+      if (isSubscription) {
+        toast.success('Subscription activated! Check your profile to manage it.');
+      } else {
+        toast.success('Order completed successfully! You will receive a confirmation email shortly.');
+      }
     }
-  }, [orderConfirmed, clearCart]);
+  }, [orderConfirmed, clearCart, isSubscription]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -38,17 +41,20 @@ export default function CheckoutSuccess() {
                 <CheckCircle className="h-16 w-16 text-green-500" />
               </div>
               <CardTitle className="text-2xl text-green-700">
-                Payment Successful!
+                {isSubscription ? 'Subscription Activated!' : 'Payment Successful!'}
               </CardTitle>
               <p className="text-lg font-semibold">
-                Thank you for shopping with <span className="font-bold text-primary">SNUSTHETIC</span>!
+                Thank you for {isSubscription ? 'subscribing with' : 'shopping with'} <span className="font-bold text-primary">SNUSTHETIC</span>!
               </p>
             </CardHeader>
             
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <p className="text-muted-foreground">
-                  Your days of spilling used pouches in your pocket are officially over! Your payment has been processed successfully.
+                  {isSubscription 
+                    ? 'Your monthly subscription is now active! You\'ll receive your first delivery soon.'
+                    : 'Your days of spilling used pouches in your pocket are officially over! Your payment has been processed successfully.'
+                  }
                 </p>
                 {sessionId && (
                   <p className="text-sm text-muted-foreground">
@@ -64,26 +70,57 @@ export default function CheckoutSuccess() {
                 </div>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li>• You'll receive an email confirmation shortly</li>
-                  <li>• Your order will be processed within 1-2 business days</li>
-                  <li>• You'll get tracking information once shipped</li>
+                  {isSubscription ? (
+                    <>
+                      <li>• Your first delivery will ship within 1-2 business days</li>
+                      <li>• Future deliveries will arrive monthly</li>
+                      <li>• Manage your subscription from your profile</li>
+                    </>
+                  ) : (
+                    <>
+                      <li>• Your order will be processed within 1-2 business days</li>
+                      <li>• You'll get tracking information once shipped</li>
+                    </>
+                  )}
                 </ul>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => navigate('/shop')}
-                  className="flex-1"
-                >
-                  Continue Shopping
-                </Button>
-                <Button 
-                  onClick={() => navigate('/')}
-                  className="flex-1"
-                >
-                  Back to Home
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                {isSubscription ? (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate('/profile')}
+                      className="flex-1"
+                    >
+                      View Subscription
+                    </Button>
+                    <Button 
+                      onClick={() => navigate('/')}
+                      className="flex-1"
+                    >
+                      Back to Home
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate('/shop')}
+                      className="flex-1"
+                    >
+                      Continue Shopping
+                    </Button>
+                    <Button 
+                      onClick={() => navigate('/')}
+                      className="flex-1"
+                    >
+                      Back to Home
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>

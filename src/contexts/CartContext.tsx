@@ -5,7 +5,18 @@ import { Product, ProductVariant } from '@/types/store';
 interface CartContextType {
   items: any[];
   isOpen: boolean;
-  addItem: (product: Product, quantity?: number, variant?: ProductVariant) => void;
+  addItem: (
+    product: Product, 
+    quantity?: number, 
+    variant?: ProductVariant,
+    subscriptionData?: {
+      quantity_type: '5' | '10' | '20' | 'custom';
+      billing_interval: 'month';
+      brand_name?: string;
+      flavor?: string;
+      strength_mg?: number;
+    }
+  ) => void;
   removeItem: (productId: string, variantId?: string) => void;
   updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
   clearCart: () => void;
@@ -15,6 +26,8 @@ interface CartContextType {
   openCart: () => void;
   closeCart: () => void;
   formatTotal: () => string;
+  hasSubscriptions: () => boolean;
+  hasPhysicalProducts: () => boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);

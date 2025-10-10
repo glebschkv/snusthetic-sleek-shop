@@ -1,14 +1,55 @@
 import { useState, useCallback } from 'react';
 import { CartItem, Product, ProductVariant } from '@/types/store';
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { toast } from 'sonner';
 
 export const useCart = () => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const { formatPrice } = useCurrency();
 
-  const addItem = useCallback((product: Product, quantity: number = 1, variant?: ProductVariant) => {
+  const addItem = useCallback((
+    product: Product, 
+    quantity: number = 1, 
+    variant?: ProductVariant,
+    subscriptionData?: {
+      quantity_type: '5' | '10' | '20' | 'custom';
+      billing_interval: 'month';
+      brand_name?: string;
+      flavor?: string;
+      strength_mg?: number;
+    }
+  ) => {
     setItems(prevItems => {
+      const hasSubscriptions = prevItems.some(item => item.is_subscription);
+      const hasPhysical = prevItems.some(item => !item.is_subscription);
+      const isAddingSubscription = !!subscriptionData;
+      
+      // Prevent mixing subscription and physical products
+      if (hasSubscriptions && !isAddingSubscription) {
+        toast.error('Please complete your subscription checkout first, or clear your cart to add physical products');
+        return prevItems;
+      }
+      
+      if (hasPhysical && isAddingSubscription) {
+        toast.error('Please complete your physical product checkout first, or clear your cart to add a subscription');
+        return prevItems;
+      }
+      
+      // For subscriptions, replace any existing subscription
+      if (isAddingSubscription) {
+        const newItem: CartItem = {
+          id: Date.now().toString(),
+          product_id: product.id,
+          quantity,
+          product,
+          is_subscription: true,
+          subscription_data: subscriptionData
+        };
+        return [newItem];
+      }
+      
+      // Existing logic for physical products
       const existingItem = prevItems.find(item => 
         item.product_id === product.id && item.variant_id === variant?.id
       );
@@ -21,7 +62,7 @@ export const useCart = () => {
         );
       } else {
         const newItem: CartItem = {
-          id: Date.now().toString(), // Simple ID for local cart
+          id: Date.now().toString(),
           product_id: product.id,
           variant_id: variant?.id,
           quantity,
@@ -85,6 +126,14 @@ export const useCart = () => {
     return formatPrice(getTotal());
   }, [getTotal, formatPrice]);
 
+  const hasSubscriptions = useCallback(() => {
+    return items.some(item => item.is_subscription);
+  }, [items]);
+
+  const hasPhysicalProducts = useCallback(() => {
+    return items.some(item => !item.is_subscription);
+  }, [items]);
+
   return {
     items,
     isOpen,
@@ -97,6 +146,8 @@ export const useCart = () => {
     toggleCart,
     openCart,
     closeCart,
-    formatTotal
+    formatTotal,
+    hasSubscriptions,
+    hasPhysicalProducts
   };
 };

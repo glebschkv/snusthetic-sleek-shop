@@ -2,7 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { CartItem } from '@/types/store';
 import { useCurrency } from '@/contexts/CurrencyContext';
-import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag, Repeat } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -62,7 +63,9 @@ const CartDrawer = ({
         
         <div className="flex-1 overflow-y-auto space-y-4 py-4">
           {items.map((item) => {
-            const itemPrice = item.product.price + (item.variant?.price_adjustment || 0);
+            const itemPrice = item.is_subscription 
+              ? item.product.price * item.quantity
+              : item.product.price + (item.variant?.price_adjustment || 0);
             const displayImage = item.variant?.image_url || item.product.image_url || '/images/placeholder.svg';
             
             return (
@@ -75,10 +78,27 @@ const CartDrawer = ({
                 
                 <div className="flex-1 space-y-2">
                   <div>
-                    <h4 className="font-medium text-sm leading-tight">
-                      {item.product.name}
-                    </h4>
-                    {item.variant && (
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-medium text-sm leading-tight">
+                        {item.product.name}
+                      </h4>
+                      {item.is_subscription && (
+                        <Badge variant="secondary" className="text-xs">
+                          <Repeat className="h-3 w-3 mr-1" />
+                          Monthly
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    {item.is_subscription && item.subscription_data && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {item.subscription_data.brand_name && `${item.subscription_data.brand_name} • `}
+                        {item.subscription_data.flavor && `${item.subscription_data.flavor} • `}
+                        {item.subscription_data.strength_mg && `${item.subscription_data.strength_mg}mg`}
+                      </div>
+                    )}
+                    
+                    {!item.is_subscription && item.variant && (
                       <div className="flex items-center gap-2 mt-1">
                         <div
                           className="w-3 h-3 rounded-full border border-border"
@@ -90,31 +110,52 @@ const CartDrawer = ({
                       </div>
                     )}
                   </div>
-                  <p className="text-sm font-semibold">
-                    {formatPrice(itemPrice)}
-                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">
+                      {formatPrice(itemPrice)}
+                      {item.is_subscription && <span className="text-xs text-muted-foreground">/month</span>}
+                    </p>
+                    
+                    {item.is_subscription && item.subscription_data && (
+                      <span className="text-xs text-green-600">
+                        {item.subscription_data.quantity_type === '5' && '15% off'}
+                        {item.subscription_data.quantity_type === '10' && '20% off'}
+                        {item.subscription_data.quantity_type === '20' && '25% off'}
+                        {item.subscription_data.quantity_type === 'custom' && '10% off'}
+                      </span>
+                    )}
+                  </div>
                 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 w-8 p-0"
-                      onClick={() => onUpdateQuantity(item.product_id, item.quantity - 1, item.variant_id)}
-                    >
-                      <Minus className="h-3 w-3" />
-                    </Button>
-                    <span className="text-sm font-medium w-8 text-center">
-                      {item.quantity}
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 w-8 p-0"
-                      onClick={() => onUpdateQuantity(item.product_id, item.quantity + 1, item.variant_id)}
-                    >
-                      <Plus className="h-3 w-3" />
-                    </Button>
+                    {!item.is_subscription ? (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0"
+                          onClick={() => onUpdateQuantity(item.product_id, item.quantity - 1, item.variant_id)}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="text-sm font-medium w-8 text-center">
+                          {item.quantity}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0"
+                          onClick={() => onUpdateQuantity(item.product_id, item.quantity + 1, item.variant_id)}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">
+                        {item.quantity} cans/month
+                      </span>
+                    )}
                   </div>
                   
                   <Button

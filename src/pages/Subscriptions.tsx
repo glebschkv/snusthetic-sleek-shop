@@ -12,6 +12,8 @@ import BrandSelector from '@/components/Subscription/BrandSelector';
 import FlavorStrengthSelector from '@/components/Subscription/FlavorStrengthSelector';
 import QuantitySelector from '@/components/Subscription/QuantitySelector';
 import ProductDetailsAccordion from '@/components/Subscription/ProductDetailsAccordion';
+import { useCartContext } from '@/contexts/CartContext';
+import { Product as StoreProduct } from '@/types/store';
 
 interface Brand {
   id: string;
@@ -34,11 +36,11 @@ interface Product {
 const Subscriptions = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { addItem, openCart } = useCartContext();
   
   const [brands, setBrands] = useState<Brand[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [subscribing, setSubscribing] = useState(false);
   
   // Selection state
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
@@ -114,13 +116,24 @@ const Subscriptions = () => {
     }
   };
 
-  const handleSubscribe = async () => {
-    if (!user) {
-      toast.error('Please log in to subscribe');
-      navigate('/auth', { state: { from: '/subscriptions' } });
-      return;
-    }
+  const calculatePrice = () => {
+    const quantity = getQuantity();
+    const basePrice = getSelectedProduct()?.price || 0;
+    
+    let discountPercent = 0;
+    if (quantityType === '5') discountPercent = 15;
+    else if (quantityType === '10') discountPercent = 20;
+    else if (quantityType === '20') discountPercent = 25;
+    else if (quantityType === 'custom') discountPercent = 10;
+    
+    const pricePerCan = basePrice * (1 - discountPercent / 100);
+    const totalPrice = pricePerCan * quantity;
+    const savings = (basePrice * quantity) - totalPrice;
+    
+    return { pricePerCan, totalPrice, savings, discountPercent };
+  };
 
+  const handleAddToCart = () => {
     const selectedProduct = getSelectedProduct();
     if (!selectedProduct) {
       toast.error('Please select a product');
@@ -133,36 +146,21 @@ const Subscriptions = () => {
       return;
     }
 
-    try {
-      setSubscribing(true);
-
-      // Call edge function to create subscription
-      const { data: session } = await supabase.auth.getSession();
-      const response = await supabase.functions.invoke('create-subscription', {
-        body: {
-          product_id: selectedProduct.id,
-          quantity_type: quantityType,
-          quantity: quantity,
-          return_url: `${window.location.origin}/profile?subscription_success=true`,
-        },
-        headers: {
-          Authorization: `Bearer ${session.session?.access_token}`,
-        },
-      });
-
-      if (response.error) throw response.error;
-
-      if (response.data?.checkout_url) {
-        window.location.href = response.data.checkout_url;
-      } else {
-        throw new Error('No checkout URL returned');
+    addItem(
+      selectedProduct as unknown as StoreProduct, 
+      quantity, 
+      undefined,
+      {
+        quantity_type: quantityType,
+        billing_interval: 'month',
+        brand_name: selectedBrand?.name,
+        flavor: selectedFlavor || undefined,
+        strength_mg: selectedStrength || undefined
       }
-    } catch (error) {
-      console.error('Subscription error:', error);
-      toast.error('Failed to start subscription. Please try again.');
-    } finally {
-      setSubscribing(false);
-    }
+    );
+    
+    openCart();
+    toast.success('Subscription added to cart!');
   };
 
   const brandProducts = selectedBrand
@@ -294,16 +292,21 @@ const Subscriptions = () => {
         {isProductSelected && (
           <section className="py-12 bg-muted/30">
             <div className="container mx-auto px-4 text-center">
+              <div className="mb-4">
+                <p className="text-2xl font-bold">€{calculatePrice().totalPrice.toFixed(2)}/month</p>
+                <p className="text-sm text-green-600">
+                  Save €{calculatePrice().savings.toFixed(2)} ({calculatePrice().discountPercent}% off)
+                </p>
+              </div>
               <Button
                 size="lg"
-                onClick={handleSubscribe}
-                disabled={subscribing}
+                onClick={handleAddToCart}
                 className="text-lg px-12 py-6"
               >
-                {subscribing ? 'Processing...' : 'Start Subscription'}
+                Add to Cart
               </Button>
               <p className="text-sm text-muted-foreground mt-4">
-                You can cancel or modify your subscription anytime
+                Review your subscription in cart before checkout
               </p>
             </div>
           </section>

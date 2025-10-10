@@ -42,6 +42,14 @@ export interface CartItem {
   quantity: number;
   product: Product;
   variant?: ProductVariant;
+  is_subscription?: boolean;
+  subscription_data?: {
+    quantity_type: '5' | '10' | '20' | 'custom';
+    billing_interval: 'month';
+    brand_name?: string;
+    flavor?: string;
+    strength_mg?: number;
+  };
 }
 
 export interface Order {

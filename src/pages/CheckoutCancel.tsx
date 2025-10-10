@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { XCircle, ArrowLeft, ShoppingCart } from 'lucide-react';
@@ -7,6 +7,8 @@ import Footer from '@/components/Layout/Footer';
 
 export default function CheckoutCancel() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isSubscription = searchParams.get('subscription') === 'true';
 
   return (
     <div className="min-h-screen bg-background">
@@ -20,14 +22,14 @@ export default function CheckoutCancel() {
                 <XCircle className="h-16 w-16 text-muted-foreground" />
               </div>
               <CardTitle className="text-2xl text-muted-foreground">
-                Payment Cancelled
+                {isSubscription ? 'Subscription Cancelled' : 'Payment Cancelled'}
               </CardTitle>
             </CardHeader>
             
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <p className="text-muted-foreground">
-                  Your payment was cancelled. No charges have been made to your account.
+                  Your {isSubscription ? 'subscription setup' : 'payment'} was cancelled. No charges have been made to your account.
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Your cart items have been saved and are still available.
@@ -36,18 +38,18 @@ export default function CheckoutCancel() {
 
               <div className="bg-muted/50 rounded-lg p-4">
                 <p className="text-sm text-muted-foreground">
-                  Need help with your order? Contact our support team or try the checkout process again.
+                  Need help? Contact our support team or try the checkout process again.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button 
                   variant="outline" 
-                  onClick={() => navigate('/shop')}
+                  onClick={() => navigate(isSubscription ? '/subscriptions' : '/shop')}
                   className="flex-1"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Continue Shopping
+                  {isSubscription ? 'Back to Subscriptions' : 'Continue Shopping'}
                 </Button>
                 <Button 
                   onClick={() => navigate('/checkout')}
