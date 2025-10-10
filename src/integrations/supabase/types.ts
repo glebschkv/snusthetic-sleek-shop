@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      brands: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          logo_url: string | null
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string
@@ -181,45 +205,64 @@ export type Database = {
       }
       products: {
         Row: {
+          brand_id: string | null
           category_id: string | null
           created_at: string
           currency: string
           description: string | null
+          flavor: string | null
           id: string
           image_url: string | null
           is_available: boolean
           name: string
           price: number
+          product_type: string | null
           stock_quantity: number
+          strength_mg: number | null
           updated_at: string
         }
         Insert: {
+          brand_id?: string | null
           category_id?: string | null
           created_at?: string
           currency?: string
           description?: string | null
+          flavor?: string | null
           id?: string
           image_url?: string | null
           is_available?: boolean
           name: string
           price: number
+          product_type?: string | null
           stock_quantity?: number
+          strength_mg?: number | null
           updated_at?: string
         }
         Update: {
+          brand_id?: string | null
           category_id?: string | null
           created_at?: string
           currency?: string
           description?: string | null
+          flavor?: string | null
           id?: string
           image_url?: string | null
           is_available?: boolean
           name?: string
           price?: number
+          product_type?: string | null
           stock_quantity?: number
+          strength_mg?: number | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "products_category_id_fkey"
             columns: ["category_id"]
@@ -299,6 +342,9 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          is_custom: boolean | null
+          max_quantity: number | null
+          min_quantity: number | null
           price_per_month: number
           product_id: string
           quantity_per_month: number
@@ -309,6 +355,9 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_custom?: boolean | null
+          max_quantity?: number | null
+          min_quantity?: number | null
           price_per_month: number
           product_id: string
           quantity_per_month: number
@@ -319,6 +368,9 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_custom?: boolean | null
+          max_quantity?: number | null
+          min_quantity?: number | null
           price_per_month?: number
           product_id?: string
           quantity_per_month?: number

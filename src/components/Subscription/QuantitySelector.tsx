@@ -1,0 +1,140 @@
+import { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+import { useCurrency } from '@/contexts/CurrencyContext';
+
+interface QuantitySelectorProps {
+  basePrice: number;
+  selectedQuantity: number;
+  quantityType: '5' | '10' | '20' | 'custom';
+  customQuantity: number;
+  onSelectQuantity: (type: '5' | '10' | '20' | 'custom', customValue?: number) => void;
+}
+
+const presetQuantities = [
+  { value: '5', quantity: 5, discount: 15, label: '5 Cans' },
+  { value: '10', quantity: 10, discount: 20, label: '10 Cans' },
+  { value: '20', quantity: 20, discount: 25, label: '20 Cans' },
+] as const;
+
+const QuantitySelector = ({
+  basePrice,
+  selectedQuantity,
+  quantityType,
+  customQuantity,
+  onSelectQuantity,
+}: QuantitySelectorProps) => {
+  const { formatPrice } = useCurrency();
+  const [customInput, setCustomInput] = useState(customQuantity.toString());
+
+  const calculatePrice = (quantity: number, discount: number) => {
+    const pricePerCan = basePrice * (1 - discount / 100);
+    const total = pricePerCan * quantity;
+    const savings = (basePrice * quantity) - total;
+    return { pricePerCan, total, savings };
+  };
+
+  const handleCustomInputChange = (value: string) => {
+    setCustomInput(value);
+    const num = parseInt(value);
+    if (!isNaN(num) && num >= 25) {
+      onSelectQuantity('custom', num);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-xl font-semibold">Select Quantity per Month</h3>
+      
+      {/* Preset Quantities */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {presetQuantities.map((option) => {
+          const { pricePerCan, total, savings } = calculatePrice(option.quantity, option.discount);
+          const isSelected = quantityType === option.value;
+          
+          return (
+            <Card
+              key={option.value}
+              className={cn(
+                "p-4 cursor-pointer transition-all hover:scale-105",
+                isSelected
+                  ? "border-primary border-2 bg-primary/5"
+                  : "border-border hover:border-primary/50"
+              )}
+              onClick={() => onSelectQuantity(option.value as '5' | '10' | '20')}
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-lg">{option.label}</h4>
+                  <Badge variant="secondary" className="bg-green-500/10 text-green-600">
+                    {option.discount}% OFF
+                  </Badge>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {formatPrice(pricePerCan)}/can
+                </div>
+                <div className="text-2xl font-bold">{formatPrice(total)}/month</div>
+                <div className="text-sm text-green-600">Save {formatPrice(savings)}</div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Custom Quantity */}
+      <Card
+        className={cn(
+          "p-4 transition-all",
+          quantityType === 'custom'
+            ? "border-primary border-2 bg-primary/5"
+            : "border-border"
+        )}
+      >
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="font-bold text-lg">Custom Quantity</h4>
+            <Badge variant="secondary" className="bg-green-500/10 text-green-600">
+              10% OFF
+            </Badge>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="custom-quantity">Number of cans (minimum 25)</Label>
+            <Input
+              id="custom-quantity"
+              type="number"
+              min="25"
+              value={customInput}
+              onChange={(e) => handleCustomInputChange(e.target.value)}
+              onFocus={() => onSelectQuantity('custom', parseInt(customInput) || 25)}
+              placeholder="Enter quantity..."
+            />
+          </div>
+          {quantityType === 'custom' && customQuantity >= 25 && (
+            <div className="pt-2 space-y-1">
+              <div className="text-sm text-muted-foreground">
+                {formatPrice(basePrice * 0.9)}/can
+              </div>
+              <div className="text-2xl font-bold">
+                {formatPrice(basePrice * 0.9 * customQuantity)}/month
+              </div>
+              <div className="text-sm text-green-600">
+                Save {formatPrice(basePrice * customQuantity * 0.1)}
+              </div>
+            </div>
+          )}
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+// Badge component inline for simplicity
+const Badge = ({ children, variant, className }: any) => (
+  <span className={cn("inline-flex items-center rounded-md px-2 py-1 text-xs font-medium", className)}>
+    {children}
+  </span>
+);
+
+export default QuantitySelector;

@@ -34,31 +34,56 @@ serve(async (req) => {
       throw new Error('Unauthorized')
     }
 
-    const { subscription_plan_id, return_url } = await req.json() as CreateSubscriptionRequest
+    const { product_id, quantity_type, quantity, return_url } = await req.json()
 
-    console.log('Creating subscription for user:', user.id, 'plan:', subscription_plan_id)
+    console.log('Creating subscription for user:', user.id, 'product:', product_id, 'quantity:', quantity)
 
-    // Get subscription plan details
-    const { data: plan, error: planError } = await supabaseClient
-      .from('subscription_plans')
-      .select(`
-        *,
-        products (
-          id,
-          name,
-          description,
-          price,
-          currency
-        )
-      `)
-      .eq('id', subscription_plan_id)
-      .single()
-
-    if (planError || !plan) {
-      throw new Error('Subscription plan not found')
+    // Validate inputs
+    if (!product_id || !quantity_type || !quantity) {
+      throw new Error('Missing required fields: product_id, quantity_type, quantity')
     }
 
-    console.log('Found plan:', plan)
+    // Validate custom quantity minimum
+    if (quantity_type === 'custom' && quantity < 25) {
+      throw new Error('Custom quantity must be at least 25 cans')
+    }
+
+    // Get product details
+    const { data: product, error: productError } = await supabaseClient
+      .from('products')
+      .select(`
+        id,
+        name,
+        description,
+        price,
+        currency,
+        flavor,
+        strength_mg,
+        brand_id,
+        brands (
+          name
+        )
+      `)
+      .eq('id', product_id)
+      .single()
+
+    if (productError || !product) {
+      throw new Error('Product not found')
+    }
+
+    console.log('Found product:', product)
+
+    // Calculate pricing based on quantity type
+    let discountPercent = 0
+    if (quantity_type === '5') discountPercent = 15
+    else if (quantity_type === '10') discountPercent = 20
+    else if (quantity_type === '20') discountPercent = 25
+    else if (quantity_type === 'custom') discountPercent = 10
+
+    const pricePerCan = product.price * (1 - discountPercent / 100)
+    const pricePerMonth = pricePerCan * quantity
+
+    console.log('Pricing:', { quantity, discountPercent, pricePerCan, pricePerMonth })
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -96,43 +121,38 @@ serve(async (req) => {
 
     console.log('Using Stripe customer:', customerId)
 
-    // Create or get Stripe product and price
-    let stripePriceId = plan.stripe_price_id
+    // Create Stripe product with full description
+    const stripeProduct = await stripe.products.create({
+      name: `${product.brands?.name || 'Brand'} ${product.flavor} ${product.strength_mg}mg - Monthly Subscription`,
+      description: `${quantity} cans per month of ${product.name}`,
+      metadata: {
+        product_id: product.id,
+        brand: product.brands?.name || '',
+        flavor: product.flavor || '',
+        strength: product.strength_mg?.toString() || '',
+        quantity_type: quantity_type
+      }
+    })
 
-    if (!stripePriceId) {
-      // Create Stripe product
-      const stripeProduct = await stripe.products.create({
-        name: `${plan.products.name} - ${plan.quantity_per_month} cans/month`,
-        description: `Monthly subscription for ${plan.quantity_per_month} cans of ${plan.products.name}`,
-        metadata: {
-          subscription_plan_id: plan.id,
-          product_id: plan.products.id
-        }
-      })
+    console.log('Created Stripe product:', stripeProduct.id)
 
-      // Create Stripe price
-      const stripePrice = await stripe.prices.create({
-        product: stripeProduct.id,
-        unit_amount: Math.round(plan.price_per_month * 100), // Convert to cents
-        currency: plan.products.currency.toLowerCase(),
-        recurring: {
-          interval: 'month'
-        },
-        metadata: {
-          subscription_plan_id: plan.id
-        }
-      })
+    // Create Stripe price for this subscription
+    const stripePrice = await stripe.prices.create({
+      product: stripeProduct.id,
+      unit_amount: Math.round(pricePerMonth * 100), // Convert to cents
+      currency: product.currency.toLowerCase(),
+      recurring: {
+        interval: 'month'
+      },
+      metadata: {
+        product_id: product.id,
+        quantity: quantity.toString(),
+        quantity_type: quantity_type,
+        discount_percent: discountPercent.toString()
+      }
+    })
 
-      stripePriceId = stripePrice.id
-
-      // Update subscription plan with Stripe price ID
-      await supabaseClient
-        .from('subscription_plans')
-        .update({ stripe_price_id: stripePriceId })
-        .eq('id', plan.id)
-    }
-
-    console.log('Using Stripe price:', stripePriceId)
+    console.log('Created Stripe price:', stripePrice.id)
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -140,7 +160,7 @@ serve(async (req) => {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: stripePriceId,
+          price: stripePrice.id,
           quantity: 1,
         },
       ],
@@ -149,12 +169,16 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/subscriptions?subscription_cancelled=true`,
       metadata: {
         user_id: user.id,
-        subscription_plan_id: plan.id
+        product_id: product.id,
+        quantity: quantity.toString(),
+        quantity_type: quantity_type
       },
       subscription_data: {
         metadata: {
           user_id: user.id,
-          subscription_plan_id: plan.id
+          product_id: product.id,
+          quantity: quantity.toString(),
+          quantity_type: quantity_type
         }
       }
     })
