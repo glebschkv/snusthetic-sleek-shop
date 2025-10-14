@@ -142,8 +142,9 @@ const ProductGrid = () => {
     );
   }
 
-  // Take first 3 products for homepage display
-  const featuredProducts = products.slice(0, 3);
+  // Filter to only show physical products (snus holders), take first 3 for homepage display
+  const physicalProducts = products.filter(p => p.product_type === 'physical');
+  const featuredProducts = physicalProducts.slice(0, 3);
   return (
     <section className="py-8 sm:py-12 lg:py-16 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
