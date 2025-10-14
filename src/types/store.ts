@@ -29,6 +29,7 @@ export interface Product {
   image_url?: string;
   stock_quantity: number;
   is_available: boolean;
+  product_type?: string;
   created_at: string;
   updated_at: string;
   category?: Category;

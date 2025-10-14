@@ -42,6 +42,8 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' 
     }
   };
 
+  const isSubscriptionOnly = product.product_type === 'nicotine_pouch';
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent navigation when clicking Add to Cart
     onAddToCart(product, selectedVariant);
@@ -99,12 +101,12 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' 
               
               <Button
                 onClick={handleAddToCart}
-                disabled={!isAvailable || currentStock <= 0}
+                disabled={!isAvailable || currentStock <= 0 || isSubscriptionOnly}
                 variant="outline"
                 size="default"
                 className="min-w-[120px]"
               >
-                {currentStock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                {isSubscriptionOnly ? 'Subscription Only' : currentStock <= 0 ? 'Out of Stock' : 'Add to Cart'}
               </Button>
             </div>
             
@@ -181,12 +183,12 @@ const ProductCard = ({ product, onAddToCart, onProductUpdate, viewMode = 'grid' 
           
           <Button
             onClick={handleAddToCart}
-            disabled={!isAvailable || currentStock <= 0}
+            disabled={!isAvailable || currentStock <= 0 || isSubscriptionOnly}
             variant="outline"
             size="sm"
             className="min-w-[100px] text-xs"
           >
-            {currentStock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+            {isSubscriptionOnly ? 'Subscription Only' : currentStock <= 0 ? 'Out of Stock' : 'Add to Cart'}
           </Button>
         </div>
       </div>

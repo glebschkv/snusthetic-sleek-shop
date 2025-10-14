@@ -60,6 +60,8 @@ export const useProducts = () => {
     loading,
     error,
     refetch,
-    categoryNames: storeService.getProductCategories(products)
+    categoryNames: storeService.getProductCategories(products),
+    physicalProducts: products.filter(p => p.product_type === 'physical'),
+    nicotinePouches: products.filter(p => p.product_type === 'nicotine_pouch'),
   };
 };

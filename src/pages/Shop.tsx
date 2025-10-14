@@ -16,9 +16,12 @@ const Shop = () => {
   const cart = useCartContext();
   const { toast } = useToast();
 
+  // Filter to only show physical products (snus holders)
+  const physicalProducts = products.filter(p => p.product_type === 'physical');
+  
   const filteredProducts = selectedCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category?.slug === selectedCategory);
+    ? physicalProducts 
+    : physicalProducts.filter(product => product.category?.slug === selectedCategory);
 
   const handleAddToCart = (product: any, variant?: any) => {
     cart.addItem(product, 1, variant);
@@ -38,10 +41,10 @@ const Shop = () => {
         <section className="bg-primary/5 py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-4">
-              SHOP COLLECTION
+              PREMIUM SNUS HOLDERS
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Premium ribbed metal snus holders for the discerning user
+              Ribbed metal holders designed for style and durability
             </p>
           </div>
         </section>

@@ -231,6 +231,37 @@ const Subscriptions = () => {
           </div>
         </section>
 
+        {/* Subscription-Only Info Section */}
+        <section className="py-8 bg-primary/5">
+          <div className="container mx-auto px-4 text-center max-w-3xl">
+            <h3 className="text-2xl font-bold mb-4">Subscription-Only Nicotine Pouches</h3>
+            <p className="text-muted-foreground mb-4">
+              Our nicotine pouch products (Zyn & Velo) are available exclusively through 
+              monthly subscriptions. This ensures you never run out and always get the best pricing.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              <div className="p-4 bg-background rounded-lg">
+                <h4 className="font-semibold mb-2">🎯 Never Run Out</h4>
+                <p className="text-sm text-muted-foreground">
+                  Automatic monthly deliveries
+                </p>
+              </div>
+              <div className="p-4 bg-background rounded-lg">
+                <h4 className="font-semibold mb-2">💰 Best Pricing</h4>
+                <p className="text-sm text-muted-foreground">
+                  Save 15-25% with subscriptions
+                </p>
+              </div>
+              <div className="p-4 bg-background rounded-lg">
+                <h4 className="font-semibold mb-2">🔄 Flexible</h4>
+                <p className="text-sm text-muted-foreground">
+                  Cancel or modify anytime
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Brand Selection */}
         <section className="py-12 bg-muted/30">
           <div className="container mx-auto px-4">
