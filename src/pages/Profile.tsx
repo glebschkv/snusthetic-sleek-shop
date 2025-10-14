@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { toast as sonnerToast } from 'sonner';
 import { ReferralSection } from '@/components/Profile/ReferralSection';
 import { User, Settings, LogOut, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -35,6 +36,14 @@ export default function Profile() {
     }
     fetchProfile();
   }, [user, navigate]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('subscription_success') === 'true') {
+      sonnerToast.success('Subscription created successfully!');
+      window.history.replaceState({}, '', '/profile');
+    }
+  }, []);
 
   const fetchProfile = async () => {
     try {

@@ -12,8 +12,6 @@ import BrandSelector from '@/components/Subscription/BrandSelector';
 import FlavorStrengthSelector from '@/components/Subscription/FlavorStrengthSelector';
 import QuantitySelector from '@/components/Subscription/QuantitySelector';
 import ProductDetailsAccordion from '@/components/Subscription/ProductDetailsAccordion';
-import { useCartContext } from '@/contexts/CartContext';
-import { Product as StoreProduct } from '@/types/store';
 
 interface Brand {
   id: string;
@@ -36,11 +34,11 @@ interface Product {
 const Subscriptions = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { addItem, openCart } = useCartContext();
   
   const [brands, setBrands] = useState<Brand[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [subscribing, setSubscribing] = useState(false);
   
   // Selection state
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
@@ -133,7 +131,13 @@ const Subscriptions = () => {
     return { pricePerCan, totalPrice, savings, discountPercent };
   };
 
-  const handleAddToCart = () => {
+  const handleSubscribe = async () => {
+    if (!user) {
+      toast.error('Please log in to subscribe');
+      navigate('/auth');
+      return;
+    }
+
     const selectedProduct = getSelectedProduct();
     if (!selectedProduct) {
       toast.error('Please select a product');
@@ -146,21 +150,31 @@ const Subscriptions = () => {
       return;
     }
 
-    addItem(
-      selectedProduct as unknown as StoreProduct, 
-      quantity, 
-      undefined,
-      {
-        quantity_type: quantityType,
-        billing_interval: 'month',
-        brand_name: selectedBrand?.name,
-        flavor: selectedFlavor || undefined,
-        strength_mg: selectedStrength || undefined
+    try {
+      setSubscribing(true);
+      
+      const { data, error } = await supabase.functions.invoke('create-subscription', {
+        body: {
+          product_id: selectedProduct.id,
+          quantity_type: quantityType,
+          quantity: quantity,
+          return_url: `${window.location.origin}/profile?subscription_success=true`
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        throw new Error('No checkout URL received');
       }
-    );
-    
-    openCart();
-    toast.success('Subscription added to cart!');
+      
+    } catch (error) {
+      console.error('Error creating subscription:', error);
+      toast.error('Failed to start subscription. Please try again.');
+      setSubscribing(false);
+    }
   };
 
   const brandProducts = selectedBrand
@@ -331,13 +345,21 @@ const Subscriptions = () => {
               </div>
               <Button
                 size="lg"
-                onClick={handleAddToCart}
+                onClick={handleSubscribe}
+                disabled={subscribing}
                 className="text-lg px-12 py-6"
               >
-                Add to Cart
+                {subscribing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+                    Processing...
+                  </>
+                ) : (
+                  'Subscribe Now'
+                )}
               </Button>
               <p className="text-sm text-muted-foreground mt-4">
-                Review your subscription in cart before checkout
+                You'll be taken to secure checkout
               </p>
             </div>
           </section>
