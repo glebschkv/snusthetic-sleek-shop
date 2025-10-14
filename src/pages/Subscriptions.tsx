@@ -153,6 +153,12 @@ const Subscriptions = () => {
     try {
       setSubscribing(true);
       
+      console.log('Calling create-subscription with:', {
+        product_id: selectedProduct.id,
+        quantity_type: quantityType,
+        quantity: quantity,
+      });
+      
       const { data, error } = await supabase.functions.invoke('create-subscription', {
         body: {
           product_id: selectedProduct.id,
@@ -162,17 +168,40 @@ const Subscriptions = () => {
         }
       });
 
-      if (error) throw error;
+      console.log('Response from create-subscription:', { data, error });
 
-      if (data.checkout_url) {
-        window.location.href = data.checkout_url;
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error('No data received from edge function');
+      }
+
+      // Check multiple possible response structures
+      const checkoutUrl = data.checkout_url || data?.data?.checkout_url;
+      
+      console.log('Checkout URL:', checkoutUrl);
+
+      if (checkoutUrl) {
+        console.log('Redirecting to:', checkoutUrl);
+        window.location.href = checkoutUrl;
       } else {
-        throw new Error('No checkout URL received');
+        console.error('Full response data:', JSON.stringify(data, null, 2));
+        throw new Error('No checkout URL received. Check console for details.');
       }
       
     } catch (error) {
       console.error('Error creating subscription:', error);
-      toast.error('Failed to start subscription. Please try again.');
+      
+      // More detailed error message
+      if (error instanceof Error) {
+        toast.error(`Failed to start subscription: ${error.message}`);
+      } else {
+        toast.error('Failed to start subscription. Please try again.');
+      }
+      
       setSubscribing(false);
     }
   };
