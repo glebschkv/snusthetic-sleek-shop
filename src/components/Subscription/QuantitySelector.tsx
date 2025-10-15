@@ -15,8 +15,8 @@ interface QuantitySelectorProps {
 
 const presetQuantities = [
   { value: '5', quantity: 5, discount: 0, label: '5 Cans' },
-  { value: '10', quantity: 10, discount: 10, label: '10 Cans' },
-  { value: '20', quantity: 20, discount: 5, label: '20 Cans' },
+  { value: '10', quantity: 10, discount: 5, label: '10 Cans' },
+  { value: '20', quantity: 20, discount: 10, label: '20 Cans' },
 ] as const;
 
 const QuantitySelector = ({
