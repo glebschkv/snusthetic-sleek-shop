@@ -235,6 +235,35 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
 
     console.log('Order created successfully:', newOrder.id);
 
+    // Send order confirmation email
+    try {
+      await supabase.functions.invoke('send-order-confirmation', {
+        body: {
+          order_id: newOrder.id,
+          customer_email: session.customer_details.email,
+          customer_name: session.customer_details.name,
+          items: items,
+          total_amount: session.amount_total / 100,
+          currency: session.currency.toLowerCase(),
+          discount_amount: discountAmount,
+          quantity_discount_percent: session.metadata.quantity_discount_percent ? parseFloat(session.metadata.quantity_discount_percent) : undefined,
+          referral_code_used: referralCode,
+          shipping_address: formattedAddress || {
+            line1: '',
+            city: '',
+            postal_code: '',
+            country: ''
+          },
+          created_at: new Date().toISOString(),
+          status: 'completed'
+        }
+      });
+      console.log('Order confirmation email sent');
+    } catch (emailError) {
+      console.error('Failed to send order confirmation email:', emailError);
+      // Don't throw - order is already created, email is secondary
+    }
+
     // Create referral usage record if referral was used - using secure function
     if (referrerId && referralCode) {
       console.log('Creating referral usage record for referrer:', referrerId);

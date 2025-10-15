@@ -123,7 +123,30 @@ serve(async (req) => {
         });
     }
 
-    // Send confirmation email (placeholder for now)
+    // Send order confirmation email
+    try {
+      await supabase.functions.invoke('send-order-confirmation', {
+        body: {
+          order_id: order.id,
+          customer_email: customer_info.email,
+          customer_name: customer_info.name,
+          items: items,
+          total_amount: paymentIntent.amount / 100,
+          currency: paymentIntent.currency.toLowerCase(),
+          discount_amount: discountAmount ? parseFloat(discountAmount) : 0,
+          quantity_discount_percent: paymentIntent.metadata?.quantity_discount_percent ? parseFloat(paymentIntent.metadata.quantity_discount_percent) : undefined,
+          referral_code_used: referralCode,
+          shipping_address: customer_info.address,
+          created_at: new Date().toISOString(),
+          status: 'paid'
+        }
+      });
+      console.log('Order confirmation email sent');
+    } catch (emailError) {
+      console.error('Failed to send order confirmation email:', emailError);
+      // Don't throw - order is already created, email is secondary
+    }
+
     console.log('Order created successfully:', order)
 
     return new Response(
