@@ -110,6 +110,24 @@ export const useCart = () => {
     return items.reduce((count, item) => count + item.quantity, 0);
   }, [items]);
 
+  const getQuantityDiscount = useCallback(() => {
+    const totalItems = getItemCount();
+    if (totalItems >= 3) return 25; // 25% off for 3+ items
+    if (totalItems >= 2) return 15; // 15% off for 2 items
+    return 0; // No discount for 1 item
+  }, [getItemCount]);
+
+  const getDiscountAmount = useCallback(() => {
+    // Only apply quantity discounts to physical products, not subscriptions
+    if (hasSubscriptions()) return 0;
+    const discount = getQuantityDiscount();
+    return (getTotal() * discount) / 100;
+  }, [getQuantityDiscount, getTotal]);
+
+  const getDiscountedTotal = useCallback(() => {
+    return getTotal() - getDiscountAmount();
+  }, [getTotal, getDiscountAmount]);
+
   const toggleCart = useCallback(() => {
     setIsOpen(prev => !prev);
   }, []);
@@ -143,6 +161,9 @@ export const useCart = () => {
     clearCart,
     getTotal,
     getItemCount,
+    getQuantityDiscount,
+    getDiscountAmount,
+    getDiscountedTotal,
     toggleCart,
     openCart,
     closeCart,

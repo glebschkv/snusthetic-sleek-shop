@@ -22,8 +22,10 @@ interface CheckoutRequest {
   customer_email?: string;
   success_url: string;
   cancel_url: string;
+  quantity_discount_percent?: number;
+  quantity_discount_amount?: number;
   referral_code?: string;
-  discount_amount?: number;
+  referral_discount_amount?: number;
 }
 
 serve(async (req) => {
@@ -38,7 +40,17 @@ serve(async (req) => {
       throw new Error('Stripe secret key not configured');
     }
 
-    const { items, currency, customer_email, success_url, cancel_url, referral_code, discount_amount }: CheckoutRequest = await req.json();
+    const { 
+      items, 
+      currency, 
+      customer_email, 
+      success_url, 
+      cancel_url, 
+      quantity_discount_percent,
+      quantity_discount_amount,
+      referral_code, 
+      referral_discount_amount 
+    }: CheckoutRequest = await req.json();
 
     // Create line items for Stripe Checkout
     const lineItems = [];
@@ -215,30 +227,58 @@ serve(async (req) => {
     
     sessionData.append('metadata[items]', JSON.stringify(minimalItems));
 
-    // Create discount if referral code is provided
-    if (referral_code && discount_amount && discount_amount > 0) {
-      // Create a coupon for the discount
-      const couponResponse = await fetch('https://api.stripe.com/v1/coupons', {
+    let discountIndex = 0;
+
+    // Create quantity-based discount coupon if applicable
+    if (quantity_discount_percent && quantity_discount_amount && quantity_discount_amount > 0) {
+      const quantityCouponResponse = await fetch('https://api.stripe.com/v1/coupons', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${stripeSecretKey}`,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          'amount_off': Math.round(discount_amount * 100).toString(), // Convert to cents
+          'amount_off': Math.round(quantity_discount_amount * 100).toString(), // Convert to cents
+          'currency': currency.toLowerCase(),
+          'duration': 'once',
+          'name': `Bulk Discount - ${quantity_discount_percent}% off`,
+        }),
+      });
+
+      if (quantityCouponResponse.ok) {
+        const quantityCoupon = await quantityCouponResponse.json();
+        sessionData.append(`discounts[${discountIndex}][coupon]`, quantityCoupon.id);
+        discountIndex++;
+        
+        // Store quantity discount in metadata
+        sessionData.append('metadata[quantity_discount_percent]', quantity_discount_percent.toString());
+        sessionData.append('metadata[quantity_discount_amount]', quantity_discount_amount.toString());
+      }
+    }
+
+    // Create referral discount coupon if provided
+    if (referral_code && referral_discount_amount && referral_discount_amount > 0) {
+      const referralCouponResponse = await fetch('https://api.stripe.com/v1/coupons', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${stripeSecretKey}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          'amount_off': Math.round(referral_discount_amount * 100).toString(), // Convert to cents
           'currency': currency.toLowerCase(),
           'duration': 'once',
           'name': `Referral Discount - ${referral_code}`,
         }),
       });
 
-      if (couponResponse.ok) {
-        const coupon = await couponResponse.json();
-        sessionData.append('discounts[0][coupon]', coupon.id);
+      if (referralCouponResponse.ok) {
+        const referralCoupon = await referralCouponResponse.json();
+        sessionData.append(`discounts[${discountIndex}][coupon]`, referralCoupon.id);
         
         // Store referral code in session metadata (more reliable for webhooks)
         sessionData.append('metadata[referral_code]', referral_code);
-        sessionData.append('metadata[discount_amount]', discount_amount.toString());
+        sessionData.append('metadata[referral_discount_amount]', referral_discount_amount.toString());
       }
     }
 

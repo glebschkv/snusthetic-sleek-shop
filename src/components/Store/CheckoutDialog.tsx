@@ -16,18 +16,25 @@ interface CheckoutDialogProps {
 }
 
 export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
-  const { items, getTotal, clearCart } = useCartContext();
+  const { items, getTotal, getQuantityDiscount, getDiscountAmount, clearCart } = useCartContext();
   const { selectedCurrency, formatPrice, convertPrice } = useCurrency();
   const total = getTotal();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [appliedReferralCode, setAppliedReferralCode] = useState<string>('');
-  const [discountPercent, setDiscountPercent] = useState<number>(0);
+  const [referralDiscountPercent, setReferralDiscountPercent] = useState<number>(0);
   
   const hasSubscriptions = items.some(item => item.is_subscription);
   const hasPhysical = items.some(item => !item.is_subscription);
-  const discountAmount = (total * discountPercent) / 100;
-  const finalTotal = total - discountAmount;
+  
+  // Quantity-based discount (15% for 2 items, 25% for 3+ items)
+  const quantityDiscountPercent = getQuantityDiscount();
+  const quantityDiscountAmount = getDiscountAmount();
+  
+  // Apply quantity discount first, then referral discount on the discounted amount
+  const subtotalAfterQuantityDiscount = total - quantityDiscountAmount;
+  const referralDiscountAmount = (subtotalAfterQuantityDiscount * referralDiscountPercent) / 100;
+  const finalTotal = subtotalAfterQuantityDiscount - referralDiscountAmount;
   
   // Shipping costs (calculated at Stripe checkout based on address)
   const shippingEstimate = 'Calculated at checkout';
@@ -114,8 +121,10 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
         customer_email: null,
         success_url: successUrl,
         cancel_url: cancelUrl,
+        quantity_discount_percent: quantityDiscountPercent,
+        quantity_discount_amount: convertPrice(quantityDiscountAmount),
         referral_code: appliedReferralCode || null,
-        discount_amount: convertPrice(discountAmount)
+        referral_discount_amount: convertPrice(referralDiscountAmount)
       }
     });
 
@@ -163,17 +172,23 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
             </div>
             <Separator className="my-3" />
             
-            {/* Only show referral code for physical products */}
+            {/* Only show discounts and shipping for physical products */}
             {!hasSubscriptions && (
               <>
                 <div className="flex justify-between text-sm">
                   <span>Subtotal</span>
                   <span>{formatPrice(total)}</span>
                 </div>
+                {quantityDiscountPercent > 0 && (
+                  <div className="flex justify-between text-sm text-green-600 font-medium">
+                    <span>Bulk Discount ({quantityDiscountPercent}%)</span>
+                    <span>-{formatPrice(quantityDiscountAmount)}</span>
+                  </div>
+                )}
                 {appliedReferralCode && (
                   <div className="flex justify-between text-sm text-green-600">
-                    <span>Discount ({discountPercent}%)</span>
-                    <span>-{formatPrice(discountAmount)}</span>
+                    <span>Referral Discount ({referralDiscountPercent}%)</span>
+                    <span>-{formatPrice(referralDiscountAmount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm text-muted-foreground">
@@ -211,11 +226,11 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
             <ReferralCodeInput 
               onReferralApplied={(code, discount) => {
                 setAppliedReferralCode(code);
-                setDiscountPercent(discount);
+                setReferralDiscountPercent(discount);
               }}
               onReferralRemoved={() => {
                 setAppliedReferralCode('');
-                setDiscountPercent(0);
+                setReferralDiscountPercent(0);
               }}
               appliedCode={appliedReferralCode}
             />

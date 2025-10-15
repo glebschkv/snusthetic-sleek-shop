@@ -22,6 +22,9 @@ interface CartContextType {
   clearCart: () => void;
   getTotal: () => number;
   getItemCount: () => number;
+  getQuantityDiscount: () => number;
+  getDiscountAmount: () => number;
+  getDiscountedTotal: () => number;
   toggleCart: () => void;
   openCart: () => void;
   closeCart: () => void;

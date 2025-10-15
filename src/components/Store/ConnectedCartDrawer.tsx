@@ -9,11 +9,27 @@ import CheckoutDialog from './CheckoutDialog';
 
 export default function ConnectedCartDrawer() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const { items, removeItem, updateQuantity, getTotal, getItemCount, isOpen, closeCart } = useCartContext();
+  const { 
+    items, 
+    removeItem, 
+    updateQuantity, 
+    getTotal, 
+    getItemCount, 
+    getQuantityDiscount, 
+    getDiscountAmount,
+    getDiscountedTotal,
+    isOpen, 
+    closeCart 
+  } = useCartContext();
   const total = getTotal();
   const itemCount = getItemCount();
+  const quantityDiscount = getQuantityDiscount();
+  const discountAmount = getDiscountAmount();
+  const discountedTotal = getDiscountedTotal();
   const { formatPrice } = useCurrency();
   const navigate = useNavigate();
+  
+  const hasSubscriptions = items.some(item => item.is_subscription);
 
   const handleCheckout = () => {
     if (items.length === 0) return;
@@ -103,10 +119,28 @@ export default function ConnectedCartDrawer() {
               </div>
               
               <div className="border-t pt-4 space-y-3">
-                <div className="flex justify-between items-center font-semibold">
-                  <span>Total:</span>
-                  <span>{formatPrice(total)}</span>
-                </div>
+                {!hasSubscriptions && quantityDiscount > 0 && (
+                  <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3 space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span>Subtotal:</span>
+                      <span>{formatPrice(total)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-green-600 dark:text-green-400 font-medium">
+                      <span>Bulk Discount ({quantityDiscount}%):</span>
+                      <span>-{formatPrice(discountAmount)}</span>
+                    </div>
+                    <div className="flex justify-between items-center font-semibold text-base pt-1 border-t border-green-200 dark:border-green-800">
+                      <span>Total:</span>
+                      <span>{formatPrice(discountedTotal)}</span>
+                    </div>
+                  </div>
+                )}
+                {(hasSubscriptions || quantityDiscount === 0) && (
+                  <div className="flex justify-between items-center font-semibold">
+                    <span>Total:</span>
+                    <span>{formatPrice(total)}</span>
+                  </div>
+                )}
                 <div className="flex flex-col gap-3">
                   <Button onClick={handleCheckout} className="w-full text-xs uppercase font-medium py-3">
                     Proceed to Checkout
