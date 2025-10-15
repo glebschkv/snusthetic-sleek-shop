@@ -14,7 +14,7 @@ interface QuantitySelectorProps {
 }
 
 const presetQuantities = [
-  { value: '5', quantity: 5, discount: 15, label: '5 Cans' },
+  { value: '5', quantity: 5, discount: 0, label: '5 Cans' },
   { value: '10', quantity: 10, discount: 20, label: '10 Cans' },
   { value: '20', quantity: 20, discount: 25, label: '20 Cans' },
 ] as const;
@@ -85,15 +85,30 @@ const QuantitySelector = ({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <h4 className="font-bold text-lg">{option.label}</h4>
-                  <Badge variant="secondary" className="bg-green-500/10 text-green-600">
-                    {option.discount}% OFF
-                  </Badge>
+                  {option.discount > 0 ? (
+                    <Badge variant="secondary" className="bg-green-500/10 text-green-600">
+                      {option.discount}% OFF
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary" className="bg-blue-500/10 text-blue-600">
+                      Base Price
+                    </Badge>
+                  )}
                 </div>
                 <div className="text-sm text-muted-foreground">
                   {formatPriceNative(pricePerCan)}/can
                 </div>
+                {option.value === '5' && (
+                  <div className="text-xs text-muted-foreground italic">
+                    Average shop price: £6/can
+                  </div>
+                )}
                 <div className="text-2xl font-bold">{formatPriceNative(total)}/month</div>
-                <div className="text-sm text-green-600">Save {formatPriceNative(savings)}</div>
+                {option.discount > 0 ? (
+                  <div className="text-sm text-green-600">Save {formatPriceNative(savings)}</div>
+                ) : (
+                  <div className="text-sm text-primary">Standard pricing</div>
+                )}
               </div>
             </Card>
           );

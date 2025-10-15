@@ -121,7 +121,7 @@ const Subscriptions = () => {
     const basePrice = getSelectedProduct()?.price || 0;
     
     let discountPercent = 0;
-    if (quantityType === '5') discountPercent = 15;
+    if (quantityType === '5') discountPercent = 0;
     else if (quantityType === '10') discountPercent = 20;
     else if (quantityType === '20') discountPercent = 25;
     else if (quantityType === 'custom') discountPercent = 10;
@@ -311,7 +311,7 @@ const Subscriptions = () => {
               <div className="p-4 bg-background rounded-lg">
                 <h4 className="font-semibold mb-2">💰 Best Pricing</h4>
                 <p className="text-sm text-muted-foreground">
-                  Save 15-25% with subscriptions
+                  Save up to 25% with bulk orders
                 </p>
               </div>
               <div className="p-4 bg-background rounded-lg">
@@ -405,9 +405,15 @@ const Subscriptions = () => {
             <div className="container mx-auto px-4 text-center">
               <div className="mb-4">
                 <p className="text-2xl font-bold">{formatPriceNative(calculatePrice().totalPrice)}/month</p>
-                <p className="text-sm text-green-600">
-                  Save {formatPriceNative(calculatePrice().savings)} ({calculatePrice().discountPercent}% off)
-                </p>
+                {calculatePrice().discountPercent > 0 ? (
+                  <p className="text-sm text-green-600">
+                    Save {formatPriceNative(calculatePrice().savings)} ({calculatePrice().discountPercent}% off)
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    vs. £30 average shop price
+                  </p>
+                )}
               </div>
               <Button
                 size="lg"
