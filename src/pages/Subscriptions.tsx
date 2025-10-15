@@ -133,6 +133,17 @@ const Subscriptions = () => {
     return { pricePerCan, totalPrice, savings, discountPercent };
   };
 
+  const formatPriceNative = (price: number) => {
+    const product = getSelectedProduct();
+    const currencySymbols: Record<string, string> = {
+      'GBP': '£',
+      'USD': '$',
+      'EUR': '€',
+    };
+    const symbol = currencySymbols[product?.currency || 'GBP'] || product?.currency || '£';
+    return `${symbol}${price.toFixed(2)}`;
+  };
+
   const handleSubscribe = async () => {
     if (!user) {
       toast.error('Please log in to subscribe');
@@ -369,6 +380,7 @@ const Subscriptions = () => {
             <div className="container mx-auto px-4 max-w-4xl">
               <QuantitySelector
                 basePrice={selectedProduct.price}
+                currency={selectedProduct.currency}
                 selectedQuantity={getQuantity()}
                 quantityType={quantityType}
                 customQuantity={customQuantity}
@@ -392,9 +404,9 @@ const Subscriptions = () => {
           <section className="py-12 bg-muted/30">
             <div className="container mx-auto px-4 text-center">
               <div className="mb-4">
-                <p className="text-2xl font-bold">€{calculatePrice().totalPrice.toFixed(2)}/month</p>
+                <p className="text-2xl font-bold">{formatPriceNative(calculatePrice().totalPrice)}/month</p>
                 <p className="text-sm text-green-600">
-                  Save €{calculatePrice().savings.toFixed(2)} ({calculatePrice().discountPercent}% off)
+                  Save {formatPriceNative(calculatePrice().savings)} ({calculatePrice().discountPercent}% off)
                 </p>
               </div>
               <Button
