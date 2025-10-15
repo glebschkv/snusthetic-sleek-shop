@@ -122,8 +122,8 @@ const Subscriptions = () => {
     
     let discountPercent = 0;
     if (quantityType === '5') discountPercent = 0;
-    else if (quantityType === '10') discountPercent = 20;
-    else if (quantityType === '20') discountPercent = 25;
+    else if (quantityType === '10') discountPercent = 10;
+    else if (quantityType === '20') discountPercent = 5;
     else if (quantityType === 'custom') discountPercent = 10;
     
     const pricePerCan = basePrice * (1 - discountPercent / 100);
@@ -259,7 +259,7 @@ const Subscriptions = () => {
             </p>
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
               <PackageCheck className="h-5 w-5" />
-              <span className="font-semibold">Save up to 25% with subscription</span>
+              <span className="font-semibold">Save up to 10% with subscription</span>
             </div>
           </div>
         </section>
@@ -311,7 +311,7 @@ const Subscriptions = () => {
               <div className="p-4 bg-background rounded-lg">
                 <h4 className="font-semibold mb-2">💰 Best Pricing</h4>
                 <p className="text-sm text-muted-foreground">
-                  Save up to 25% with bulk orders
+                  Save up to 10% with bulk orders
                 </p>
               </div>
               <div className="p-4 bg-background rounded-lg">
