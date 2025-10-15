@@ -39,7 +39,7 @@ const QuantitySelector = ({
   const handleCustomInputChange = (value: string) => {
     setCustomInput(value);
     const num = parseInt(value);
-    if (!isNaN(num) && num >= 25) {
+    if (!isNaN(num) && num >= 5) {
       onSelectQuantity('custom', num);
     }
   };
@@ -100,18 +100,18 @@ const QuantitySelector = ({
             </Badge>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="custom-quantity">Number of cans (minimum 25)</Label>
+            <Label htmlFor="custom-quantity">Number of cans (minimum 5)</Label>
             <Input
               id="custom-quantity"
               type="number"
-              min="25"
+              min="5"
               value={customInput}
               onChange={(e) => handleCustomInputChange(e.target.value)}
-              onFocus={() => onSelectQuantity('custom', parseInt(customInput) || 25)}
+              onFocus={() => onSelectQuantity('custom', parseInt(customInput) || 5)}
               placeholder="Enter quantity..."
             />
           </div>
-          {quantityType === 'custom' && customQuantity >= 25 && (
+          {quantityType === 'custom' && customQuantity >= 5 && (
             <div className="pt-2 space-y-1">
               <div className="text-sm text-muted-foreground">
                 {formatPrice(basePrice * 0.9)}/can
