@@ -17,7 +17,7 @@ interface CheckoutDialogProps {
 
 export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const { items, getTotal, clearCart } = useCartContext();
-  const { selectedCurrency, formatPrice } = useCurrency();
+  const { selectedCurrency, formatPrice, convertPrice } = useCurrency();
   const total = getTotal();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -100,7 +100,7 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
         items: items.map(item => ({
           id: item.id,
           name: item.product?.name || 'Product',
-          price: item.product?.price || 0,
+          price: convertPrice(item.product?.price || 0),
           quantity: item.quantity,
           color: item.variant?.color_name,
           imageUrl: item.variant?.image_url || item.product?.image_url
@@ -110,7 +110,7 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
         success_url: successUrl,
         cancel_url: cancelUrl,
         referral_code: appliedReferralCode || null,
-        discount_amount: discountAmount
+        discount_amount: convertPrice(discountAmount)
       }
     });
 
