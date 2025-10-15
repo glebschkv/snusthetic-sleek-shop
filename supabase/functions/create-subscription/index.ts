@@ -34,7 +34,7 @@ serve(async (req) => {
       throw new Error('Unauthorized')
     }
 
-    const { product_id, quantity_type, quantity, return_url } = await req.json()
+    const { product_id, quantity_type, quantity, currency, converted_price, return_url } = await req.json()
 
     console.log('Creating subscription for user:', user.id, 'product:', product_id, 'quantity:', quantity)
 
@@ -74,16 +74,18 @@ serve(async (req) => {
     console.log('Found product:', product)
 
     // Calculate pricing based on quantity type
+    // Use converted_price if provided (for multi-currency), otherwise use database price
+    const basePrice = converted_price || product.price
     let discountPercent = 0
     if (quantity_type === '5') discountPercent = 15
     else if (quantity_type === '10') discountPercent = 20
     else if (quantity_type === '20') discountPercent = 25
     else if (quantity_type === 'custom') discountPercent = 10
 
-    const pricePerCan = product.price * (1 - discountPercent / 100)
+    const pricePerCan = basePrice * (1 - discountPercent / 100)
     const pricePerMonth = pricePerCan * quantity
 
-    console.log('Pricing:', { quantity, discountPercent, pricePerCan, pricePerMonth })
+    console.log('Pricing:', { quantity, discountPercent, pricePerCan, pricePerMonth, basePrice, converted_price })
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -140,7 +142,7 @@ serve(async (req) => {
     const stripePrice = await stripe.prices.create({
       product: stripeProduct.id,
       unit_amount: Math.round(pricePerMonth * 100), // Convert to cents
-      currency: product.currency.toLowerCase(),
+      currency: (currency || product.currency).toLowerCase(),
       recurring: {
         interval: 'month'
       },

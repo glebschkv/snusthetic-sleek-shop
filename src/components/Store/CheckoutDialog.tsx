@@ -76,6 +76,8 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
         product_id: subscriptionItem.product_id,
         quantity_type: subscriptionItem.subscription_data?.quantity_type,
         quantity: subscriptionItem.quantity,
+        currency: selectedCurrency.code,
+        converted_price: convertPrice(subscriptionItem.product?.price || 0),
         return_url: `${window.location.origin}/checkout/success?subscription=true`,
       }
     });
