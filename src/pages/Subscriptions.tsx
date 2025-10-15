@@ -296,7 +296,7 @@ const Subscriptions = () => {
         {/* Subscription-Only Info Section */}
         <section className="py-8 bg-accent/5">
           <div className="container mx-auto px-4 text-center max-w-3xl">
-            <h3 className="text-2xl font-bold mb-4">Subscription-Only Nicotine Pouches</h3>
+            <h3 className="text-2xl font-bold mb-4">Introducing the SnusScription</h3>
             <p className="text-muted-foreground mb-4">
               Our nicotine pouch products (Zyn & Velo) are available exclusively through 
               monthly subscriptions. This ensures you never run out and always get the best pricing.
