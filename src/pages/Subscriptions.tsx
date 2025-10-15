@@ -145,8 +145,8 @@ const Subscriptions = () => {
     }
 
     const quantity = getQuantity();
-    if (quantityType === 'custom' && quantity < 25) {
-      toast.error('Custom quantity must be at least 25 cans');
+    if (quantityType === 'custom' && quantity < 5) {
+      toast.error('Custom quantity must be at least 5 cans');
       return;
     }
 

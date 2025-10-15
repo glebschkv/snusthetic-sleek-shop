@@ -44,8 +44,8 @@ serve(async (req) => {
     }
 
     // Validate custom quantity minimum
-    if (quantity_type === 'custom' && quantity < 25) {
-      throw new Error('Custom quantity must be at least 25 cans')
+    if (quantity_type === 'custom' && quantity < 5) {
+      throw new Error('Custom quantity must be at least 5 cans')
     }
 
     // Get product details
