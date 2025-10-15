@@ -186,7 +186,12 @@ const Subscriptions = () => {
 
       if (checkoutUrl) {
         console.log('Redirecting to:', checkoutUrl);
-        window.location.href = checkoutUrl;
+        // Use window.top to break out of iframe (for Lovable preview)
+        if (window.top) {
+          window.top.location.href = checkoutUrl;
+        } else {
+          window.location.href = checkoutUrl;
+        }
       } else {
         console.error('Full response data:', JSON.stringify(data, null, 2));
         throw new Error('No checkout URL received. Check console for details.');
