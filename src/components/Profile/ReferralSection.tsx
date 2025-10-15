@@ -11,6 +11,8 @@ interface ReferralStats {
   totalReferrals: number;
   totalEarnings: number;
   referralCode: string;
+  pendingEarnings: number;
+  paidEarnings: number;
 }
 
 export const ReferralSection = () => {
@@ -19,7 +21,9 @@ export const ReferralSection = () => {
   const [stats, setStats] = useState<ReferralStats>({
     totalReferrals: 0,
     totalEarnings: 0,
-    referralCode: ''
+    referralCode: '',
+    pendingEarnings: 0,
+    paidEarnings: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -40,21 +44,32 @@ export const ReferralSection = () => {
 
       if (profileError) throw profileError;
 
-      // Get referral usage stats
+      // Get referral usage stats with commission data
       const { data: usage, error: usageError } = await supabase
         .from('referral_usage')
-        .select('discount_amount')
+        .select('discount_amount, commission_amount, payout_status')
         .eq('referrer_id', user?.id);
 
       if (usageError) throw usageError;
 
       const totalReferrals = usage?.length || 0;
       const totalEarnings = usage?.reduce((sum, item) => sum + (parseFloat(String(item.discount_amount)) || 0), 0) || 0;
+      
+      // Calculate pending and paid earnings from commission
+      const pendingEarnings = usage
+        ?.filter(item => item.payout_status === 'pending' || item.payout_status === 'approved')
+        .reduce((sum, item) => sum + (parseFloat(String(item.commission_amount)) || 0), 0) || 0;
+      
+      const paidEarnings = usage
+        ?.filter(item => item.payout_status === 'paid')
+        .reduce((sum, item) => sum + (parseFloat(String(item.commission_amount)) || 0), 0) || 0;
 
       setStats({
         totalReferrals,
         totalEarnings,
-        referralCode: profile?.referral_code || ''
+        referralCode: profile?.referral_code || '',
+        pendingEarnings,
+        paidEarnings
       });
     } catch (error) {
       console.error('Error fetching referral stats:', error);
@@ -180,8 +195,38 @@ export const ReferralSection = () => {
             Share Referral Link
           </Button>
           <p className="text-xs text-muted-foreground">
-            Friends get 10% off their order, and you get tracking insights!
+            Friends get 10% off their order, and you earn 5% commission!
           </p>
+        </div>
+
+        {/* Earnings Section */}
+        <div className="space-y-3 p-4 bg-primary/5 rounded-lg border border-primary/10">
+          <h3 className="font-medium flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-primary" />
+            Your Commission Earnings
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-center p-3 bg-background rounded-lg">
+              <div className="text-xl font-bold text-primary">£{stats.pendingEarnings.toFixed(2)}</div>
+              <div className="text-xs text-muted-foreground">Pending</div>
+            </div>
+            <div className="text-center p-3 bg-background rounded-lg">
+              <div className="text-xl font-bold text-green-600">£{stats.paidEarnings.toFixed(2)}</div>
+              <div className="text-xs text-muted-foreground">Paid Out</div>
+            </div>
+          </div>
+          {stats.pendingEarnings >= 20 && (
+            <div className="pt-2">
+              <Badge variant="default" className="w-full justify-center py-2">
+                £20 minimum reached - Contact support to request payout
+              </Badge>
+            </div>
+          )}
+          {stats.pendingEarnings < 20 && (
+            <p className="text-xs text-muted-foreground text-center">
+              Earn £{(20 - stats.pendingEarnings).toFixed(2)} more to reach the £20 payout minimum
+            </p>
+          )}
         </div>
 
         {/* Stats Section */}
@@ -197,7 +242,7 @@ export const ReferralSection = () => {
             <div className="flex items-center justify-center mb-2">
               <TrendingUp className="h-5 w-5 text-primary" />
             </div>
-            <div className="text-2xl font-bold">€{stats.totalEarnings.toFixed(2)}</div>
+            <div className="text-2xl font-bold">£{stats.totalEarnings.toFixed(2)}</div>
             <div className="text-sm text-muted-foreground">Discounts Given</div>
           </div>
         </div>
@@ -207,9 +252,10 @@ export const ReferralSection = () => {
           <h4 className="font-medium">How it works:</h4>
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• Share your referral code with friends</li>
-            <li>• They get 10% off their first order</li>
-            <li>• You can track your referral success</li>
-            <li>• Everyone saves money!</li>
+            <li>• They get 10% off their order</li>
+            <li>• You earn 5% commission on their order total</li>
+            <li>• Request payout when you reach £20 minimum</li>
+            <li>• Get paid via PayPal or bank transfer</li>
           </ul>
         </div>
       </CardContent>

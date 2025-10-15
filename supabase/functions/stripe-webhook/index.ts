@@ -239,6 +239,11 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
     if (referrerId && referralCode) {
       console.log('Creating referral usage record for referrer:', referrerId);
 
+      // Calculate 5% commission on order total
+      const orderTotal = session.amount_total / 100; // Convert from cents
+      const commissionPercentage = 5.0;
+      const commissionAmount = orderTotal * (commissionPercentage / 100);
+
       try {
         const { data: referralUsageId, error: referralError } = await supabase.rpc('create_referral_usage_record', {
           p_referrer_id: referrerId,
@@ -249,13 +254,27 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
 
         if (referralError) {
           console.error('Error creating referral usage:', referralError);
-          // Don't throw here - order is more important than referral tracking
         } else {
           console.log('Referral usage recorded successfully with ID:', referralUsageId);
+          
+          // Update the referral usage record with commission data
+          const { error: updateError } = await supabase
+            .from('referral_usage')
+            .update({
+              commission_amount: commissionAmount,
+              commission_percentage: commissionPercentage,
+              payout_status: 'pending'
+            })
+            .eq('id', referralUsageId);
+
+          if (updateError) {
+            console.error('Error updating commission data:', updateError);
+          } else {
+            console.log(`Commission of ${commissionAmount} (${commissionPercentage}%) recorded for referrer`);
+          }
         }
       } catch (error) {
         console.error('Exception while recording referral usage:', error);
-        // Don't throw here - order is more important than referral tracking
       }
     }
 

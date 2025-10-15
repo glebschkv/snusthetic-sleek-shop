@@ -278,6 +278,9 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          payout_email: string | null
+          payout_method: string | null
+          payout_minimum: number | null
           referral_code: string
           updated_at: string
         }
@@ -286,6 +289,9 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          payout_email?: string | null
+          payout_method?: string | null
+          payout_minimum?: number | null
           referral_code: string
           updated_at?: string
         }
@@ -294,35 +300,106 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          payout_email?: string | null
+          payout_method?: string | null
+          payout_minimum?: number | null
           referral_code?: string
           updated_at?: string
         }
         Relationships: []
       }
+      referral_payouts: {
+        Row: {
+          created_at: string | null
+          currency: string
+          id: string
+          notes: string | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_reference: string | null
+          referral_usage_ids: string[]
+          referrer_id: string
+          status: string
+          total_amount: number
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          referral_usage_ids: string[]
+          referrer_id: string
+          status?: string
+          total_amount: number
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          referral_usage_ids?: string[]
+          referrer_id?: string
+          status?: string
+          total_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_payouts_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referral_usage: {
         Row: {
+          commission_amount: number | null
+          commission_percentage: number | null
           created_at: string
           discount_amount: number
           id: string
           order_id: string | null
+          payout_date: string | null
+          payout_method: string | null
+          payout_reference: string | null
+          payout_status: string | null
           referee_email: string
           referrer_id: string
           updated_at: string
         }
         Insert: {
+          commission_amount?: number | null
+          commission_percentage?: number | null
           created_at?: string
           discount_amount?: number
           id?: string
           order_id?: string | null
+          payout_date?: string | null
+          payout_method?: string | null
+          payout_reference?: string | null
+          payout_status?: string | null
           referee_email: string
           referrer_id: string
           updated_at?: string
         }
         Update: {
+          commission_amount?: number | null
+          commission_percentage?: number | null
           created_at?: string
           discount_amount?: number
           id?: string
           order_id?: string | null
+          payout_date?: string | null
+          payout_method?: string | null
+          payout_reference?: string | null
+          payout_status?: string | null
           referee_email?: string
           referrer_id?: string
           updated_at?: string
