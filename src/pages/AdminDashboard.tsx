@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Plus, Edit, Trash2, Package, Users, ShoppingCart, Tags, Home } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, Package, Users, ShoppingCart, Tags, Home, DollarSign, TrendingUp, Clock, CheckCircle2, Download } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ProductVariantForm from '@/components/Admin/ProductVariantForm';
@@ -49,6 +49,40 @@ interface Order {
   created_at: string;
 }
 
+interface ReferralUsage {
+  id: string;
+  referrer_id: string;
+  referee_email: string;
+  order_id?: string;
+  discount_amount: number;
+  commission_amount: number;
+  commission_percentage: number;
+  payout_status: string;
+  payout_date?: string;
+  payout_method?: string;
+  payout_reference?: string;
+  created_at: string;
+  referrer?: {
+    display_name?: string;
+    payout_email?: string;
+  };
+  order?: {
+    total_amount: number;
+    status: string;
+  };
+}
+
+interface ReferrerStats {
+  referrer_id: string;
+  display_name?: string;
+  payout_email?: string;
+  total_referrals: number;
+  total_commission: number;
+  pending_amount: number;
+  paid_amount: number;
+  last_referral_date: string;
+}
+
 const AdminDashboard = () => {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -63,6 +97,16 @@ const AdminDashboard = () => {
   const [showProductDialog, setShowProductDialog] = useState(false);
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
   const [productVariants, setProductVariants] = useState<ProductVariant[]>([]);
+  const [referralUsages, setReferralUsages] = useState<ReferralUsage[]>([]);
+  const [referrerStats, setReferrerStats] = useState<ReferrerStats[]>([]);
+  const [viewMode, setViewMode] = useState<'all' | 'grouped'>('all');
+  const [payoutDialog, setPayoutDialog] = useState(false);
+  const [selectedReferrer, setSelectedReferrer] = useState<ReferrerStats | null>(null);
+  const [payoutForm, setPayoutForm] = useState({
+    payment_method: '',
+    payment_reference: '',
+    notes: '',
+  });
   
   const [productForm, setProductForm] = useState({
     name: '',
@@ -103,15 +147,37 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       
-      const [productsRes, categoriesRes, ordersRes] = await Promise.all([
+      const [productsRes, categoriesRes, ordersRes, referralsRes] = await Promise.all([
         supabase.from('products').select('*, category:categories(name), variants:product_variants(*)').order('created_at', { ascending: false }),
         supabase.from('categories').select('*').order('name'),
         supabase.from('orders').select('*').order('created_at', { ascending: false }),
+        supabase.from('referral_usage').select(`
+          *,
+          referrer:profiles!referrer_id(display_name, payout_email)
+        `).order('created_at', { ascending: false }),
       ]);
 
       if (productsRes.data) setProducts(productsRes.data);
       if (categoriesRes.data) setCategories(categoriesRes.data);
       if (ordersRes.data) setOrders(ordersRes.data);
+      if (referralsRes.data) {
+        // Fetch order details separately for each referral
+        const referralsWithOrders = await Promise.all(
+          referralsRes.data.map(async (ref: any) => {
+            if (ref.order_id) {
+              const { data: orderData } = await supabase
+                .from('orders')
+                .select('total_amount, status')
+                .eq('id', ref.order_id)
+                .single();
+              return { ...ref, order: orderData };
+            }
+            return ref;
+          })
+        );
+        setReferralUsages(referralsWithOrders as ReferralUsage[]);
+        calculateReferrerStats(referralsWithOrders as ReferralUsage[]);
+      }
     } catch (error) {
       toast({
         title: "Error loading data",
@@ -121,6 +187,39 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateReferrerStats = (referrals: ReferralUsage[]) => {
+    const statsMap = new Map<string, ReferrerStats>();
+    
+    referrals.forEach((ref) => {
+      const existing = statsMap.get(ref.referrer_id) || {
+        referrer_id: ref.referrer_id,
+        display_name: ref.referrer?.display_name,
+        payout_email: ref.referrer?.payout_email,
+        total_referrals: 0,
+        total_commission: 0,
+        pending_amount: 0,
+        paid_amount: 0,
+        last_referral_date: ref.created_at,
+      };
+
+      existing.total_referrals += 1;
+      existing.total_commission += Number(ref.commission_amount);
+      if (ref.payout_status === 'pending') {
+        existing.pending_amount += Number(ref.commission_amount);
+      } else if (ref.payout_status === 'paid') {
+        existing.paid_amount += Number(ref.commission_amount);
+      }
+      
+      if (new Date(ref.created_at) > new Date(existing.last_referral_date)) {
+        existing.last_referral_date = ref.created_at;
+      }
+
+      statsMap.set(ref.referrer_id, existing);
+    });
+
+    setReferrerStats(Array.from(statsMap.values()).sort((a, b) => b.pending_amount - a.pending_amount));
   };
 
   const handleProductSubmit = async (e: React.FormEvent) => {
@@ -303,6 +402,88 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleMarkAsPaid = async (referralIds: string[]) => {
+    if (!selectedReferrer) return;
+    
+    try {
+      const { error } = await supabase
+        .from('referral_usage')
+        .update({
+          payout_status: 'paid',
+          payout_date: new Date().toISOString(),
+          payout_method: payoutForm.payment_method,
+          payout_reference: payoutForm.payment_reference,
+        })
+        .in('id', referralIds);
+
+      if (error) throw error;
+
+      // Create payout record
+      const { error: payoutError } = await supabase
+        .from('referral_payouts')
+        .insert({
+          referrer_id: selectedReferrer.referrer_id,
+          total_amount: selectedReferrer.pending_amount,
+          referral_usage_ids: referralIds,
+          status: 'paid',
+          paid_at: new Date().toISOString(),
+          payment_method: payoutForm.payment_method,
+          payment_reference: payoutForm.payment_reference,
+          notes: payoutForm.notes,
+          currency: 'gbp',
+        });
+
+      if (payoutError) throw payoutError;
+
+      toast({
+        title: "Payout processed",
+        description: `Successfully processed payout of £${selectedReferrer.pending_amount.toFixed(2)}`,
+      });
+
+      setPayoutDialog(false);
+      setSelectedReferrer(null);
+      setPayoutForm({ payment_method: '', payment_reference: '', notes: '' });
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to process payout.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const exportToCSV = (data: any[], filename: string) => {
+    if (data.length === 0) return;
+    
+    const headers = Object.keys(data[0]);
+    const csv = [
+      headers.join(','),
+      ...data.map(row => headers.map(h => JSON.stringify(row[h] ?? '')).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const getStatusBadgeVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    switch (status) {
+      case 'paid':
+        return 'default';
+      case 'pending':
+        return 'secondary';
+      case 'cancelled':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -342,6 +523,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="orders" className="flex items-center gap-2">
               <ShoppingCart className="h-4 w-4" />
               Orders
+            </TabsTrigger>
+            <TabsTrigger value="referrals" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Referrals
             </TabsTrigger>
           </TabsList>
 
@@ -679,6 +864,320 @@ const AdminDashboard = () => {
                 </Table>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="referrals">
+            <div className="space-y-6">
+              {/* Stats Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Referrers</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-2xl font-bold">{referrerStats.length}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Referrals</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-2xl font-bold">{referralUsages.length}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Pending Commissions</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-2xl font-bold">
+                        £{referrerStats.reduce((sum, r) => sum + r.pending_amount, 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Paid Out</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-2xl font-bold">
+                        £{referrerStats.reduce((sum, r) => sum + r.paid_amount, 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* View Toggle & Export */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={viewMode === 'all' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('all')}
+                  >
+                    All Referrals
+                  </Button>
+                  <Button
+                    variant={viewMode === 'grouped' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('grouped')}
+                  >
+                    By Referrer
+                  </Button>
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (viewMode === 'all') {
+                      exportToCSV(
+                        referralUsages.map(r => ({
+                          referrer_name: r.referrer?.display_name || 'N/A',
+                          referrer_email: r.referrer?.payout_email || 'N/A',
+                          referee_email: r.referee_email,
+                          order_total: r.order?.total_amount || 0,
+                          discount_amount: r.discount_amount,
+                          commission_amount: r.commission_amount,
+                          payout_status: r.payout_status,
+                          created_at: new Date(r.created_at).toLocaleDateString(),
+                        })),
+                        'referral-usage.csv'
+                      );
+                    } else {
+                      exportToCSV(
+                        referrerStats.map(r => ({
+                          referrer_name: r.display_name || 'N/A',
+                          payout_email: r.payout_email || 'N/A',
+                          total_referrals: r.total_referrals,
+                          total_commission: r.total_commission,
+                          pending_amount: r.pending_amount,
+                          paid_amount: r.paid_amount,
+                          last_referral: new Date(r.last_referral_date).toLocaleDateString(),
+                        })),
+                        'referrer-stats.csv'
+                      );
+                    }
+                  }}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export CSV
+                </Button>
+              </div>
+
+              {/* All Referrals View */}
+              {viewMode === 'all' && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>All Referral Activity</CardTitle>
+                    <CardDescription>Complete history of referral uses and commissions</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Referrer</TableHead>
+                          <TableHead>Referee Email</TableHead>
+                          <TableHead>Order Total</TableHead>
+                          <TableHead>Discount</TableHead>
+                          <TableHead>Commission</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Date</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {referralUsages.map((usage) => (
+                          <TableRow key={usage.id}>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{usage.referrer?.display_name || 'Unknown'}</span>
+                                <span className="text-xs text-muted-foreground">{usage.referrer?.payout_email}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>{usage.referee_email}</TableCell>
+                            <TableCell>£{usage.order?.total_amount?.toFixed(2) || '0.00'}</TableCell>
+                            <TableCell>£{Number(usage.discount_amount).toFixed(2)}</TableCell>
+                            <TableCell className="font-medium">£{Number(usage.commission_amount).toFixed(2)}</TableCell>
+                            <TableCell>
+                              <Badge variant={getStatusBadgeVariant(usage.payout_status)}>
+                                {usage.payout_status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {new Date(usage.created_at).toLocaleDateString()}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Grouped by Referrer View */}
+              {viewMode === 'grouped' && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Referrer Statistics</CardTitle>
+                    <CardDescription>Aggregated stats and payout management per referrer</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Referrer</TableHead>
+                          <TableHead>Total Referrals</TableHead>
+                          <TableHead>Total Commission</TableHead>
+                          <TableHead>Pending</TableHead>
+                          <TableHead>Paid</TableHead>
+                          <TableHead>Last Referral</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {referrerStats.map((stats) => (
+                          <TableRow key={stats.referrer_id}>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{stats.display_name || 'Unknown'}</span>
+                                <span className="text-xs text-muted-foreground">{stats.payout_email}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>{stats.total_referrals}</TableCell>
+                            <TableCell>£{stats.total_commission.toFixed(2)}</TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">£{stats.pending_amount.toFixed(2)}</Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="default">£{stats.paid_amount.toFixed(2)}</Badge>
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {new Date(stats.last_referral_date).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {stats.pending_amount >= 20 && (
+                                <Button
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedReferrer(stats);
+                                    setPayoutDialog(true);
+                                  }}
+                                >
+                                  <DollarSign className="h-4 w-4 mr-1" />
+                                  Process Payout
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Payout Dialog */}
+              <Dialog open={payoutDialog} onOpenChange={setPayoutDialog}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Process Payout</DialogTitle>
+                    <DialogDescription>
+                      Mark pending commissions as paid for {selectedReferrer?.display_name}
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  {selectedReferrer && (
+                    <div className="space-y-4">
+                      <div className="p-4 bg-muted rounded-lg space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Referrer:</span>
+                          <span className="font-medium">{selectedReferrer.display_name}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Email:</span>
+                          <span className="font-medium">{selectedReferrer.payout_email}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Pending Amount:</span>
+                          <span className="font-bold text-lg">£{selectedReferrer.pending_amount.toFixed(2)}</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="payment-method">Payment Method</Label>
+                        <Select
+                          value={payoutForm.payment_method}
+                          onValueChange={(value) => setPayoutForm(prev => ({ ...prev, payment_method: value }))}
+                        >
+                          <SelectTrigger id="payment-method">
+                            <SelectValue placeholder="Select payment method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                            <SelectItem value="paypal">PayPal</SelectItem>
+                            <SelectItem value="stripe">Stripe</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="payment-reference">Payment Reference / Transaction ID</Label>
+                        <Input
+                          id="payment-reference"
+                          value={payoutForm.payment_reference}
+                          onChange={(e) => setPayoutForm(prev => ({ ...prev, payment_reference: e.target.value }))}
+                          placeholder="TX123456789"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="notes">Notes (Optional)</Label>
+                        <Textarea
+                          id="notes"
+                          value={payoutForm.notes}
+                          onChange={(e) => setPayoutForm(prev => ({ ...prev, notes: e.target.value }))}
+                          placeholder="Additional notes about this payout..."
+                        />
+                      </div>
+
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setPayoutDialog(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            const pendingReferralIds = referralUsages
+                              .filter(r => r.referrer_id === selectedReferrer.referrer_id && r.payout_status === 'pending')
+                              .map(r => r.id);
+                            handleMarkAsPaid(pendingReferralIds);
+                          }}
+                          disabled={!payoutForm.payment_method || !payoutForm.payment_reference}
+                        >
+                          Mark as Paid
+                        </Button>
+                      </DialogFooter>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
