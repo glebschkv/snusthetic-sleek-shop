@@ -46,7 +46,13 @@ const QuantitySelector = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-semibold">Select Quantity per Month</h3>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <h3 className="text-xl font-semibold">Select Quantity per Month</h3>
+        <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm font-medium">
+          <span>💰</span>
+          <span>50% less than average store price</span>
+        </div>
+      </div>
       
       {/* Preset Quantities */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
