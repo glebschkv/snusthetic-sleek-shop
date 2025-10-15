@@ -34,8 +34,9 @@ serve(async (req) => {
         <p><strong>Customer:</strong> ${firstName} ${lastName}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Quantity:</strong> ${quantity}</p>
-        <p><strong>Requirements:</strong></p>
-        <p>${requirements}</p>
+        <div style="margin-top: 10px;">
+          ${requirements}
+        </div>
         <hr>
         <p>Please follow up with the customer directly at ${email}</p>
       `,
@@ -52,8 +53,10 @@ serve(async (req) => {
         <p>We have received your custom order request with the following details:</p>
         <ul>
           <li><strong>Quantity:</strong> ${quantity}</li>
-          <li><strong>Requirements:</strong> ${requirements}</li>
         </ul>
+        <div style="margin: 15px 0; padding: 15px; background-color: #f5f5f5; border-left: 4px solid #333;">
+          ${requirements}
+        </div>
         <p>Our team will review your request and get back to you within 24-48 hours at this email address.</p>
         <p>Thank you for choosing Snusthetic!</p>
         <p>Best regards,<br>The Snusthetic Team</p>

@@ -50,12 +50,12 @@ const CustomBrandRequest = ({ userEmail }: CustomBrandRequestProps) => {
 
       // Format the custom requirements for the edge function
       const customRequirements = `
-Custom Brand Request:
-Brand: ${validated.brandName}
-Flavor: ${validated.flavor}
-Strength: ${validated.strength}
-Quantity Preference: ${validated.quantityPreference || 'Not specified'}
-Additional Notes: ${validated.additionalNotes || 'None'}
+<strong>Custom Brand Request:</strong><br/>
+<strong>Brand:</strong> ${validated.brandName}<br/>
+<strong>Flavor:</strong> ${validated.flavor}<br/>
+<strong>Strength:</strong> ${validated.strength}<br/>
+<strong>Quantity Preference:</strong> ${validated.quantityPreference || 'Not specified'}<br/>
+<strong>Additional Notes:</strong> ${validated.additionalNotes || 'None'}
       `.trim();
 
       const { error } = await supabase.functions.invoke('send-custom-order', {
@@ -64,7 +64,7 @@ Additional Notes: ${validated.additionalNotes || 'None'}
           lastName: 'Request',
           email: validated.email,
           quantity: validated.quantityPreference || 'To be determined',
-          customRequirements,
+          requirements: customRequirements,
         },
       });
 
