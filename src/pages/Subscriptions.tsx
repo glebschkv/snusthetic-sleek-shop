@@ -186,11 +186,12 @@ const Subscriptions = () => {
 
       if (checkoutUrl) {
         console.log('Redirecting to:', checkoutUrl);
-        // Use window.top to break out of iframe (for Lovable preview)
-        if (window.top) {
-          window.top.location.href = checkoutUrl;
+        // Open in new tab (works in sandboxed iframes like Lovable preview)
+        const newWindow = window.open(checkoutUrl, '_blank');
+        if (!newWindow) {
+          toast.error('Please allow popups to complete checkout');
         } else {
-          window.location.href = checkoutUrl;
+          toast.success('Opening Stripe checkout...');
         }
       } else {
         console.error('Full response data:', JSON.stringify(data, null, 2));
