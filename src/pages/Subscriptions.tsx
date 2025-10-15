@@ -12,6 +12,7 @@ import BrandSelector from '@/components/Subscription/BrandSelector';
 import FlavorStrengthSelector from '@/components/Subscription/FlavorStrengthSelector';
 import QuantitySelector from '@/components/Subscription/QuantitySelector';
 import ProductDetailsAccordion from '@/components/Subscription/ProductDetailsAccordion';
+import CustomBrandRequest from '@/components/Subscription/CustomBrandRequest';
 
 interface Brand {
   id: string;
@@ -46,6 +47,7 @@ const Subscriptions = () => {
   const [selectedStrength, setSelectedStrength] = useState<number | null>(null);
   const [quantityType, setQuantityType] = useState<'5' | '10' | '20' | 'custom'>('10');
   const [customQuantity, setCustomQuantity] = useState(25);
+  const [isCustomBrandRequest, setIsCustomBrandRequest] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -321,13 +323,30 @@ const Subscriptions = () => {
                 setSelectedBrand(brand);
                 setSelectedFlavor(null);
                 setSelectedStrength(null);
+                setIsCustomBrandRequest(false);
               }}
+              onSelectCustom={() => {
+                setIsCustomBrandRequest(true);
+                setSelectedBrand(null);
+                setSelectedFlavor(null);
+                setSelectedStrength(null);
+              }}
+              isCustomSelected={isCustomBrandRequest}
             />
           </div>
         </section>
 
+        {/* Custom Brand Request */}
+        {isCustomBrandRequest && (
+          <section className="py-12 bg-background">
+            <div className="container mx-auto px-4">
+              <CustomBrandRequest userEmail={user?.email} />
+            </div>
+          </section>
+        )}
+
         {/* Product Customization */}
-        {selectedBrand && (
+        {selectedBrand && !isCustomBrandRequest && (
           <section className="py-12 bg-background">
             <div className="container mx-auto px-4 max-w-4xl">
               <FlavorStrengthSelector
