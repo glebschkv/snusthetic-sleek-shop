@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Shield, Settings, Package, Sparkles, Scissors, Minimize, Truck, Zap, Leaf } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import narcoProductImage from '@/assets/narco-product-showcase.jpeg';
+import genericComparisonImage from '@/assets/generic-comparison.jpeg';
 
 const About = () => {
   return (
@@ -155,7 +157,11 @@ const About = () => {
               </div>
             </div>
             
-            <div className="aspect-square bg-muted rounded-2xl"></div>
+            <img 
+              src={narcoProductImage} 
+              alt="Snusthetic Narco collection showing multiple color variants" 
+              className="aspect-square object-cover rounded-2xl shadow-lg" 
+            />
           </div>
         </div>
       </section>
@@ -180,10 +186,12 @@ const About = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="aspect-square bg-muted rounded-xl"></div>
-              <div className="aspect-square bg-muted rounded-xl"></div>
-              <div className="col-span-2 aspect-video bg-muted rounded-xl"></div>
+            <div className="lg:sticky lg:top-24">
+              <img 
+                src={genericComparisonImage} 
+                alt="Snusthetic premium tins vs generic packaging - You make your choice" 
+                className="w-full rounded-2xl shadow-lg"
+              />
             </div>
           </div>
         </div>
