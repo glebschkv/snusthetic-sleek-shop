@@ -111,7 +111,14 @@ serve(async (req) => {
     });
 
     // Add shipping countries (append multiple values)
-    const allowedCountries = ['US', 'CA', 'GB', 'SE', 'NO', 'DK', 'FI'];
+    const allowedCountries = [
+      'US', 'CA', 'GB', 'SE', 'NO', 'DK', 'FI', // Original countries
+      'AU', 'NZ', // Oceania
+      'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'AT', 'CH', 'IE', 'PL', 'PT', // Europe
+      'JP', 'SG', 'HK', 'KR', // Asia
+      'AE', 'SA', // Middle East
+      'MX', 'BR', // Latin America
+    ];
     allowedCountries.forEach(country => {
       sessionData.append('shipping_address_collection[allowed_countries][]', country);
     });
