@@ -110,23 +110,55 @@ export const useCart = () => {
     return items.reduce((count, item) => count + item.quantity, 0);
   }, [items]);
 
+  const hasSubscriptions = useCallback(() => {
+    return items.some(item => item.is_subscription);
+  }, [items]);
+
+  const hasPhysicalProducts = useCallback(() => {
+    return items.some(item => !item.is_subscription);
+  }, [items]);
+
   const getQuantityDiscount = useCallback(() => {
-    const totalItems = getItemCount();
+    const totalItems = items.reduce((count, item) => count + item.quantity, 0);
     if (totalItems >= 3) return 25; // 25% off for 3+ items
     if (totalItems >= 2) return 15; // 15% off for 2 items
     return 0; // No discount for 1 item
-  }, [getItemCount]);
+  }, [items]);
 
   const getDiscountAmount = useCallback(() => {
     // Only apply quantity discounts to physical products, not subscriptions
-    if (hasSubscriptions()) return 0;
-    const discount = getQuantityDiscount();
-    return (getTotal() * discount) / 100;
-  }, [getQuantityDiscount, getTotal]);
+    const hasSubs = items.some(item => item.is_subscription);
+    if (hasSubs) return 0;
+    
+    const totalItems = items.reduce((count, item) => count + item.quantity, 0);
+    let discount = 0;
+    if (totalItems >= 3) discount = 25;
+    else if (totalItems >= 2) discount = 15;
+    
+    const total = items.reduce((total, item) => {
+      const itemPrice = item.product.price + (item.variant?.price_adjustment || 0);
+      return total + (itemPrice * item.quantity);
+    }, 0);
+    
+    return (total * discount) / 100;
+  }, [items]);
 
   const getDiscountedTotal = useCallback(() => {
-    return getTotal() - getDiscountAmount();
-  }, [getTotal, getDiscountAmount]);
+    const total = items.reduce((total, item) => {
+      const itemPrice = item.product.price + (item.variant?.price_adjustment || 0);
+      return total + (itemPrice * item.quantity);
+    }, 0);
+    
+    const hasSubs = items.some(item => item.is_subscription);
+    if (hasSubs) return total;
+    
+    const totalItems = items.reduce((count, item) => count + item.quantity, 0);
+    let discount = 0;
+    if (totalItems >= 3) discount = 25;
+    else if (totalItems >= 2) discount = 15;
+    
+    return total - (total * discount) / 100;
+  }, [items]);
 
   const toggleCart = useCallback(() => {
     setIsOpen(prev => !prev);
@@ -143,14 +175,6 @@ export const useCart = () => {
   const formatTotal = useCallback(() => {
     return formatPrice(getTotal());
   }, [getTotal, formatPrice]);
-
-  const hasSubscriptions = useCallback(() => {
-    return items.some(item => item.is_subscription);
-  }, [items]);
-
-  const hasPhysicalProducts = useCallback(() => {
-    return items.some(item => !item.is_subscription);
-  }, [items]);
 
   return {
     items,
