@@ -10,11 +10,11 @@ max_rows = 1000
 [auth]
 enabled = true
 port = 54324
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://qqrgwesxjqmdwxyxgipx.supabase.co/auth/v1/callback"]
+site_url = "https://qqrgwesxjqmdwxyxgipx.supabase.co"
+additional_redirect_urls = ["http://localhost:3000/**", "https://*.lovable.app/**"]
 jwt_expiry = 3600
 enable_signup = true
-enable_email_confirmations = false
+enable_email_confirmations = true
 enable_sms_confirmations = false
 
 [functions.shopify-api]

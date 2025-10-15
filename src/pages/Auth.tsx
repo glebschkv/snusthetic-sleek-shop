@@ -36,7 +36,13 @@ const Auth = () => {
       const { error } = await signIn(signInData.email, signInData.password);
       
       if (error) {
-        if (error.message.includes('Invalid login credentials')) {
+        if (error.message.includes('Email not confirmed')) {
+          toast({
+            title: "Email not verified",
+            description: "Please check your email and click the verification link before signing in.",
+            variant: "destructive",
+          });
+        } else if (error.message.includes('Invalid login credentials')) {
           toast({
             title: "Login failed",
             description: "Invalid email or password. Please try again.",
