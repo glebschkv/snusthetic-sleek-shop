@@ -414,6 +414,9 @@ const Subscriptions = () => {
                     vs. £30 average shop price
                   </p>
                 )}
+                <p className="text-xs text-muted-foreground mt-2">
+                  First delivery shipping: £3.50 EU/UK • £10.00 US
+                </p>
               </div>
               <Button
                 size="lg"

@@ -156,14 +156,51 @@ serve(async (req) => {
 
     console.log('Created Stripe price:', stripePrice.id)
 
+    // Create one-time shipping charge for first delivery
+    // £3.50 for EU/UK, £10.00 for US (converted to USD for Stripe)
+    const gbpToUsdRate = 1 / 0.73;
+    const shippingEuUkAmount = Math.round(3.50 * gbpToUsdRate * 100);
+    const shippingUsAmount = Math.round(10.00 * gbpToUsdRate * 100);
+
+    // Create shipping rates
+    const shippingRateEuUk = await stripe.shippingRates.create({
+      display_name: 'First Delivery Shipping (EU/UK)',
+      type: 'fixed_amount',
+      fixed_amount: {
+        amount: shippingEuUkAmount,
+        currency: (currency || product.currency).toLowerCase(),
+      },
+      delivery_estimate: {
+        minimum: { unit: 'business_day', value: 5 },
+        maximum: { unit: 'business_day', value: 10 },
+      },
+    });
+
+    const shippingRateUs = await stripe.shippingRates.create({
+      display_name: 'First Delivery Shipping (US)',
+      type: 'fixed_amount',
+      fixed_amount: {
+        amount: shippingUsAmount,
+        currency: (currency || product.currency).toLowerCase(),
+      },
+      delivery_estimate: {
+        minimum: { unit: 'business_day', value: 7 },
+        maximum: { unit: 'business_day', value: 14 },
+      },
+    });
+
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ['card'],
       billing_address_collection: 'required',
       shipping_address_collection: {
-        allowed_countries: ['GB', 'US', 'CA', 'AU', 'NZ', 'IE', 'DE', 'FR', 'ES', 'IT', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI'],
+        allowed_countries: ['GB', 'US', 'CA', 'AU', 'NZ', 'IE', 'DE', 'FR', 'ES', 'IT', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'PT', 'GR', 'CZ', 'PL', 'HU', 'RO', 'BG', 'SK', 'SI', 'HR', 'LT', 'LV', 'EE', 'CY', 'MT', 'LU'],
       },
+      shipping_options: [
+        { shipping_rate: shippingRateEuUk.id },
+        { shipping_rate: shippingRateUs.id },
+      ],
       line_items: [
         {
           price: stripePrice.id,

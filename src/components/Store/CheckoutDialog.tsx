@@ -29,6 +29,9 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
   const discountAmount = (total * discountPercent) / 100;
   const finalTotal = total - discountAmount;
   
+  // Shipping costs (calculated at Stripe checkout based on address)
+  const shippingEstimate = 'Calculated at checkout';
+  
   const handleProceedToPayment = async () => {
     setLoading(true);
     
@@ -173,20 +176,33 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
                     <span>-{formatPrice(discountAmount)}</span>
                   </div>
                 )}
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>Shipping</span>
+                  <span>{shippingEstimate}</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  £3.50 EU/UK • £10.00 US
+                </p>
                 <Separator className="my-2" />
                 <div className="flex justify-between font-medium text-lg">
                   <span>Final Total</span>
-                  <span>{formatPrice(finalTotal)}</span>
+                  <span>{formatPrice(finalTotal)} + shipping</span>
                 </div>
               </>
             )}
             
             {/* Subscription total */}
             {hasSubscriptions && (
-              <div className="flex justify-between font-medium text-lg">
-                <span>Monthly Total</span>
-                <span>{formatPrice(total)}/month</span>
-              </div>
+              <>
+                <div className="flex justify-between font-medium text-lg">
+                  <span>Monthly Total</span>
+                  <span>{formatPrice(total)}/month</span>
+                </div>
+                <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                  <span>First delivery shipping</span>
+                  <span>£3.50 EU/UK • £10.00 US</span>
+                </div>
+              </>
             )}
           </div>
 

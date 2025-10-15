@@ -100,6 +100,56 @@ serve(async (req) => {
       });
     }
 
+    // Create shipping rates for EU/UK and US
+    // Shipping costs: £3.50 for EU/UK, £10.00 for US
+    // Convert from GBP to currency (using GBP rate of 0.73 to USD)
+    const gbpToUsdRate = 1 / 0.73;
+    
+    const shippingEuUkAmount = Math.round(3.50 * gbpToUsdRate * 100); // £3.50 in cents
+    const shippingUsAmount = Math.round(10.00 * gbpToUsdRate * 100); // £10.00 in cents
+
+    // Create EU/UK shipping rate
+    const shippingRateEuUk = await fetch('https://api.stripe.com/v1/shipping_rates', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${stripeSecretKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        'display_name': 'Standard Shipping (EU/UK)',
+        'type': 'fixed_amount',
+        'fixed_amount[amount]': shippingEuUkAmount.toString(),
+        'fixed_amount[currency]': currency.toLowerCase(),
+        'delivery_estimate[minimum][unit]': 'business_day',
+        'delivery_estimate[minimum][value]': '5',
+        'delivery_estimate[maximum][unit]': 'business_day',
+        'delivery_estimate[maximum][value]': '10',
+      }),
+    });
+
+    const euUkRate = await shippingRateEuUk.json();
+
+    // Create US shipping rate
+    const shippingRateUs = await fetch('https://api.stripe.com/v1/shipping_rates', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${stripeSecretKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        'display_name': 'Standard Shipping (US)',
+        'type': 'fixed_amount',
+        'fixed_amount[amount]': shippingUsAmount.toString(),
+        'fixed_amount[currency]': currency.toLowerCase(),
+        'delivery_estimate[minimum][unit]': 'business_day',
+        'delivery_estimate[minimum][value]': '7',
+        'delivery_estimate[maximum][unit]': 'business_day',
+        'delivery_estimate[maximum][value]': '14',
+      }),
+    });
+
+    const usRate = await shippingRateUs.json();
+
     // Create Stripe Checkout Session
     const sessionData = new URLSearchParams({
       'mode': 'payment',
@@ -110,7 +160,7 @@ serve(async (req) => {
       ...(customer_email && { 'customer_email': customer_email }),
     });
 
-    // Add shipping countries (all countries supported by Stripe)
+    // Add shipping countries and options
     const allowedCountries = [
       'AC', 'AD', 'AE', 'AF', 'AG', 'AI', 'AL', 'AM', 'AO', 'AQ', 'AR', 'AT', 'AU', 'AW', 'AX', 'AZ',
       'BA', 'BB', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BL', 'BM', 'BN', 'BO', 'BQ', 'BR', 'BS', 'BT', 'BV', 'BW', 'BY', 'BZ',
@@ -142,6 +192,10 @@ serve(async (req) => {
     allowedCountries.forEach(country => {
       sessionData.append('shipping_address_collection[allowed_countries][]', country);
     });
+
+    // Add shipping options - both rates will be shown, Stripe automatically selects based on address
+    sessionData.append('shipping_options[0][shipping_rate]', euUkRate.id);
+    sessionData.append('shipping_options[1][shipping_rate]', usRate.id);
 
     // Add line items to the session data
     lineItems.forEach((item, index) => {
