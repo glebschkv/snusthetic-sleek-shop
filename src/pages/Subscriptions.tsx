@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -35,6 +36,7 @@ interface Product {
 const Subscriptions = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { formatPrice, convertPrice } = useCurrency();
   
   const [brands, setBrands] = useState<Brand[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -118,7 +120,13 @@ const Subscriptions = () => {
 
   const calculatePrice = () => {
     const quantity = getQuantity();
-    const basePrice = getSelectedProduct()?.price || 0;
+    const product = getSelectedProduct();
+    if (!product) return { pricePerCan: 0, totalPrice: 0, savings: 0, discountPercent: 0 };
+    
+    // Convert product price from its stored currency (GBP) to USD base, then to selected currency
+    // Products are stored in GBP (rate: 0.73 USD), so we need to convert to USD first
+    const priceInUSD = product.currency.toUpperCase() === 'GBP' ? product.price / 0.73 : product.price;
+    const basePrice = convertPrice(priceInUSD);
     
     let discountPercent = 0;
     if (quantityType === '5') discountPercent = 0;
@@ -131,17 +139,6 @@ const Subscriptions = () => {
     const savings = (basePrice * quantity) - totalPrice;
     
     return { pricePerCan, totalPrice, savings, discountPercent };
-  };
-
-  const formatPriceNative = (price: number) => {
-    const product = getSelectedProduct();
-    const currencySymbols: Record<string, string> = {
-      'GBP': '£',
-      'USD': '$',
-      'EUR': '€',
-    };
-    const symbol = currencySymbols[product?.currency || 'GBP'] || product?.currency || '£';
-    return `${symbol}${price.toFixed(2)}`;
   };
 
   const handleSubscribe = async () => {
@@ -379,7 +376,7 @@ const Subscriptions = () => {
           <section className="py-12 bg-muted/30">
             <div className="container mx-auto px-4 max-w-4xl">
               <QuantitySelector
-                basePrice={selectedProduct.price}
+                basePrice={selectedProduct.currency.toUpperCase() === 'GBP' ? convertPrice(selectedProduct.price / 0.73) : convertPrice(selectedProduct.price)}
                 currency={selectedProduct.currency}
                 selectedQuantity={getQuantity()}
                 quantityType={quantityType}
@@ -404,18 +401,18 @@ const Subscriptions = () => {
           <section className="py-12 bg-muted/30">
             <div className="container mx-auto px-4 text-center">
               <div className="mb-4">
-                <p className="text-2xl font-bold">{formatPriceNative(calculatePrice().totalPrice)}/month</p>
+                <p className="text-2xl font-bold">{formatPrice(calculatePrice().totalPrice)}/month</p>
                 {calculatePrice().discountPercent > 0 ? (
                   <p className="text-sm text-green-600">
-                    Save {formatPriceNative(calculatePrice().savings)} ({calculatePrice().discountPercent}% off)
+                    Save {formatPrice(calculatePrice().savings)} ({calculatePrice().discountPercent}% off)
                   </p>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    vs. £30 average shop price
+                    vs. {formatPrice(30)} average shop price
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground mt-2">
-                  First delivery shipping: £3.50 EU/UK • £10.00 US
+                  First delivery shipping: {formatPrice(3.50)} EU/UK • {formatPrice(10)} US
                 </p>
               </div>
               <Button
