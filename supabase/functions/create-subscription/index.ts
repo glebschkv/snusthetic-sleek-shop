@@ -77,9 +77,9 @@ serve(async (req) => {
     // Use converted_price if provided (for multi-currency), otherwise use database price
     const basePrice = converted_price || product.price
     let discountPercent = 0
-    if (quantity_type === '5') discountPercent = 15
-    else if (quantity_type === '10') discountPercent = 20
-    else if (quantity_type === '20') discountPercent = 25
+    if (quantity_type === '5') discountPercent = 0
+    else if (quantity_type === '10') discountPercent = 5
+    else if (quantity_type === '20') discountPercent = 10
     else if (quantity_type === 'custom') discountPercent = 10
 
     const pricePerCan = basePrice * (1 - discountPercent / 100)

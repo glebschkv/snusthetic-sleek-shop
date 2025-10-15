@@ -121,9 +121,9 @@ const Subscriptions = () => {
     const basePrice = getSelectedProduct()?.price || 0;
     
     let discountPercent = 0;
-    if (quantityType === '5') discountPercent = 15;
-    else if (quantityType === '10') discountPercent = 20;
-    else if (quantityType === '20') discountPercent = 25;
+    if (quantityType === '5') discountPercent = 0;
+    else if (quantityType === '10') discountPercent = 5;
+    else if (quantityType === '20') discountPercent = 10;
     else if (quantityType === 'custom') discountPercent = 10;
     
     const pricePerCan = basePrice * (1 - discountPercent / 100);
