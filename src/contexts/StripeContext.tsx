@@ -1,7 +1,8 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { loadStripe, Stripe } from '@stripe/stripe-js';
+import { STRIPE_PUBLISHABLE_KEY } from '@/config/stripe';
 
-const stripePromise = loadStripe('pk_test_51S8K6LK5475G51yQr2GqoNLnKij1qXuE4Mdp1yc7mLEdS8j2chMOfdysP2ehPvf7xeIjZC5vF4NtnUpVbKO6Aidx00WMTjbpPz');
+const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
 interface StripeContextType {
   stripe: Promise<Stripe | null>;

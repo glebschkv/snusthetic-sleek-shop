@@ -10,8 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { toast } from 'sonner';
+import { STRIPE_PUBLISHABLE_KEY } from '@/config/stripe';
 
-const stripePromise = loadStripe('pk_test_51S8K6LK5475G51yQr2GqoNLnKij1qXuE4Mdp1yc7mLEdS8j2chMOfdysP2ehPvf7xeIjZC5vF4NtnUpVbKO6Aidx00WMTjbpPz');
+const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
 interface StripeCheckoutProps {
   clientSecret: string;
