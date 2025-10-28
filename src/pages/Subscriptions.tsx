@@ -123,8 +123,10 @@ const Subscriptions = () => {
     const product = getSelectedProduct();
     if (!product) return { pricePerCan: 0, totalPrice: 0, savings: 0, discountPercent: 0 };
     
-    // Base price is in GBP, convert to selected currency
-    const basePrice = convertPrice(product.price);
+    // Products are stored in GBP, convert to USD base first (GBP rate is 0.73)
+    // Then convertPrice will handle USD to selected currency
+    const priceInUSD = product.price / 0.73;
+    const basePrice = convertPrice(priceInUSD);
     
     let discountPercent = 0;
     if (quantityType === '5') discountPercent = 0;
@@ -380,7 +382,7 @@ const Subscriptions = () => {
           <section className="py-12 bg-muted/30">
             <div className="container mx-auto px-4 max-w-4xl">
               <QuantitySelector
-                basePrice={selectedProduct.price}
+                basePrice={selectedProduct.price / 0.73}
                 selectedQuantity={getQuantity()}
                 quantityType={quantityType}
                 customQuantity={customQuantity}
