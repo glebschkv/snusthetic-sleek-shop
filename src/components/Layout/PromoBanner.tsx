@@ -5,6 +5,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 const PromoBanner = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const isMobile = useIsMobile();
 
   const desktopMessages = [
@@ -33,7 +34,15 @@ const PromoBanner = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentMessageIndex((prev) => (prev + 1) % desktopMessages.length);
+      // Start fade out
+      setIsTransitioning(true);
+      
+      // Change message after fade out completes
+      setTimeout(() => {
+        setCurrentMessageIndex((prev) => (prev + 1) % desktopMessages.length);
+        // Start fade in
+        setIsTransitioning(false);
+      }, 400); // Match fade-out duration
     }, 5000);
 
     return () => clearInterval(interval);
@@ -47,7 +56,7 @@ const PromoBanner = () => {
     <div className="relative bg-foreground text-background py-2 overflow-hidden animate-slide-down">
       <div className="relative flex items-center justify-center overflow-hidden w-full max-w-full">
         {/* Scrolling text container */}
-        <div className="flex whitespace-nowrap animate-scroll-right w-max no-scrollbar">
+        <div className={`flex whitespace-nowrap animate-scroll-right w-max no-scrollbar transition-opacity duration-400 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
           <span className={`inline-block px-8 font-medium ${isMobile ? 'text-xs' : 'text-sm'}`}>
             {displayText}
           </span>
