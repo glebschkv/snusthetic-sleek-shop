@@ -36,7 +36,7 @@ interface Product {
 const Subscriptions = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { formatPrice, convertPrice } = useCurrency();
+  const { formatPrice, convertPrice, selectedCurrency } = useCurrency();
   
   const [brands, setBrands] = useState<Brand[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -123,10 +123,8 @@ const Subscriptions = () => {
     const product = getSelectedProduct();
     if (!product) return { pricePerCan: 0, totalPrice: 0, savings: 0, discountPercent: 0 };
     
-    // Convert product price from its stored currency (GBP) to USD base, then to selected currency
-    // Products are stored in GBP (rate: 0.73 USD), so we need to convert to USD first
-    const priceInUSD = product.currency.toUpperCase() === 'GBP' ? product.price / 0.73 : product.price;
-    const basePrice = convertPrice(priceInUSD);
+    // Base price is in GBP, convert to selected currency
+    const basePrice = convertPrice(product.price);
     
     let discountPercent = 0;
     if (quantityType === '5') discountPercent = 0;
@@ -163,10 +161,14 @@ const Subscriptions = () => {
     try {
       setSubscribing(true);
       
+      const { totalPrice } = calculatePrice();
+      
       console.log('Calling create-subscription with:', {
         product_id: selectedProduct.id,
         quantity_type: quantityType,
         quantity: quantity,
+        currency: selectedCurrency.code,
+        converted_price: totalPrice,
       });
       
       const { data, error } = await supabase.functions.invoke('create-subscription', {
@@ -174,6 +176,8 @@ const Subscriptions = () => {
           product_id: selectedProduct.id,
           quantity_type: quantityType,
           quantity: quantity,
+          currency: selectedCurrency.code.toLowerCase(),
+          converted_price: totalPrice,
           return_url: `${window.location.origin}/profile?subscription_success=true`
         }
       });
@@ -376,8 +380,7 @@ const Subscriptions = () => {
           <section className="py-12 bg-muted/30">
             <div className="container mx-auto px-4 max-w-4xl">
               <QuantitySelector
-                basePrice={selectedProduct.currency.toUpperCase() === 'GBP' ? convertPrice(selectedProduct.price / 0.73) : convertPrice(selectedProduct.price)}
-                currency={selectedProduct.currency}
+                basePrice={selectedProduct.price}
                 selectedQuantity={getQuantity()}
                 quantityType={quantityType}
                 customQuantity={customQuantity}

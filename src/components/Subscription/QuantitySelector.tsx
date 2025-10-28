@@ -3,10 +3,10 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface QuantitySelectorProps {
   basePrice: number;
-  currency: string;
   selectedQuantity: number;
   quantityType: '5' | '10' | '20' | 'custom';
   customQuantity: number;
@@ -21,24 +21,13 @@ const presetQuantities = [
 
 const QuantitySelector = ({
   basePrice,
-  currency,
   selectedQuantity,
   quantityType,
   customQuantity,
   onSelectQuantity,
 }: QuantitySelectorProps) => {
   const [customInput, setCustomInput] = useState(customQuantity.toString());
-
-  // Format price in native currency without conversion
-  const formatPriceNative = (price: number) => {
-    const currencySymbols: Record<string, string> = {
-      'GBP': '£',
-      'USD': '$',
-      'EUR': '€',
-    };
-    const symbol = currencySymbols[currency] || currency;
-    return `${symbol}${price.toFixed(2)}`;
-  };
+  const { formatPrice } = useCurrency();
 
   const calculatePrice = (quantity: number, discount: number) => {
     const pricePerCan = basePrice * (1 - discount / 100);
@@ -96,16 +85,16 @@ const QuantitySelector = ({
                   )}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {formatPriceNative(pricePerCan)}/can
+                  {formatPrice(pricePerCan)}/can
                 </div>
                 {option.value === '5' && (
                   <div className="text-xs text-muted-foreground italic">
-                    Average shop price: £6/can
+                    Average shop price: {formatPrice(6)}/can
                   </div>
                 )}
-                <div className="text-2xl font-bold">{formatPriceNative(total)}/month</div>
+                <div className="text-2xl font-bold">{formatPrice(total)}/month</div>
                 {option.discount > 0 ? (
-                  <div className="text-sm text-green-600">Save {formatPriceNative(savings)}</div>
+                  <div className="text-sm text-green-600">Save {formatPrice(savings)}</div>
                 ) : (
                   <div className="text-sm text-primary">Standard pricing</div>
                 )}
@@ -146,13 +135,13 @@ const QuantitySelector = ({
           {quantityType === 'custom' && customQuantity >= 5 && (
             <div className="pt-2 space-y-1">
               <div className="text-sm text-muted-foreground">
-                {formatPriceNative(basePrice * 0.9)}/can
+                {formatPrice(basePrice * 0.9)}/can
               </div>
               <div className="text-2xl font-bold">
-                {formatPriceNative(basePrice * 0.9 * customQuantity)}/month
+                {formatPrice(basePrice * 0.9 * customQuantity)}/month
               </div>
               <div className="text-sm text-green-600">
-                Save {formatPriceNative(basePrice * customQuantity * 0.1)}
+                Save {formatPrice(basePrice * customQuantity * 0.1)}
               </div>
             </div>
           )}
