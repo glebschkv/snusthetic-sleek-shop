@@ -417,7 +417,7 @@ const Subscriptions = () => {
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground mt-2">
-                  First delivery shipping: {formatPrice(3.50)} EU/UK • {formatPrice(10)} US
+                  Shipping will be calculated at checkout based on your location
                 </p>
               </div>
               <Button

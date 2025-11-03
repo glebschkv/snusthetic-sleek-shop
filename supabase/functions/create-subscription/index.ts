@@ -74,18 +74,27 @@ serve(async (req) => {
     console.log('Found product:', product)
 
     // Calculate pricing based on quantity type
-    // Use converted_price if provided (for multi-currency), otherwise use database price
-    const basePrice = converted_price || product.price
+    // If converted_price is provided, it's already the final monthly amount (with discount applied)
+    // Otherwise, calculate from base price
+    let pricePerMonth: number
     let discountPercent = 0
-    if (quantity_type === '5') discountPercent = 0
-    else if (quantity_type === '10') discountPercent = 5
-    else if (quantity_type === '20') discountPercent = 10
-    else if (quantity_type === 'custom') discountPercent = 10
 
-    const pricePerCan = basePrice * (1 - discountPercent / 100)
-    const pricePerMonth = pricePerCan * quantity
+    if (converted_price) {
+      // Frontend already calculated final price with discount applied
+      pricePerMonth = converted_price
+      console.log('Using pre-calculated price:', { pricePerMonth, converted_price })
+    } else {
+      // Backwards compatibility: calculate discount here
+      const basePrice = product.price
+      if (quantity_type === '5') discountPercent = 0
+      else if (quantity_type === '10') discountPercent = 5
+      else if (quantity_type === '20') discountPercent = 10
+      else if (quantity_type === 'custom') discountPercent = 10
 
-    console.log('Pricing:', { quantity, discountPercent, pricePerCan, pricePerMonth, basePrice, converted_price })
+      const pricePerCan = basePrice * (1 - discountPercent / 100)
+      pricePerMonth = pricePerCan * quantity
+      console.log('Calculated pricing:', { quantity, discountPercent, pricePerCan, pricePerMonth, basePrice })
+    }
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -156,40 +165,9 @@ serve(async (req) => {
 
     console.log('Created Stripe price:', stripePrice.id)
 
-    // Create one-time shipping charge for first delivery
-    // £3.50 for EU/UK, £10.00 for US (converted to USD for Stripe)
-    const gbpToUsdRate = 1 / 0.73;
-    const shippingEuUkAmount = Math.round(3.50 * gbpToUsdRate * 100);
-    const shippingUsAmount = Math.round(10.00 * gbpToUsdRate * 100);
-
-    // Create shipping rates
-    const shippingRateEuUk = await stripe.shippingRates.create({
-      display_name: 'First Delivery Shipping (EU/UK)',
-      type: 'fixed_amount',
-      fixed_amount: {
-        amount: shippingEuUkAmount,
-        currency: (currency || product.currency).toLowerCase(),
-      },
-      delivery_estimate: {
-        minimum: { unit: 'business_day', value: 5 },
-        maximum: { unit: 'business_day', value: 10 },
-      },
-    });
-
-    const shippingRateUs = await stripe.shippingRates.create({
-      display_name: 'First Delivery Shipping (US)',
-      type: 'fixed_amount',
-      fixed_amount: {
-        amount: shippingUsAmount,
-        currency: (currency || product.currency).toLowerCase(),
-      },
-      delivery_estimate: {
-        minimum: { unit: 'business_day', value: 7 },
-        maximum: { unit: 'business_day', value: 14 },
-      },
-    });
-
     // Create Stripe checkout session
+    // Note: Stripe subscription mode doesn't support shipping_options
+    // Shipping address will be collected but shipping costs must be handled separately
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ['card'],
@@ -197,10 +175,6 @@ serve(async (req) => {
       shipping_address_collection: {
         allowed_countries: ['GB', 'US', 'CA', 'AU', 'NZ', 'IE', 'DE', 'FR', 'ES', 'IT', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'PT', 'GR', 'CZ', 'PL', 'HU', 'RO', 'BG', 'SK', 'SI', 'HR', 'LT', 'LV', 'EE', 'CY', 'MT', 'LU'],
       },
-      shipping_options: [
-        { shipping_rate: shippingRateEuUk.id },
-        { shipping_rate: shippingRateUs.id },
-      ],
       line_items: [
         {
           price: stripePrice.id,
