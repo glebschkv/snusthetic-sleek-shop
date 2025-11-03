@@ -121,12 +121,19 @@ const Subscriptions = () => {
   const calculatePrice = () => {
     const quantity = getQuantity();
     const product = getSelectedProduct();
-    if (!product) return { pricePerCan: 0, totalPrice: 0, savings: 0, discountPercent: 0 };
+    if (!product) return { pricePerCan: 0, totalPrice: 0, savings: 0, discountPercent: 0, storePricePerCan: 0 };
+    
+    // Average store price per can in GBP
+    const STORE_PRICE_GBP = 7;
     
     // Products are stored in GBP, convert to USD base first (GBP rate is 0.73)
     // Then convertPrice will handle USD to selected currency
     const priceInUSD = product.price / 0.73;
     const basePrice = convertPrice(priceInUSD);
+    
+    // Convert store price to selected currency
+    const storePriceInUSD = STORE_PRICE_GBP / 0.73;
+    const storePriceConverted = convertPrice(storePriceInUSD);
     
     let discountPercent = 0;
     if (quantityType === '5') discountPercent = 0;
@@ -136,9 +143,12 @@ const Subscriptions = () => {
     
     const pricePerCan = basePrice * (1 - discountPercent / 100);
     const totalPrice = pricePerCan * quantity;
-    const savings = (basePrice * quantity) - totalPrice;
     
-    return { pricePerCan, totalPrice, savings, discountPercent };
+    // Calculate real savings vs store price
+    const totalStorePrice = storePriceConverted * quantity;
+    const realSavings = totalStorePrice - totalPrice;
+    
+    return { pricePerCan, totalPrice, savings: realSavings, discountPercent, storePricePerCan: storePriceConverted };
   };
 
   const handleSubscribe = async () => {
@@ -407,15 +417,9 @@ const Subscriptions = () => {
             <div className="container mx-auto px-4 text-center">
               <div className="mb-4">
                 <p className="text-2xl font-bold">{formatPrice(calculatePrice().totalPrice)}/month</p>
-                {calculatePrice().discountPercent > 0 ? (
-                  <p className="text-sm text-green-600">
-                    Save {formatPrice(calculatePrice().savings)} ({calculatePrice().discountPercent}% off)
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    vs. {formatPrice(30)} average shop price
-                  </p>
-                )}
+                <p className="text-sm text-green-600 font-semibold">
+                  Save {formatPrice(calculatePrice().savings)} vs. {formatPrice(calculatePrice().storePricePerCan)} average shop price per can
+                </p>
                 <p className="text-xs text-muted-foreground mt-2">
                   Shipping will be calculated at checkout based on your location
                 </p>
