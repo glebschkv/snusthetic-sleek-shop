@@ -123,10 +123,12 @@ const Subscriptions = () => {
     const product = getSelectedProduct();
     if (!product) return { pricePerCan: 0, totalPrice: 0, savings: 0, discountPercent: 0 };
     
-    // Products are stored in GBP, convert to USD base first (GBP rate is 0.73)
-    // Then convertPrice will handle USD to selected currency
-    const priceInUSD = product.price / 0.73;
-    const basePrice = convertPrice(priceInUSD);
+    // Products are stored in GBP
+    // If viewing in GBP, use product price directly
+    // If viewing in other currencies, convert GBP -> USD -> selected currency
+    const basePrice = selectedCurrency.code === 'GBP' 
+      ? product.price 
+      : convertPrice(product.price / 0.73);
     
     let discountPercent = 0;
     if (quantityType === '5') discountPercent = 0;
