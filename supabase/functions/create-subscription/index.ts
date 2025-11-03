@@ -34,7 +34,7 @@ serve(async (req) => {
       throw new Error('Unauthorized')
     }
 
-    const { product_id, quantity_type, quantity, currency, converted_price, return_url } = await req.json()
+    const { product_id, quantity_type, quantity, converted_price, return_url } = await req.json()
 
     console.log('Creating subscription for user:', user.id, 'product:', product_id, 'quantity:', quantity)
 
@@ -150,8 +150,8 @@ serve(async (req) => {
     // Create Stripe price for this subscription
     const stripePrice = await stripe.prices.create({
       product: stripeProduct.id,
-      unit_amount: Math.round(pricePerMonth * 100), // Convert to cents
-      currency: (currency || product.currency).toLowerCase(),
+      unit_amount: Math.round(pricePerMonth * 100), // Convert to cents/pence
+      currency: product.currency.toLowerCase(), // Always use product's native currency
       recurring: {
         interval: 'month'
       },
