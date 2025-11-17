@@ -275,6 +275,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const html = generateEmailHTML(orderData);
 
+    // Send confirmation email to customer
     const emailResponse = await resend.emails.send({
       from: "Snusthetic <orders@snusthetic.com>",
       to: [orderData.customer_email],
@@ -282,7 +283,17 @@ const handler = async (req: Request): Promise<Response> => {
       html,
     });
 
-    console.log("Order confirmation email sent successfully:", emailResponse);
+    console.log("Customer email sent successfully:", emailResponse);
+
+    // Send business notification email
+    const businessEmailResponse = await resend.emails.send({
+      from: "Snusthetic Orders <orders@snusthetic.com>",
+      to: ["snusthetic@gmail.com"],
+      subject: `New Order #${orderData.order_id.substring(0, 8)} - ${orderData.customer_name}`,
+      html,
+    });
+
+    console.log("Business notification email sent successfully:", businessEmailResponse);
 
     return new Response(
       JSON.stringify({ success: true, data: emailResponse }),
