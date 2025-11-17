@@ -276,7 +276,7 @@ const handler = async (req: Request): Promise<Response> => {
     const html = generateEmailHTML(orderData);
 
     const emailResponse = await resend.emails.send({
-      from: "Snusthetic <onboarding@resend.dev>",
+      from: "Snusthetic <orders@snusthetic.com>",
       to: [orderData.customer_email],
       subject: `Order Confirmation #${orderData.order_id.substring(0, 8)} - Thank You!`,
       html,

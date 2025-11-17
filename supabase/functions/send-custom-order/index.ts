@@ -26,7 +26,7 @@ serve(async (req) => {
 
     // Send notification email to business
     const businessEmailResponse = await resend.emails.send({
-      from: "Snusthetic Orders <onboarding@resend.dev>",
+      from: "Snusthetic Orders <orders@snusthetic.com>",
       to: ["snusthetic@gmail.com"],
       subject: `New Custom Order Request from ${firstName} ${lastName}`,
       html: `
@@ -44,7 +44,7 @@ serve(async (req) => {
 
     // Send confirmation email to customer
     const customerEmailResponse = await resend.emails.send({
-      from: "Snusthetic <onboarding@resend.dev>",
+      from: "Snusthetic <orders@snusthetic.com>",
       to: [email],
       subject: "Your Custom Order Request - Snusthetic",
       html: `
