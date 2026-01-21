@@ -12,11 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const Header = () => {
-  console.log('Header component rendering');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  console.log('About to call useCartContext');
   const { getItemCount, toggleCart } = useCartContext();
-  console.log('useCartContext returned successfully');
   const { user, signOut, isAdmin } = useAuth();
   const location = useLocation();
   const itemCount = getItemCount();
@@ -101,7 +98,10 @@ const Header = () => {
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="p-1.5 md:p-2 text-foreground hover:text-primary transition-colors">
+                    <button
+                      className="p-1.5 md:p-2 text-foreground hover:text-primary transition-colors"
+                      aria-label="Open user menu"
+                    >
                       <User className="h-4 w-4 md:h-5 md:w-5" />
                     </button>
                   </DropdownMenuTrigger>
@@ -121,7 +121,11 @@ const Header = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Link to="/auth" className="p-1.5 md:p-2 text-foreground hover:text-primary transition-colors">
+                <Link
+                  to="/auth"
+                  className="p-1.5 md:p-2 text-foreground hover:text-primary transition-colors"
+                  aria-label="Sign in or create account"
+                >
                   <User className="h-4 w-4 md:h-5 md:w-5" />
                 </Link>
               )}
@@ -130,6 +134,7 @@ const Header = () => {
               <button
                 onClick={toggleCart}
                 className="relative p-1.5 md:p-2 text-foreground hover:text-primary transition-colors"
+                aria-label={`Shopping cart${itemCount > 0 ? `, ${itemCount} items` : ', empty'}`}
               >
                 <ShoppingBag className="h-4 w-4 md:h-5 md:w-5" />
                 {itemCount > 0 && (
@@ -147,8 +152,10 @@ const Header = () => {
             <button
               className="md:hidden p-1.5 text-foreground hover:text-primary transition-colors ml-2"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={isMobileMenuOpen}
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         </div>

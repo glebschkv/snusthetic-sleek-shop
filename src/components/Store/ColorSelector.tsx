@@ -47,7 +47,7 @@ const ColorSelector = ({ variants, selectedVariant, onVariantChange, onVariantUp
         </div>
       )}
       
-      <div className={`flex flex-wrap ${currentSize.gap}`}>
+      <div className={`flex flex-wrap ${currentSize.gap}`} role="group" aria-label="Color options">
         {variants.map((variant) => (
           <Button
             key={variant.id}
@@ -56,14 +56,17 @@ const ColorSelector = ({ variants, selectedVariant, onVariantChange, onVariantUp
             onClick={() => onVariantChange(variant)}
             className={`${currentSize.button} relative`}
             disabled={!variant.is_available || variant.stock_quantity <= 0}
+            aria-pressed={selectedVariant?.id === variant.id}
+            aria-label={`${variant.color_name}${variant.stock_quantity <= 0 ? ', out of stock' : ''}`}
           >
             <div
               className={`${currentSize.dot} rounded-full border border-border mr-1`}
               style={{ backgroundColor: variant.color_hex }}
+              aria-hidden="true"
             />
             {variant.color_name}
             {variant.stock_quantity <= 0 && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full" />
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full" aria-hidden="true" />
             )}
           </Button>
         ))}
