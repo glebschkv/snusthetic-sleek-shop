@@ -223,7 +223,7 @@ const ProductVariantForm = ({ productId, variants, onVariantsChange }: ProductVa
               {newVariant.image_url && (
                 <div className="mt-1">
                   <img 
-                    src={`https://qqrgwesxjqmdwxyxgipx.supabase.co/storage/v1/object/public/product-images/${newVariant.image_url}`}
+                    src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${newVariant.image_url}`}
                     alt="Variant preview"
                     className="w-12 h-12 object-cover rounded border"
                     onError={(e) => {

@@ -161,20 +161,19 @@ const AdminDashboard = () => {
       if (categoriesRes.data) setCategories(categoriesRes.data);
       if (ordersRes.data) setOrders(ordersRes.data);
       if (referralsRes.data) {
-        // Fetch order details separately for each referral
-        const referralsWithOrders = await Promise.all(
-          referralsRes.data.map(async (ref: any) => {
-            if (ref.order_id) {
-              const { data: orderData } = await supabase
-                .from('orders')
-                .select('total_amount, status')
-                .eq('id', ref.order_id)
-                .single();
-              return { ...ref, order: orderData };
-            }
-            return ref;
-          })
-        );
+        // Order data is already included via the JOIN in the query
+        // Map the data to include order info from the orders table
+        const referralsWithOrders = referralsRes.data.map((ref: ReferralUsage & { order?: { total_amount: number; status: string } }) => {
+          // If we have order_id, find matching order from ordersRes
+          if (ref.order_id && ordersRes.data) {
+            const matchingOrder = ordersRes.data.find((order: Order) => order.id === ref.order_id);
+            return {
+              ...ref,
+              order: matchingOrder ? { total_amount: matchingOrder.total_amount, status: matchingOrder.status } : undefined
+            };
+          }
+          return ref;
+        });
         setReferralUsages(referralsWithOrders as ReferralUsage[]);
         calculateReferrerStats(referralsWithOrders as ReferralUsage[]);
       }
@@ -633,7 +632,7 @@ const AdminDashboard = () => {
                           {productForm.image_url && (
                             <div className="mt-1">
                               <img 
-                                src={`https://qqrgwesxjqmdwxyxgipx.supabase.co/storage/v1/object/public/product-images/${productForm.image_url}`}
+                                src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${productForm.image_url}`}
                                 alt="Product preview"
                                 className="w-16 h-16 object-cover rounded border"
                                 onError={(e) => {

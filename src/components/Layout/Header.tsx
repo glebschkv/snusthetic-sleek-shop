@@ -12,11 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const Header = () => {
-  console.log('Header component rendering');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  console.log('About to call useCartContext');
   const { getItemCount, toggleCart } = useCartContext();
-  console.log('useCartContext returned successfully');
   const { user, signOut, isAdmin } = useAuth();
   const location = useLocation();
   const itemCount = getItemCount();

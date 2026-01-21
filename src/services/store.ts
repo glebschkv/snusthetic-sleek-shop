@@ -15,13 +15,13 @@ export const storeService = {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching products:', error);
+        // Error fetching products
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error fetching products:', error);
+      // Error fetching products
       return [];
     }
   },
@@ -34,13 +34,13 @@ export const storeService = {
         .order('name');
 
       if (error) {
-        console.error('Error fetching categories:', error);
+        // Error fetching categories
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      // Error fetching categories
       return [];
     }
   },
@@ -63,13 +63,13 @@ export const storeService = {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching products by category:', error);
+        // Error fetching products by category
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error fetching products by category:', error);
+      // Error fetching products by category
       return [];
     }
   },
@@ -83,13 +83,13 @@ export const storeService = {
         .single();
 
       if (error) {
-        console.error('Error creating product variant:', error);
+        // Error creating product variant
         return null;
       }
 
       return data;
     } catch (error) {
-      console.error('Error creating product variant:', error);
+      // Error creating product variant
       return null;
     }
   },
@@ -104,13 +104,13 @@ export const storeService = {
         .single();
 
       if (error) {
-        console.error('Error updating product variant:', error);
+        // Error updating product variant
         return null;
       }
 
       return data;
     } catch (error) {
-      console.error('Error updating product variant:', error);
+      // Error updating product variant
       return null;
     }
   },
@@ -123,13 +123,13 @@ export const storeService = {
         .eq('id', id);
 
       if (error) {
-        console.error('Error deleting product variant:', error);
+        // Error deleting product variant
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error deleting product variant:', error);
+      // Error deleting product variant
       return false;
     }
   },
@@ -153,13 +153,13 @@ export const storeService = {
         .single();
 
       if (error) {
-        console.error('Error creating order:', error);
+        // Error creating order
         return null;
       }
 
       return data;
     } catch (error) {
-      console.error('Error creating order:', error);
+      // Error creating order
       return null;
     }
   },

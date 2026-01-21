@@ -49,8 +49,7 @@ export const FeatureSection = () => {
       })
       
       reset()
-    } catch (error) {
-      console.error('Error submitting custom order:', error)
+    } catch {
       toast({
         title: "Error sending request",
         description: "Please try again or contact us directly.",

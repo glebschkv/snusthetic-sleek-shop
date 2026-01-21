@@ -66,8 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .maybeSingle();
       
       setIsAdmin(!!data);
-    } catch (error) {
-      console.error('Error checking admin status:', error);
+    } catch {
       setIsAdmin(false);
     }
   };
@@ -81,8 +80,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signUp = async (email: string, password: string, displayName?: string) => {
-    const redirectUrl = 'https://snusthetic.com/';
-    
+    const redirectUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -102,8 +101,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const resetPassword = async (email: string) => {
+    const redirectUrl = import.meta.env.VITE_APP_URL || window.location.origin;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://snusthetic.com/',
+      redirectTo: redirectUrl,
     });
     return { error };
   };

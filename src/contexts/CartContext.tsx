@@ -2,8 +2,25 @@ import { createContext, useContext, ReactNode } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { Product, ProductVariant } from '@/types/store';
 
+interface CartItem {
+  id: string;
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  variant?: ProductVariant;
+  imageUrl?: string;
+  subscriptionData?: {
+    quantity_type: '5' | '10' | '20' | 'custom';
+    billing_interval: 'month';
+    brand_name?: string;
+    flavor?: string;
+    strength_mg?: number;
+  };
+}
+
 interface CartContextType {
-  items: any[];
+  items: CartItem[];
   isOpen: boolean;
   addItem: (
     product: Product, 
@@ -36,10 +53,8 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  console.log('CartProvider rendering');
   const cartHook = useCart();
-  console.log('CartProvider cartHook:', cartHook);
-  
+
   return (
     <CartContext.Provider value={cartHook}>
       {children}
@@ -48,11 +63,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useCartContext = () => {
-  console.log('useCartContext called');
   const context = useContext(CartContext);
-  console.log('useCartContext context:', context);
   if (context === undefined) {
-    console.error('useCartContext: context is undefined');
     throw new Error('useCartContext must be used within a CartProvider');
   }
   return context;

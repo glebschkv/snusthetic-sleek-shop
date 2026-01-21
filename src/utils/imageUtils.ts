@@ -3,7 +3,7 @@
  * Images are now stored in Supabase Storage bucket 'product-images'
  */
 
-const SUPABASE_URL = 'https://qqrgwesxjqmdwxyxgipx.supabase.co';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 const STORAGE_BUCKET = 'product-images';
 
 /**

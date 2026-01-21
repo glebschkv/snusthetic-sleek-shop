@@ -89,8 +89,7 @@ const Subscriptions = () => {
       if (productsError) throw productsError;
       setProducts(productsData || []);
       
-    } catch (error) {
-      console.error('Error fetching data:', error);
+    } catch {
       toast.error('Failed to load subscription options');
     } finally {
       setLoading(false);
@@ -167,14 +166,6 @@ const Subscriptions = () => {
       
       const { totalPrice } = calculatePrice();
       
-      console.log('Calling create-subscription with:', {
-        product_id: selectedProduct.id,
-        quantity_type: quantityType,
-        quantity: quantity,
-        currency: selectedCurrency.code,
-        converted_price: totalPrice,
-      });
-      
       const { data, error } = await supabase.functions.invoke('create-subscription', {
         body: {
           product_id: selectedProduct.id,
@@ -186,10 +177,7 @@ const Subscriptions = () => {
         }
       });
 
-      console.log('Response from create-subscription:', { data, error });
-
       if (error) {
-        console.error('Edge function error:', error);
         throw error;
       }
 
@@ -199,11 +187,8 @@ const Subscriptions = () => {
 
       // Check multiple possible response structures
       const checkoutUrl = data.checkout_url || data?.data?.checkout_url;
-      
-      console.log('Checkout URL:', checkoutUrl);
 
       if (checkoutUrl) {
-        console.log('Redirecting to:', checkoutUrl);
         // Open in new tab (works in sandboxed iframes like Lovable preview)
         const newWindow = window.open(checkoutUrl, '_blank');
         if (!newWindow) {
@@ -212,12 +197,10 @@ const Subscriptions = () => {
           toast.success('Opening Stripe checkout...');
         }
       } else {
-        console.error('Full response data:', JSON.stringify(data, null, 2));
-        throw new Error('No checkout URL received. Check console for details.');
+        throw new Error('No checkout URL received from payment service.');
       }
-      
+
     } catch (error) {
-      console.error('Error creating subscription:', error);
       
       // More detailed error message
       if (error instanceof Error) {
