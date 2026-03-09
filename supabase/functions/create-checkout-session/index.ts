@@ -231,85 +231,55 @@ serve(async (req) => {
     
     sessionData.append('metadata[items]', JSON.stringify(minimalItems));
 
-    let discountIndex = 0;
+    // Stripe Checkout only supports ONE discount/coupon per session.
+    // Combine all discount amounts into a single coupon.
+    let totalDiscountAmount = 0;
+    const discountParts: string[] = [];
 
-    // Create quantity-based discount coupon if applicable
+    // Track quantity discount
     if (quantity_discount_percent && quantity_discount_amount && quantity_discount_amount > 0) {
-      const quantityCouponResponse = await fetch('https://api.stripe.com/v1/coupons', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${stripeSecretKey}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          'amount_off': Math.round(quantity_discount_amount * 100).toString(), // Convert to cents
-          'currency': currency.toLowerCase(),
-          'duration': 'once',
-          'name': `Bulk Discount - ${quantity_discount_percent}% off`,
-        }),
-      });
-
-      if (quantityCouponResponse.ok) {
-        const quantityCoupon = await quantityCouponResponse.json();
-        sessionData.append(`discounts[${discountIndex}][coupon]`, quantityCoupon.id);
-        discountIndex++;
-        
-        // Store quantity discount in metadata
-        sessionData.append('metadata[quantity_discount_percent]', quantity_discount_percent.toString());
-        sessionData.append('metadata[quantity_discount_amount]', quantity_discount_amount.toString());
-      }
+      totalDiscountAmount += quantity_discount_amount;
+      discountParts.push(`Bulk ${quantity_discount_percent}%`);
+      sessionData.append('metadata[quantity_discount_percent]', quantity_discount_percent.toString());
+      sessionData.append('metadata[quantity_discount_amount]', quantity_discount_amount.toString());
     }
 
-    // Create referral discount coupon if provided
+    // Track referral discount
     if (referral_code && referral_discount_amount && referral_discount_amount > 0) {
-      const referralCouponResponse = await fetch('https://api.stripe.com/v1/coupons', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${stripeSecretKey}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          'amount_off': Math.round(referral_discount_amount * 100).toString(), // Convert to cents
-          'currency': currency.toLowerCase(),
-          'duration': 'once',
-          'name': `Referral Discount - ${referral_code}`,
-        }),
-      });
-
-      if (referralCouponResponse.ok) {
-        const referralCoupon = await referralCouponResponse.json();
-        sessionData.append(`discounts[${discountIndex}][coupon]`, referralCoupon.id);
-        discountIndex++;
-
-        // Store referral code in session metadata (more reliable for webhooks)
-        sessionData.append('metadata[referral_code]', referral_code);
-        sessionData.append('metadata[referral_discount_amount]', referral_discount_amount.toString());
-      }
+      totalDiscountAmount += referral_discount_amount;
+      discountParts.push(`Referral ${referral_code}`);
+      sessionData.append('metadata[referral_code]', referral_code);
+      sessionData.append('metadata[referral_discount_amount]', referral_discount_amount.toString());
     }
 
-    // Create promo discount coupon if provided
+    // Track promo code discount
     if (discount_code && discount_code_amount && discount_code_amount > 0) {
-      const promoCouponResponse = await fetch('https://api.stripe.com/v1/coupons', {
+      totalDiscountAmount += discount_code_amount;
+      discountParts.push(`Promo ${discount_code}`);
+      sessionData.append('metadata[discount_code]', discount_code);
+      sessionData.append('metadata[discount_code_amount]', discount_code_amount.toString());
+    }
+
+    // Create a single combined coupon if any discounts apply
+    if (totalDiscountAmount > 0) {
+      const couponName = discountParts.join(' + ');
+      const combinedCouponResponse = await fetch('https://api.stripe.com/v1/coupons', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${stripeSecretKey}`,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          'amount_off': Math.round(discount_code_amount * 100).toString(),
+          'amount_off': Math.round(totalDiscountAmount * 100).toString(),
           'currency': currency.toLowerCase(),
           'duration': 'once',
-          'name': `Promo Code - ${discount_code}`,
+          'name': couponName,
         }),
       });
 
-      if (promoCouponResponse.ok) {
-        const promoCoupon = await promoCouponResponse.json();
-        sessionData.append(`discounts[${discountIndex}][coupon]`, promoCoupon.id);
-        discountIndex++;
-
-        sessionData.append('metadata[discount_code]', discount_code);
-        sessionData.append('metadata[discount_code_amount]', discount_code_amount.toString());
+      if (combinedCouponResponse.ok) {
+        const combinedCoupon = await combinedCouponResponse.json();
+        sessionData.append('discounts[0][coupon]', combinedCoupon.id);
       }
     }
 
