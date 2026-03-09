@@ -9,13 +9,16 @@ max_rows = 1000
 
 [auth]
 enabled = true
-port = 54324
 site_url = "https://qqrgwesxjqmdwxyxgipx.supabase.co"
 additional_redirect_urls = ["http://localhost:3000/**", "https://*.lovable.app/**", "https://snusthetic.com/**"]
 jwt_expiry = 3600
 enable_signup = true
-enable_email_confirmations = true
-enable_sms_confirmations = false
+
+[auth.email]
+enable_confirmations = true
+
+[auth.sms]
+enable_confirmations = false
 
 [functions.shopify-api]
 verify_jwt = false
@@ -33,4 +36,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.send-order-confirmation]
+verify_jwt = false
+
+[functions.validate-discount-code]
 verify_jwt = false
