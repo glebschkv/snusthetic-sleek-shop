@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, ExternalLink } from 'lucide-react';
 import { ReferralCodeInput } from './ReferralCodeInput';
+import { DiscountCodeInput } from './DiscountCodeInput';
 
 interface CheckoutDialogProps {
   open: boolean;
@@ -23,6 +24,10 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
   const [loading, setLoading] = useState(false);
   const [appliedReferralCode, setAppliedReferralCode] = useState<string>('');
   const [referralDiscountPercent, setReferralDiscountPercent] = useState<number>(0);
+  const [appliedDiscountCode, setAppliedDiscountCode] = useState<string>('');
+  const [discountCodeType, setDiscountCodeType] = useState<string>('');
+  const [discountCodeValue, setDiscountCodeValue] = useState<number>(0);
+  const [discountCodeAmount, setDiscountCodeAmount] = useState<number>(0);
   
   const hasSubscriptions = items.some(item => item.is_subscription);
   const hasPhysical = items.some(item => !item.is_subscription);
@@ -31,10 +36,11 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
   const quantityDiscountPercent = getQuantityDiscount();
   const quantityDiscountAmount = getDiscountAmount();
   
-  // Apply quantity discount first, then referral discount on the discounted amount
+  // Apply quantity discount first, then referral or promo discount (mutually exclusive)
   const subtotalAfterQuantityDiscount = total - quantityDiscountAmount;
   const referralDiscountAmount = (subtotalAfterQuantityDiscount * referralDiscountPercent) / 100;
-  const finalTotal = subtotalAfterQuantityDiscount - referralDiscountAmount;
+  const promoDiscountAmount = appliedDiscountCode ? discountCodeAmount : 0;
+  const finalTotal = subtotalAfterQuantityDiscount - referralDiscountAmount - promoDiscountAmount;
   
   // Shipping costs (calculated at Stripe checkout based on address)
   const shippingEstimate = 'Calculated at checkout';
@@ -124,7 +130,9 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
         quantity_discount_percent: quantityDiscountPercent,
         quantity_discount_amount: convertPrice(quantityDiscountAmount),
         referral_code: appliedReferralCode || null,
-        referral_discount_amount: convertPrice(referralDiscountAmount)
+        referral_discount_amount: convertPrice(referralDiscountAmount),
+        discount_code: appliedDiscountCode || null,
+        discount_code_amount: convertPrice(promoDiscountAmount),
       }
     });
 
@@ -191,6 +199,14 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
                     <span>-{formatPrice(referralDiscountAmount)}</span>
                   </div>
                 )}
+                {appliedDiscountCode && (
+                  <div className="flex justify-between text-sm text-green-600 font-medium">
+                    <span>
+                      Promo: {appliedDiscountCode} ({discountCodeType === 'percentage' ? `${discountCodeValue}%` : `£${discountCodeValue}`})
+                    </span>
+                    <span>-{formatPrice(promoDiscountAmount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Shipping</span>
                   <span>{shippingEstimate}</span>
@@ -223,7 +239,7 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
 
           {/* Referral Code Input - only for physical products */}
           {!hasSubscriptions && (
-            <ReferralCodeInput 
+            <ReferralCodeInput
               onReferralApplied={(code, discount) => {
                 setAppliedReferralCode(code);
                 setReferralDiscountPercent(discount);
@@ -233,6 +249,29 @@ export default function CheckoutDialog({ open, onOpenChange }: CheckoutDialogPro
                 setReferralDiscountPercent(0);
               }}
               appliedCode={appliedReferralCode}
+            />
+          )}
+
+          {/* Discount Code Input - only for physical products, mutually exclusive with referral */}
+          {!hasSubscriptions && (
+            <DiscountCodeInput
+              orderTotal={subtotalAfterQuantityDiscount}
+              onDiscountApplied={(code, type, value, amount) => {
+                setAppliedDiscountCode(code);
+                setDiscountCodeType(type);
+                setDiscountCodeValue(value);
+                setDiscountCodeAmount(amount);
+              }}
+              onDiscountRemoved={() => {
+                setAppliedDiscountCode('');
+                setDiscountCodeType('');
+                setDiscountCodeValue(0);
+                setDiscountCodeAmount(0);
+              }}
+              appliedCode={appliedDiscountCode}
+              appliedDiscountType={discountCodeType}
+              appliedDiscountValue={discountCodeValue}
+              disabled={!!appliedReferralCode}
             />
           )}
 

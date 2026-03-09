@@ -157,6 +157,8 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
 
     const referralCode = session.metadata.referral_code;
     const discountAmount = session.metadata.discount_amount ? parseFloat(session.metadata.discount_amount) : 0;
+    const discountCode = session.metadata.discount_code;
+    const discountCodeAmount = session.metadata.discount_code_amount ? parseFloat(session.metadata.discount_code_amount) : 0;
 
     console.log('Items:', items);
     console.log('Referral code:', referralCode);
@@ -217,7 +219,8 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
       shipping_address: formattedAddress,
       referrer_id: referrerId,
       referral_code_used: referralCode,
-      discount_amount: discountAmount
+      discount_code_used: discountCode || null,
+      discount_amount: discountAmount + discountCodeAmount
     };
 
     console.log('Creating order with data:', orderData);
@@ -234,6 +237,22 @@ async function handleCheckoutSessionCompleted(event: CheckoutSessionCompletedEve
     }
 
     console.log('Order created successfully:', newOrder.id);
+
+    // Increment discount code usage if a promo code was used
+    if (discountCode) {
+      try {
+        const { error: rpcError } = await supabase.rpc('increment_discount_code_usage', {
+          p_code: discountCode,
+        });
+        if (rpcError) {
+          console.error('Error incrementing discount code usage:', rpcError);
+        } else {
+          console.log('Discount code usage incremented for:', discountCode);
+        }
+      } catch (error) {
+        console.error('Exception incrementing discount code usage:', error);
+      }
+    }
 
     // Send order confirmation email
     try {
