@@ -26,6 +26,8 @@ interface CheckoutRequest {
   quantity_discount_amount?: number;
   referral_code?: string;
   referral_discount_amount?: number;
+  discount_code?: string;
+  discount_code_amount?: number;
 }
 
 serve(async (req) => {
@@ -48,8 +50,10 @@ serve(async (req) => {
       cancel_url, 
       quantity_discount_percent,
       quantity_discount_amount,
-      referral_code, 
-      referral_discount_amount 
+      referral_code,
+      referral_discount_amount,
+      discount_code,
+      discount_code_amount,
     }: CheckoutRequest = await req.json();
 
     // Create line items for Stripe Checkout
@@ -275,10 +279,37 @@ serve(async (req) => {
       if (referralCouponResponse.ok) {
         const referralCoupon = await referralCouponResponse.json();
         sessionData.append(`discounts[${discountIndex}][coupon]`, referralCoupon.id);
-        
+        discountIndex++;
+
         // Store referral code in session metadata (more reliable for webhooks)
         sessionData.append('metadata[referral_code]', referral_code);
         sessionData.append('metadata[referral_discount_amount]', referral_discount_amount.toString());
+      }
+    }
+
+    // Create promo discount coupon if provided
+    if (discount_code && discount_code_amount && discount_code_amount > 0) {
+      const promoCouponResponse = await fetch('https://api.stripe.com/v1/coupons', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${stripeSecretKey}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          'amount_off': Math.round(discount_code_amount * 100).toString(),
+          'currency': currency.toLowerCase(),
+          'duration': 'once',
+          'name': `Promo Code - ${discount_code}`,
+        }),
+      });
+
+      if (promoCouponResponse.ok) {
+        const promoCoupon = await promoCouponResponse.json();
+        sessionData.append(`discounts[${discountIndex}][coupon]`, promoCoupon.id);
+        discountIndex++;
+
+        sessionData.append('metadata[discount_code]', discount_code);
+        sessionData.append('metadata[discount_code_amount]', discount_code_amount.toString());
       }
     }
 
